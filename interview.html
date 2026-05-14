@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>AI Mock Interview — APTIORA</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700;800&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{--gold:#f5c842;--purple:#7c3aed;--dark:#050508;--dark3:#13131f;--text:#ffffff;--text2:rgba(255,255,255,0.55);--border:rgba(255,255,255,0.08);}
+html,body{width:100%;min-height:100%;font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);overflow-x:hidden;}
+body::before{content:"";position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:0.4;}
+canvas{position:fixed;inset:0;z-index:1;pointer-events:none;}
+.orb{position:fixed;border-radius:50%;filter:blur(80px);pointer-events:none;z-index:1;}
+.orb1{width:500px;height:500px;background:radial-gradient(circle,rgba(124,58,237,0.15),transparent 70%);top:-100px;left:-100px;animation:f1 12s ease-in-out infinite;}
+.orb2{width:400px;height:400px;background:radial-gradient(circle,rgba(59,130,246,0.12),transparent 70%);bottom:-80px;right:-80px;animation:f2 10s ease-in-out infinite;}
+@keyframes f1{0%,100%{transform:translate(0,0);}50%{transform:translate(40px,40px);}}
+@keyframes f2{0%,100%{transform:translate(0,0);}50%{transform:translate(-30px,-30px);}}
+.navbar{position:fixed;top:0;left:0;right:0;z-index:100;padding:16px 32px;display:flex;align-items:center;justify-content:space-between;background:rgba(5,5,8,0.7);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);}
+.nav-logo{font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:800;letter-spacing:2px;background:linear-gradient(135deg,#fff 30%,var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.back-btn{background:rgba(255,255,255,0.07);border:1px solid var(--border);color:white;padding:8px 16px;border-radius:10px;cursor:pointer;font-size:13px;font-weight:600;font-family:'Inter',sans-serif;transition:all 0.2s;}
+.back-btn:hover{background:rgba(255,255,255,0.12);}
+.page{position:relative;z-index:10;padding:88px 20px 40px;max-width:800px;margin:0 auto;}
+
+/* SETUP CARD */
+.setup-card{background:rgba(13,13,20,0.9);backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,0.1);border-radius:24px;padding:36px;margin-bottom:20px;animation:fadeIn 0.6s ease;position:relative;overflow:hidden;}
+.setup-card::before{content:"";position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(124,58,237,0.5),transparent);}
+@keyframes fadeIn{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+.setup-title{font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;margin-bottom:6px;}
+.setup-sub{font-size:13px;color:var(--text2);margin-bottom:24px;line-height:1.6;}
+.setup-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px;}
+@media(max-width:500px){.setup-grid{grid-template-columns:1fr;}}
+.setup-label{font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;}
+.setup-select{width:100%;padding:11px 14px;background:rgba(255,255,255,0.06);border:1px solid var(--border);border-radius:10px;color:white;font-size:14px;font-family:'Inter',sans-serif;outline:none;cursor:pointer;}
+.setup-select:focus{border-color:rgba(124,58,237,0.5);}
+.setup-select option{background:#13131f;color:white;}
+.start-interview-btn{width:100%;padding:15px;border:none;border-radius:14px;background:linear-gradient(135deg,var(--purple),#6d28d9);color:white;font-size:16px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.3s;box-shadow:0 8px 24px rgba(124,58,237,0.35);}
+.start-interview-btn:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(124,58,237,0.45);}
+.start-interview-btn:disabled{opacity:0.5;cursor:not-allowed;transform:none;}
+
+/* INTERVIEW AREA */
+.interview-area{display:none;}
+.interview-header{background:rgba(13,13,20,0.9);border:1px solid rgba(124,58,237,0.2);border-radius:18px;padding:18px 22px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+.interviewer-info{display:flex;align-items:center;gap:12px;}
+.interviewer-avatar{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--purple),#6d28d9);display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 4px 14px rgba(124,58,237,0.4);}
+.interviewer-name{font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:700;}
+.interviewer-sub{font-size:12px;color:var(--text2);}
+.interview-meta{display:flex;gap:8px;flex-wrap:wrap;}
+.meta-tag{background:rgba(255,255,255,0.06);border:1px solid var(--border);padding:5px 12px;border-radius:20px;font-size:12px;color:var(--text2);}
+.meta-tag.live{border-color:rgba(34,197,94,0.3);color:#86efac;background:rgba(34,197,94,0.08);}
+.q-progress{display:flex;align-items:center;gap:10px;margin-bottom:16px;}
+.q-dots{display:flex;gap:6px;}
+.q-dot{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,0.15);transition:all 0.3s;}
+.q-dot.done{background:#86efac;}
+.q-dot.active{background:var(--purple);box-shadow:0 0 8px rgba(124,58,237,0.5);}
+.q-count{font-size:13px;color:var(--text2);margin-left:4px;}
+
+/* QUESTION CARD */
+.q-card{background:rgba(13,13,20,0.9);border:1px solid var(--border);border-radius:18px;padding:26px;margin-bottom:16px;position:relative;overflow:hidden;}
+.q-card::before{content:"";position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(124,58,237,0.3),transparent);}
+.q-from{font-size:11px;color:var(--text2);margin-bottom:10px;font-weight:600;text-transform:uppercase;letter-spacing:1px;display:flex;align-items:center;gap:6px;}
+.q-from span{color:#a78bfa;}
+.q-text{font-size:17px;font-weight:600;line-height:1.55;color:white;}
+.q-topic-badge{display:inline-block;background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.3);color:#a78bfa;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;margin-top:12px;}
+.typing-indicator{display:flex;gap:5px;align-items:center;padding:16px 22px;background:rgba(124,58,237,0.06);border:1px solid rgba(124,58,237,0.15);border-radius:14px;margin-bottom:14px;}
+.typing-indicator span{font-size:12px;color:var(--text2);margin-right:4px;}
+.tdot{width:7px;height:7px;border-radius:50%;background:#a78bfa;animation:tdot 1.2s infinite;}
+.tdot:nth-child(3){animation-delay:0.2s;}.tdot:nth-child(4){animation-delay:0.4s;}
+@keyframes tdot{0%,80%,100%{transform:scale(0.6);opacity:0.4;}40%{transform:scale(1);opacity:1;}}
+
+/* ANSWER AREA */
+.ans-label{font-size:12px;color:var(--text2);margin-bottom:8px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;}
+.ans-textarea{width:100%;background:rgba(255,255,255,0.05);border:1.5px solid var(--border);color:white;padding:14px 16px;border-radius:14px;font-size:14px;font-family:'Inter',sans-serif;outline:none;resize:vertical;min-height:100px;line-height:1.6;transition:border-color 0.2s;}
+.ans-textarea:focus{border-color:rgba(124,58,237,0.5);background:rgba(124,58,237,0.04);}
+.ans-actions{display:flex;gap:10px;margin-top:10px;flex-wrap:wrap;}
+.submit-ans-btn{padding:12px 28px;border:none;border-radius:12px;background:linear-gradient(135deg,var(--purple),#6d28d9);color:white;font-size:14px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.3s;box-shadow:0 4px 14px rgba(124,58,237,0.35);}
+.submit-ans-btn:hover{transform:translateY(-2px);}
+.submit-ans-btn:disabled{opacity:0.5;cursor:not-allowed;transform:none;}
+.skip-btn{padding:12px 20px;background:rgba(255,255,255,0.07);border:1px solid var(--border);color:var(--text2);border-radius:12px;cursor:pointer;font-size:13px;font-weight:600;font-family:'Inter',sans-serif;transition:all 0.2s;}
+.skip-btn:hover{background:rgba(255,255,255,0.1);}
+
+/* FEEDBACK */
+.feedback-card{background:rgba(124,58,237,0.08);border:1px solid rgba(124,58,237,0.2);border-radius:16px;padding:20px 22px;margin-bottom:16px;display:none;}
+.feedback-header{font-size:12px;font-weight:700;color:#a78bfa;margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+.feedback-text{font-size:14px;line-height:1.7;color:rgba(255,255,255,0.85);}
+.score-indicator{display:flex;align-items:center;gap:10px;margin-top:12px;}
+.score-label{font-size:12px;color:var(--text2);}
+.score-stars{font-size:18px;}
+.next-q-btn{padding:11px 24px;border:none;border-radius:12px;background:rgba(34,197,94,0.12);border:1px solid rgba(34,197,94,0.3);color:#86efac;font-size:14px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.2s;margin-top:12px;}
+.next-q-btn:hover{background:rgba(34,197,94,0.2);}
+
+/* FINAL REPORT */
+.final-report{display:none;background:rgba(13,13,20,0.95);border:1px solid rgba(255,255,255,0.1);border-radius:24px;padding:36px;text-align:center;animation:fadeIn 0.6s ease;}
+.final-icon{font-size:64px;margin-bottom:16px;}
+.final-title{font-family:'Space Grotesk',sans-serif;font-size:26px;font-weight:700;margin-bottom:8px;}
+.final-sub{font-size:14px;color:var(--text2);margin-bottom:24px;}
+.final-stats{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:24px;}
+.fstat{background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:14px;padding:14px 22px;text-align:center;}
+.fstat-num{font-family:'Space Grotesk',sans-serif;font-size:24px;font-weight:700;}
+.fstat-lbl{font-size:11px;color:var(--text2);margin-top:2px;}
+.overall-feedback{background:rgba(124,58,237,0.08);border:1px solid rgba(124,58,237,0.2);border-radius:16px;padding:20px;text-align:left;margin-bottom:20px;}
+.overall-feedback-lbl{font-size:12px;font-weight:700;color:#a78bfa;margin-bottom:8px;}
+.overall-feedback-txt{font-size:14px;line-height:1.7;color:rgba(255,255,255,0.85);}
+.final-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
+.final-btn{padding:13px 24px;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.3s;}
+.btn-restart{background:linear-gradient(135deg,var(--purple),#6d28d9);color:white;}
+.btn-dashboard{background:rgba(255,255,255,0.08);border:1px solid var(--border);color:white;}
+
+body.light-mode{background:#f0f2f7!important;color:#1a1a2e!important;}
+body.light-mode .navbar{background:rgba(240,242,247,0.85)!important;border-bottom-color:rgba(0,0,0,0.08)!important;}
+body.light-mode .back-btn{background:rgba(0,0,0,0.05)!important;border-color:rgba(0,0,0,0.1)!important;color:#1a1a2e!important;}
+body.light-mode .setup-card,.light-mode .q-card,.light-mode .interview-header,.light-mode .final-report{background:rgba(255,255,255,0.92)!important;border-color:rgba(0,0,0,0.08)!important;}
+body.light-mode .setup-select{background:rgba(0,0,0,0.04)!important;border-color:rgba(0,0,0,0.1)!important;color:#1a1a2e!important;}
+body.light-mode .ans-textarea{background:rgba(0,0,0,0.04)!important;border-color:rgba(0,0,0,0.1)!important;color:#1a1a2e!important;}
+body.light-mode .q-text{color:#1a1a2e!important;}
+body.light-mode .setup-title,.light-mode .final-title,.light-mode .interviewer-name{color:#1a1a2e!important;}
+body.light-mode canvas{opacity:0.2!important;}
+</style>
+</head>
+<body>
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+<canvas id="c"></canvas>
+<nav class="navbar">
+  <div class="nav-logo">🎤 Mock Interview</div>
+  <button class="back-btn" onclick="location.href='dashboard.html'">⬅ Dashboard</button>
+</nav>
+<div class="page">
+
+  <!-- SETUP -->
+  <div class="setup-card" id="setupCard">
+    <div class="setup-title">🤖 AI Mock Interview</div>
+    <div class="setup-sub">Claude will act as an interviewer and ask you aptitude questions verbally. Answer in your own words — get real-time feedback and a final performance report. Perfect for placement prep!</div>
+    <div class="setup-grid">
+      <div>
+        <div class="setup-label">Topic</div>
+        <select class="setup-select" id="topicSel">
+          <option value="mixed">🔀 Mixed (All Topics)</option>
+          <option value="Verbal Ability">📖 Verbal Ability</option>
+          <option value="Algebra">🔢 Algebra</option>
+          <option value="Series & Sequence">📈 Series & Sequence</option>
+        </select>
+      </div>
+      <div>
+        <div class="setup-label">Number of Questions</div>
+        <select class="setup-select" id="numQSel">
+          <option value="5">5 Questions (~8 min)</option>
+          <option value="8" selected>8 Questions (~12 min)</option>
+          <option value="10">10 Questions (~15 min)</option>
+        </select>
+      </div>
+      <div>
+        <div class="setup-label">Difficulty</div>
+        <select class="setup-select" id="diffSel">
+          <option value="easy">😊 Easy</option>
+          <option value="medium" selected>🧠 Medium</option>
+          <option value="hard">🔥 Hard</option>
+        </select>
+      </div>
+      <div>
+        <div class="setup-label">Interviewer Style</div>
+        <select class="setup-select" id="styleSel">
+          <option value="friendly">😊 Friendly & Encouraging</option>
+          <option value="professional" selected>💼 Professional</option>
+          <option value="strict">🎯 Strict & Challenging</option>
+        </select>
+      </div>
+    </div>
+    <button class="start-interview-btn" onclick="startInterview()" id="startBtn">🚀 Start Interview</button>
+  </div>
+
+  <!-- INTERVIEW -->
+  <div class="interview-area" id="interviewArea">
+    <div class="interview-header">
+      <div class="interviewer-info">
+        <div class="interviewer-avatar">🤖</div>
+        <div>
+          <div class="interviewer-name">AI Interviewer</div>
+          <div class="interviewer-sub">APTIORA Placement Prep</div>
+        </div>
+      </div>
+      <div class="interview-meta">
+        <div class="meta-tag live">🟢 Live</div>
+        <div class="meta-tag" id="metaTopic">Mixed</div>
+        <div class="meta-tag" id="metaDiff">Medium</div>
+      </div>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+      <div class="q-dots" id="qDots"></div>
+      <div class="q-count" id="qCountTxt"></div>
+    </div>
+
+    <div class="typing-indicator" id="typingIndicator" style="display:none;">
+      <span>Interviewer is typing</span>
+      <div class="tdot"></div><div class="tdot"></div><div class="tdot"></div>
+    </div>
+
+    <div class="q-card" id="qCard" style="display:none;">
+      <div class="q-from">🤖 <span>AI Interviewer</span> asks:</div>
+      <div class="q-text" id="qText"></div>
+      <div class="q-topic-badge" id="qTopicBadge"></div>
+    </div>
+
+    <div id="ansSection" style="display:none;">
+      <div class="ans-label">Your Answer</div>
+      <textarea class="ans-textarea" id="ansInput" placeholder="Type your answer here... Take your time, think it through."></textarea>
+      <div class="ans-actions">
+        <button class="submit-ans-btn" onclick="submitAnswer()" id="submitBtn">✅ Submit Answer</button>
+        <button class="skip-btn" onclick="skipQuestion()">⏭ Skip</button>
+      </div>
+    </div>
+
+    <div class="feedback-card" id="feedbackCard">
+      <div class="feedback-header">💬 Interviewer Feedback</div>
+      <div class="feedback-text" id="feedbackText"></div>
+      <div class="score-indicator">
+        <span class="score-label">Rating:</span>
+        <span class="score-stars" id="scoreStars"></span>
+      </div>
+      <button class="next-q-btn" onclick="nextQuestion()" id="nextQBtn">Next Question ▶</button>
+    </div>
+  </div>
+
+  <!-- FINAL REPORT -->
+  <div class="final-report" id="finalReport">
+    <div class="final-icon">🎓</div>
+    <div class="final-title">Interview Complete!</div>
+    <div class="final-sub" id="finalSub"></div>
+    <div class="final-stats" id="finalStats"></div>
+    <div class="overall-feedback" id="overallFeedback" style="display:none;">
+      <div class="overall-feedback-lbl">🤖 Overall Performance Review</div>
+      <div class="overall-feedback-txt" id="overallFeedbackTxt"></div>
+    </div>
+    <div class="final-btns">
+      <button class="final-btn btn-restart" onclick="restartInterview()">🔄 New Interview</button>
+      <button class="final-btn btn-dashboard" onclick="location.href='dashboard.html'">🏠 Dashboard</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){let m=localStorage.getItem('darkMode')||(window.matchMedia&&window.matchMedia('(prefers-color-scheme:light)').matches?'light':'dark');if(m==='light')document.body.classList.add('light-mode');})();
+let reg=localStorage.getItem("username")||"guest";
+function getUsers(){return JSON.parse(localStorage.getItem("users"))||{"714524205005":{name:"Balaji"},"714524205053":{name:"Vicky"},"714524205027":{name:"Ismail"},"714524205041":{name:"Sakthivel"}};}
+let name=(getUsers()[reg]||{}).name||"Student";
+
+let questions=[],currentQ=0,totalQ=8,ratings=[],skipped=0;
+let topic="mixed",difficulty="medium",style="professional";
+
+async function startInterview(){
+  topic=document.getElementById("topicSel").value;
+  totalQ=parseInt(document.getElementById("numQSel").value);
+  difficulty=document.getElementById("diffSel").value;
+  style=document.getElementById("styleSel").value;
+  document.getElementById("startBtn").disabled=true;
+  document.getElementById("startBtn").innerText="Generating questions...";
+
+  // Generate all questions upfront
+  try{
+    let topicLine=topic==="mixed"?"Mix equally from: Verbal Ability, Algebra, Series & Sequence":topic;
+    let prompt=`You are an interviewer preparing ${totalQ} aptitude interview questions for a B.Tech student named ${name}.
+Topic: ${topicLine}
+Difficulty: ${difficulty}
+Style: ${style} interviewer
+
+Generate exactly ${totalQ} questions. Return ONLY a JSON array:
+[{"q":"question text","topic":"Verbal Ability","hint":"brief hint for evaluating answer","ideal":"ideal answer in 1 sentence"},...]
+
+Make them feel like real interview questions — conversational, not just MCQ format.`;
+    let resp=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:1200,messages:[{role:"user",content:prompt}]})});
+    let data=await resp.json();
+    let raw=(data.content&&data.content[0]&&data.content[0].text)||"[]";
+    questions=JSON.parse(raw.replace(/```json|```/g,"").trim());
+  }catch(e){
+    // Fallback questions
+    questions=[{q:"Can you explain what a geometric progression is and give an example?",topic:"Series & Sequence",hint:"Check if they mention common ratio",ideal:"GP is a sequence where each term is multiplied by a fixed ratio. E.g., 2,6,18,54 with r=3."},{q:"What is the synonym of 'Diligent' and use it in a sentence?",topic:"Verbal Ability",hint:"Hardworking/industrious",ideal:"Diligent means hardworking. E.g., She was diligent in her studies."},{q:"Solve: if x + 5 = 12, what is x?",topic:"Algebra",hint:"Simple linear equation",ideal:"x = 7"},{q:"What comes next in: 2, 4, 8, 16, ?",topic:"Series & Sequence",hint:"Pattern is ×2",ideal:"32, because each term doubles."},{q:"What is the antonym of 'Ancient'?",topic:"Verbal Ability",hint:"Modern/Contemporary",ideal:"Modern or Contemporary."},{q:"If 3x = 21, find x.",topic:"Algebra",hint:"Divide both sides by 3",ideal:"x = 7"},{q:"Complete the series: 1, 4, 9, 16, ?",topic:"Series & Sequence",hint:"Perfect squares",ideal:"25 — these are 1², 2², 3², 4², 5²."},{q:"What does the word 'Benevolent' mean?",topic:"Verbal Ability",hint:"Kind/charitable",ideal:"Benevolent means kind and generous."}].slice(0,totalQ);
+  }
+
+  // Setup UI
+  document.getElementById("metaTopic").innerText=topic==="mixed"?"🔀 Mixed":topic;
+  document.getElementById("metaDiff").innerText=difficulty==="easy"?"😊 Easy":difficulty==="hard"?"🔥 Hard":"🧠 Medium";
+  document.getElementById("setupCard").style.display="none";
+  document.getElementById("interviewArea").style.display="block";
+  buildDots();
+  showQuestion(0);
+}
+
+function buildDots(){
+  let html="";for(let i=0;i<questions.length;i++)html+=`<div class="q-dot" id="dot_${i}"></div>`;
+  document.getElementById("qDots").innerHTML=html;
+  updateDots();
+}
+function updateDots(){
+  questions.forEach((_,i)=>{let d=document.getElementById("dot_"+i);if(d){d.className="q-dot"+(i<currentQ?" done":i===currentQ?" active":"");}});
+  document.getElementById("qCountTxt").innerText=`Question ${currentQ+1} of ${questions.length}`;
+}
+
+function showQuestion(idx){
+  let q=questions[idx];if(!q)return showFinalReport();
+  updateDots();
+  // Typing indicator
+  document.getElementById("typingIndicator").style.display="flex";
+  document.getElementById("qCard").style.display="none";
+  document.getElementById("ansSection").style.display="none";
+  document.getElementById("feedbackCard").style.display="none";
+  setTimeout(()=>{
+    document.getElementById("typingIndicator").style.display="none";
+    document.getElementById("qText").innerText=q.q;
+    document.getElementById("qTopicBadge").innerText=q.topic||topic;
+    document.getElementById("qCard").style.display="block";
+    document.getElementById("ansSection").style.display="block";
+    document.getElementById("ansInput").value="";
+    document.getElementById("ansInput").focus();
+    document.getElementById("submitBtn").disabled=false;
+  },1200+Math.random()*800);
+}
+
+async function submitAnswer(){
+  let ans=document.getElementById("ansInput").value.trim();
+  if(!ans){alert("Please type your answer first!");return;}
+  document.getElementById("submitBtn").disabled=true;
+  document.getElementById("submitBtn").innerText="Evaluating...";
+  let q=questions[currentQ];
+  try{
+    let stylePrompt=style==="strict"?"Be critical and challenging — point out gaps clearly.":style==="friendly"?"Be warm and encouraging — highlight positives.":"Be professional and balanced.";
+    let prompt=`You are an aptitude interviewer. ${stylePrompt}
+Question: "${q.q}"
+Ideal answer: "${q.ideal||"correct aptitude answer"}"
+Student answered: "${ans}"
+
+Give SHORT feedback (2-3 sentences): was the answer correct? What was good/missing? Rate 1-5 stars.
+Return ONLY JSON: {"feedback":"...","stars":3}`;
+    let resp=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:200,messages:[{role:"user",content:prompt}]})});
+    let data=await resp.json();
+    let raw=(data.content&&data.content[0]&&data.content[0].text)||'{"feedback":"Good attempt!","stars":3}';
+    let result=JSON.parse(raw.replace(/```json|```/g,"").trim());
+    ratings.push({q:q.q,ans,stars:result.stars,feedback:result.feedback});
+    document.getElementById("feedbackText").innerText=result.feedback;
+    document.getElementById("scoreStars").innerText="★".repeat(result.stars)+"☆".repeat(5-result.stars);
+    document.getElementById("feedbackCard").style.display="block";
+    document.getElementById("nextQBtn").innerText=currentQ===questions.length-1?"🎓 Finish Interview":"Next Question ▶";
+  }catch(e){
+    ratings.push({q:q.q,ans,stars:3,feedback:"Good effort! Keep practicing."});
+    document.getElementById("feedbackText").innerText="Good effort! Keep practicing.";
+    document.getElementById("scoreStars").innerText="★★★☆☆";
+    document.getElementById("feedbackCard").style.display="block";
+  }
+  document.getElementById("submitBtn").innerText="✅ Submit Answer";
+}
+
+function skipQuestion(){
+  ratings.push({q:questions[currentQ].q,ans:"[Skipped]",stars:0,feedback:"Question skipped."});
+  skipped++;
+  currentQ++;showQuestion(currentQ);
+}
+
+function nextQuestion(){
+  currentQ++;
+  if(currentQ>=questions.length){showFinalReport();return;}
+  showQuestion(currentQ);
+  document.getElementById("feedbackCard").style.display="none";
+}
+
+async function showFinalReport(){
+  document.getElementById("interviewArea").style.display="none";
+  document.getElementById("finalReport").style.display="block";
+  let answered=ratings.filter(r=>r.ans!=="[Skipped]").length;
+  let totalStars=ratings.reduce((s,r)=>s+r.stars,0);
+  let avgStars=answered>0?Math.round(totalStars/answered):0;
+  let pct=Math.round((totalStars/(answered*5))*100)||0;
+  document.getElementById("finalSub").innerText=`Great job, ${name}! Here's how you performed.`;
+  document.getElementById("finalStats").innerHTML=`
+    <div class="fstat"><div class="fstat-num">${answered}</div><div class="fstat-lbl">Answered</div></div>
+    <div class="fstat"><div class="fstat-num" style="color:#fca5a5;">${skipped}</div><div class="fstat-lbl">Skipped</div></div>
+    <div class="fstat"><div class="fstat-num" style="color:#f5c842;">${"★".repeat(avgStars)}</div><div class="fstat-lbl">Avg Rating</div></div>
+    <div class="fstat"><div class="fstat-num" style="color:${pct>=70?'#86efac':'#fca5a5'}">${pct}%</div><div class="fstat-lbl">Performance</div></div>`;
+  // Overall AI feedback
+  try{
+    let summary=ratings.filter(r=>r.ans!=="[Skipped]").map((r,i)=>`Q${i+1}: "${r.q}" — ${r.stars}/5 stars`).join("\n");
+    let resp=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:200,messages:[{role:"user",content:`Write a 3-sentence overall performance review for ${name} who completed an aptitude mock interview. Results:\n${summary}\n\nBe specific about strengths and what to improve. Encouraging tone.`}]})});
+    let data=await resp.json();
+    let txt=(data.content&&data.content[0]&&data.content[0].text)||"Good effort!";
+    document.getElementById("overallFeedback").style.display="block";
+    document.getElementById("overallFeedbackTxt").innerText=txt;
+  }catch(e){document.getElementById("overallFeedback").style.display="none";}
+  // Save to history
+  let hist=JSON.parse(localStorage.getItem("mockInterviewHistory_"+reg))||[];
+  hist.push({date:new Date().toLocaleDateString("en-IN"),answered,skipped,avgStars,pct});
+  localStorage.setItem("mockInterviewHistory_"+reg,JSON.stringify(hist));
+}
+
+function restartInterview(){
+  questions=[];currentQ=0;ratings=[];skipped=0;
+  document.getElementById("finalReport").style.display="none";
+  document.getElementById("setupCard").style.display="block";
+  document.getElementById("startBtn").disabled=false;
+  document.getElementById("startBtn").innerText="🚀 Start Interview";
+}
+
+const cv=document.getElementById("c"),ctx=cv.getContext("2d");
+let W=cv.width=innerWidth,H=cv.height=innerHeight;
+class P{constructor(){this.reset();}reset(){this.x=Math.random()*W;this.y=Math.random()*H;this.r=Math.random()*1.5+0.3;this.dx=(Math.random()-.5)*.35;this.dy=(Math.random()-.5)*.35;this.a=Math.random()*.5+0.1;}draw(){ctx.beginPath();ctx.arc(this.x,this.y,this.r,0,Math.PI*2);ctx.fillStyle=`rgba(255,255,255,${this.a})`;ctx.fill();}update(){this.x+=this.dx;this.y+=this.dy;if(this.x<0||this.x>W||this.y<0||this.y>H)this.reset();this.draw();}}
+const pts=Array.from({length:60},()=>new P());
+function draw(){ctx.clearRect(0,0,W,H);pts.forEach(p=>p.update());for(let i=0;i<pts.length;i++)for(let j=i+1;j<pts.length;j++){let d=Math.hypot(pts[i].x-pts[j].x,pts[i].y-pts[j].y);if(d<120){ctx.beginPath();ctx.strokeStyle=`rgba(124,58,237,${(1-d/120)*0.12})`;ctx.lineWidth=0.8;ctx.moveTo(pts[i].x,pts[i].y);ctx.lineTo(pts[j].x,pts[j].y);ctx.stroke();}}requestAnimationFrame(draw);}
+draw();addEventListener("resize",()=>{W=cv.width=innerWidth;H=cv.height=innerHeight;});
+</script>
+</body>
+</html>
