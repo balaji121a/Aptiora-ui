@@ -1,0 +1,1689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>APTIORA — Admin Panel</title>
+<script>
+// Firebase integration (optional - works without it too)
+(async function(){
+  try{
+    const m=await import("./firebase-config.js");
+    const db=m.db;
+    const {collection,doc,setDoc,deleteDoc,onSnapshot,getDocs,serverTimestamp}=await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+    window._db2=db;window._fb2={collection,doc,setDoc,deleteDoc,onSnapshot,getDocs,serverTimestamp};
+    onSnapshot(collection(db,"leaderboard"),snap=>{let b=[];snap.forEach(d=>b.push({...d.data(),_id:d.id}));localStorage.setItem("leaderboard",JSON.stringify(b));if(typeof renderLeaderboard!=="undefined")setTimeout(renderLeaderboard,100);});
+    onSnapshot(collection(db,"users"),snap=>{let u={};snap.forEach(d=>{u[d.id]=d.data();});if(Object.keys(u).length>0)localStorage.setItem("users",JSON.stringify(u));});
+  }catch(e){console.log("Firebase not configured — using localStorage only");}
+})();
+</script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700;800&display=swap');
+
+:root{
+  --bg:#050508;
+  --sidebar:#0a0a12;
+  --sidebar-hover:#13131f;
+  --card:#0d0d14;
+  --text:#ffffff;
+  --text2:rgba(255,255,255,0.55);
+  --accent:#7c3aed;
+  --accent2:#3b82f6;
+  --success:#22c55e;
+  --danger:#ef4444;
+  --warning:#f59e0b;
+  --border:rgba(255,255,255,0.08);
+  --shadow:0 4px 24px rgba(0,0,0,0.4);
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;transition:background 0.3s,color 0.3s;}
+body::before{content:"";position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:0.4;}
+
+/* ===== SIDEBAR ===== */
+.sidebar{
+  width:260px;min-height:100vh;
+  background:var(--sidebar);
+  color:white;
+  display:flex;flex-direction:column;
+  position:fixed;top:0;left:0;bottom:0;
+  z-index:100;transition:width 0.3s;
+  overflow:hidden;
+}
+.sidebar-logo{
+  padding:28px 20px 20px;
+  border-bottom:1px solid rgba(255,255,255,0.1);
+}
+.sidebar-logo h1{font-size:22px;font-weight:800;letter-spacing:3px;font-family:'Space Grotesk',sans-serif;background:linear-gradient(135deg,#fff 30%,#f5c842);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.sidebar-logo p{font-size:11px;color:rgba(255,255,255,0.5);margin-top:2px;}
+
+.nav-section{padding:12px 0;}
+.nav-label{font-size:10px;font-weight:600;color:rgba(255,255,255,0.35);letter-spacing:1.5px;padding:8px 20px 4px;text-transform:uppercase;}
+
+.nav-item{
+  display:flex;align-items:center;gap:12px;
+  padding:12px 20px;cursor:pointer;
+  transition:background 0.2s,border-left 0.2s;
+  border-left:3px solid transparent;
+  font-size:14px;color:rgba(255,255,255,0.75);
+}
+.nav-item:hover{background:var(--sidebar-hover);color:white;}
+.nav-item.active{background:var(--sidebar-hover);border-left-color:#6366f1;color:white;font-weight:600;}
+.nav-item .icon{font-size:18px;width:24px;text-align:center;}
+
+.sidebar-footer{
+  margin-top:auto;padding:16px 20px;
+  border-top:1px solid rgba(255,255,255,0.1);
+  font-size:12px;color:rgba(255,255,255,0.4);
+}
+
+/* ===== MAIN ===== */
+.main{margin-left:260px;flex:1;min-height:100vh;display:flex;flex-direction:column;}
+
+/* TOPBAR */
+.topbar{
+  background:var(--card);
+  padding:16px 28px;
+  display:flex;align-items:center;justify-content:space-between;
+  box-shadow:0 1px 0 var(--border);
+  position:sticky;top:0;z-index:50;
+}
+.topbar-title{font-size:20px;font-weight:700;}
+.topbar-right{display:flex;align-items:center;gap:14px;}
+.dark-toggle{
+  background:var(--accent);color:white;
+  border:none;padding:7px 14px;border-radius:20px;
+  cursor:pointer;font-size:13px;font-weight:600;
+  transition:0.3s;
+}
+.admin-badge{
+  background:linear-gradient(135deg,#6366f1,#8b5cf6);
+  color:white;padding:6px 14px;border-radius:20px;
+  font-size:12px;font-weight:700;letter-spacing:1px;
+}
+.logout-btn{
+  background:var(--danger);color:white;border:none;
+  padding:7px 14px;border-radius:8px;cursor:pointer;
+  font-size:13px;font-weight:600;transition:0.3s;
+}
+.logout-btn:hover{opacity:0.85;}
+
+/* CONTENT */
+.content{padding:28px;flex:1;}
+
+/* SECTIONS */
+.section{display:none;}
+.section.active{display:block;animation:fadeIn 0.4s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+
+/* STATS GRID */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px;margin-bottom:28px;}
+.stat-card{
+  background:var(--card);border-radius:16px;padding:22px;
+  box-shadow:var(--shadow);display:flex;align-items:center;gap:16px;
+  border:1px solid var(--border);transition:transform 0.2s;
+}
+.stat-card:hover{transform:translateY(-3px);}
+.stat-icon{
+  width:52px;height:52px;border-radius:14px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:24px;flex-shrink:0;
+}
+.stat-info h3{font-size:26px;font-weight:800;}
+.stat-info p{font-size:12px;color:var(--text2);margin-top:2px;}
+
+/* CARD */
+.card{
+  background:var(--card);border-radius:16px;
+  padding:24px;box-shadow:var(--shadow);
+  border:1px solid var(--border);margin-bottom:24px;
+}
+.card-header{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:20px;padding-bottom:16px;
+  border-bottom:1px solid var(--border);
+}
+.card-title{font-size:16px;font-weight:700;}
+
+/* TABLES */
+table{width:100%;border-collapse:collapse;}
+th{
+  text-align:left;padding:12px 14px;
+  font-size:12px;font-weight:600;
+  color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;
+  border-bottom:2px solid var(--border);
+}
+td{
+  padding:13px 14px;font-size:14px;
+  border-bottom:1px solid var(--border);
+}
+tr:last-child td{border-bottom:none;}
+tbody tr:hover{background:rgba(99,102,241,0.04);}
+
+/* BUTTONS */
+.btn{
+  padding:8px 16px;border:none;border-radius:8px;
+  cursor:pointer;font-size:13px;font-weight:600;
+  font-family:'Poppins',sans-serif;transition:0.2s;
+}
+.btn:hover{opacity:0.88;transform:translateY(-1px);}
+.btn-primary{background:var(--accent);color:white;}
+.btn-success{background:var(--success);color:white;}
+.btn-danger{background:var(--danger);color:white;}
+.btn-warning{background:var(--warning);color:white;}
+.btn-sm{padding:5px 12px;font-size:12px;}
+.btn-outline{background:transparent;border:1.5px solid var(--accent);color:var(--accent);}
+
+/* BADGES */
+.badge{
+  padding:3px 10px;border-radius:20px;
+  font-size:11px;font-weight:600;
+}
+.badge-green{background:#dcfce7;color:#16a34a;}
+.badge-blue{background:#dbeafe;color:#1d4ed8;}
+.badge-red{background:#fee2e2;color:#dc2626;}
+.badge-yellow{background:#fef9c3;color:#b45309;}
+
+/* FORMS */
+.form-group{margin-bottom:16px;}
+.form-label{font-size:13px;font-weight:600;margin-bottom:6px;display:block;color:var(--text2);}
+.form-input{
+  width:100%;padding:10px 14px;border:1.5px solid var(--border);
+  border-radius:8px;font-size:14px;font-family:'Poppins',sans-serif;
+  background:var(--card);color:var(--text);
+  transition:border 0.2s;outline:none;
+}
+.form-input:focus{border-color:var(--accent);}
+select.form-input{cursor:pointer;}
+
+/* GRID 2 */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+
+/* NOTIFICATION */
+.notif{
+  position:fixed;top:20px;right:20px;
+  background:#1e293b;color:white;
+  padding:14px 20px;border-radius:12px;
+  font-size:14px;font-weight:500;z-index:9999;
+  transform:translateX(120%);transition:0.4s;
+  box-shadow:0 8px 24px rgba(0,0,0,0.3);
+  display:flex;align-items:center;gap:10px;
+  max-width:320px;
+}
+.notif.show{transform:translateX(0);}
+.notif.success{border-left:4px solid var(--success);}
+.notif.error{border-left:4px solid var(--danger);}
+.notif.info{border-left:4px solid var(--accent2);}
+
+/* MODAL */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,0.5);
+  z-index:200;display:none;align-items:center;justify-content:center;
+  backdrop-filter:blur(4px);
+}
+.modal-overlay.show{display:flex;}
+.modal{
+  background:var(--card);border-radius:20px;
+  padding:28px;width:90%;max-width:520px;
+  box-shadow:0 20px 60px rgba(0,0,0,0.3);
+  animation:modalIn 0.3s ease;
+}
+@keyframes modalIn{from{transform:scale(0.9);opacity:0;}to{transform:scale(1);opacity:1;}}
+.modal-header{
+  display:flex;justify-content:space-between;align-items:center;
+  margin-bottom:20px;
+}
+.modal-title{font-size:18px;font-weight:700;}
+.modal-close{
+  width:32px;height:32px;border-radius:50%;
+  background:var(--border);border:none;cursor:pointer;
+  font-size:16px;display:flex;align-items:center;justify-content:center;
+  color:var(--text2);transition:0.2s;
+}
+.modal-close:hover{background:var(--danger);color:white;}
+
+/* ANSWER OPTION ROW */
+.option-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.option-row input[type="text"]{flex:1;}
+.correct-radio{accent-color:var(--success);width:16px;height:16px;cursor:pointer;}
+
+/* PERFORMANCE TOP 3 */
+.podium{display:flex;align-items:flex-end;justify-content:center;gap:16px;margin:20px 0;}
+.podium-item{
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+}
+.podium-avatar{
+  width:56px;height:56px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;font-weight:800;color:white;
+}
+.podium-block{
+  width:90px;border-radius:12px 12px 0 0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:24px;
+}
+.podium-name{font-size:13px;font-weight:600;text-align:center;}
+.podium-score{font-size:12px;color:var(--text2);}
+
+/* ACTIVITY LOG */
+.activity-item{
+  display:flex;align-items:flex-start;gap:12px;
+  padding:12px 0;border-bottom:1px solid var(--border);
+}
+.activity-item:last-child{border-bottom:none;}
+.activity-dot{
+  width:10px;height:10px;border-radius:50%;
+  flex-shrink:0;margin-top:5px;
+}
+.activity-text{font-size:13px;}
+.activity-time{font-size:11px;color:var(--text2);margin-top:2px;}
+
+/* SETTINGS ROW */
+.setting-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 0;border-bottom:1px solid var(--border);
+}
+.setting-row:last-child{border-bottom:none;}
+.setting-info h4{font-size:14px;font-weight:600;}
+.setting-info p{font-size:12px;color:var(--text2);margin-top:2px;}
+
+/* TOGGLE SWITCH */
+.toggle-sw{position:relative;width:48px;height:26px;}
+.toggle-sw input{opacity:0;width:0;height:0;}
+.toggle-sw .slider{
+  position:absolute;inset:0;background:#ccc;
+  border-radius:26px;cursor:pointer;transition:0.3s;
+}
+.toggle-sw input:checked + .slider{background:var(--success);}
+.toggle-sw .slider:before{
+  content:"";position:absolute;width:20px;height:20px;
+  border-radius:50%;background:white;bottom:3px;left:3px;transition:0.3s;
+}
+.toggle-sw input:checked + .slider:before{transform:translateX(22px);}
+
+/* WEAK AREA BAR */
+.weak-bar{height:8px;border-radius:4px;background:#e2e8f0;margin-top:4px;}
+.weak-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,#6366f1,#8b5cf6);}
+
+/* LOGIN OVERLAY */
+#loginOverlay{
+  position:fixed;inset:0;
+  background:linear-gradient(-45deg,#667eea,#764ba2,#6366f1,#2193b0);
+  background-size:400% 400%;
+  animation:bg 8s infinite;
+  z-index:999;display:flex;align-items:center;justify-content:center;
+}
+@keyframes bg{0%{background-position:0% 50%;}50%{background-position:100% 50%;}100%{background-position:0% 50%;}}
+.login-card{
+  background:rgba(255,255,255,0.12);backdrop-filter:blur(16px);
+  border-radius:20px;padding:40px 36px;width:360px;text-align:center;
+  color:white;box-shadow:0 20px 60px rgba(0,0,0,0.3);
+}
+.login-card h1{font-size:28px;font-weight:800;letter-spacing:2px;color:#a5b4fc;}
+.login-card p{font-size:13px;color:rgba(255,255,255,0.6);margin-bottom:24px;}
+.login-input{
+  width:100%;padding:12px 16px;margin-bottom:14px;
+  border:1.5px solid rgba(255,255,255,0.3);border-radius:10px;
+  background:rgba(255,255,255,0.15);color:white;
+  font-size:14px;font-family:'Poppins',sans-serif;outline:none;
+}
+.login-input::placeholder{color:rgba(255,255,255,0.5);}
+.login-input:focus{border-color:#a5b4fc;}
+.login-btn{
+  width:100%;padding:13px;border:none;border-radius:10px;
+  background:linear-gradient(135deg,#6366f1,#8b5cf6);
+  color:white;font-size:15px;font-weight:700;
+  cursor:pointer;transition:0.3s;font-family:'Poppins',sans-serif;
+}
+.login-btn:hover{transform:scale(1.03);box-shadow:0 0 20px rgba(139,92,246,0.5);}
+.login-err{color:#fca5a5;font-size:13px;margin-top:8px;display:none;}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:6px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:#6366f1;border-radius:6px;}
+
+/* LIGHT MODE (toggled via .light-mode class) */
+body.light-mode{
+  --bg:#f0f2f7;
+  --sidebar:#ffffff;
+  --sidebar-hover:#f1f5f9;
+  --card:#ffffff;
+  --text:#1a1a2e;
+  --text2:rgba(26,26,46,0.55);
+  --border:rgba(0,0,0,0.08);
+  --shadow:0 4px 24px rgba(0,0,0,0.1);
+}
+body.light-mode .sidebar{border-right:1px solid rgba(0,0,0,0.08);}
+body.light-mode .sidebar-logo h1{background:linear-gradient(135deg,#1a1a2e 30%,#7c3aed);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+body.light-mode .sidebar-logo p{color:rgba(26,26,46,0.45);}
+body.light-mode .nav-item{color:rgba(26,26,46,0.65);}
+body.light-mode .nav-item:hover,.sidebar.light-mode .nav-item.active{color:#1a1a2e;}
+body.light-mode .nav-label{color:rgba(26,26,46,0.35);}
+body.light-mode .sidebar-footer{color:rgba(26,26,46,0.35);}
+body.light-mode .notif{background:#ffffff;color:#1a1a2e;}
+body.light-mode .modal{background:#ffffff;}
+body.light-mode .form-input{background:#f8fafc;color:#1a1a2e;border-color:rgba(0,0,0,0.12);}
+body.light-mode table th{color:rgba(26,26,46,0.55);}
+body.light-mode .activity-time{color:rgba(26,26,46,0.45);}
+body.light-mode .badge-green{background:#dcfce7;color:#16a34a;}
+body.light-mode .badge-blue{background:#dbeafe;color:#1d4ed8;}
+body.light-mode .badge-red{background:#fee2e2;color:#dc2626;}
+body.light-mode .badge-yellow{background:#fef9c3;color:#b45309;}
+body.light-mode tbody tr:hover{background:rgba(99,102,241,0.06);}
+body.light-mode .weak-bar{background:#e2e8f0;}
+body.light-mode .dark-toggle{background:#1a1a2e;}
+
+/* RESPONSIVE */
+/* HAMBURGER */
+.ham-btn{display:none;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.1);color:white;width:36px;height:36px;border-radius:8px;cursor:pointer;font-size:18px;align-items:center;justify-content:center;flex-shrink:0;}
+.mob-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:98;backdrop-filter:blur(2px);}
+.mob-overlay.on{display:block;}
+@media(max-width:768px){
+  .ham-btn{display:flex;}
+  .sidebar{position:fixed;top:0;left:0;height:100vh;z-index:99;transform:translateX(-260px);transition:transform 0.28s cubic-bezier(.4,0,.2,1);}
+  .sidebar.mobile-open{transform:translateX(0);}
+  .main{margin-left:0;}
+  .grid2{grid-template-columns:1fr;}
+  .topbar{padding:12px 14px;}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN OVERLAY -->
+<div class="mob-overlay" id="mobOverlay" onclick="closeSidebar()"></div>
+<div id="loginOverlay">
+  <div class="login-card">
+    <h1>APTIORA</h1>
+    <p>Admin Panel — Secure Access</p>
+    <input class="login-input" type="text" id="adminUser" placeholder="Admin Username">
+    <input class="login-input" type="password" id="adminPass" placeholder="Admin Password">
+    <button class="login-btn" onclick="adminLogin()">🔐 Login</button>
+    <p class="login-err" id="loginErr">❌ Wrong credentials!</p>
+  </div>
+</div>
+
+<!-- NOTIFICATION -->
+<div class="notif" id="notif"></div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 class="modal-title" id="modalTitle">Modal</h3>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+<!-- SIDEBAR -->
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <h1>APTIORA</h1>
+    <p>Admin Control Panel</p>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Overview</div>
+    <div class="nav-item active" onclick="showSection('dashboard')">
+      <span class="icon">📊</span><span>Dashboard</span>
+    </div>
+    <div class="nav-item" onclick="showSection('performance')">
+      <span class="icon">🏆</span><span>Performance</span>
+    </div>
+    <div class="nav-item" onclick="showSection('activity')">
+      <span class="icon">📈</span><span>Activity Log</span>
+    </div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Management</div>
+    <div class="nav-item" onclick="showSection('users')">
+      <span class="icon">👥</span><span>Users</span>
+    </div>
+    <div class="nav-item" onclick="showSection('questions')">
+      <span class="icon">❓</span><span>Questions</span>
+    </div>
+    <div class="nav-item" onclick="showSection('leaderboard')">
+      <span class="icon">🎯</span><span>Leaderboard</span>
+    </div>
+    <div class="nav-item" onclick="showSection('batches')">
+      <span class="icon">🏫</span><span>Batches</span>
+    </div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Control</div>
+    <div class="nav-item" onclick="showSection('notifications')">
+      <span class="icon">🔔</span><span>Notifications</span>
+    </div>
+    <div class="nav-item" onclick="showSection('settings')">
+      <span class="icon">⚙️</span><span>Settings</span>
+    </div>
+  </div>
+
+  <div class="sidebar-footer">v2.0 · Admin Only</div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <button class="ham-btn" onclick="toggleSidebar()">☰</button>
+      <div class="topbar-title" id="pageTitle">📊 Dashboard</div>
+    </div>
+    <div class="topbar-right">
+      <button class="dark-toggle" onclick="toggleDark()">🌙 Dark</button>
+      <div class="admin-badge">ADMIN</div>
+      <button class="logout-btn" onclick="adminLogout()">Logout</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- ===== DASHBOARD ===== -->
+    <div class="section active" id="sec-dashboard">
+      <div class="stats-grid" id="statsGrid"></div>
+      <div class="grid2">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">🏅 Top Performers</h3>
+          </div>
+          <div class="podium" id="miniPodium"></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">📋 Recent Activity</h3>
+          </div>
+          <div id="recentActivity"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">📉 Weak Area Overview</h3>
+        </div>
+        <div id="weakOverview"></div>
+      </div>
+    </div>
+
+    <!-- ===== PERFORMANCE ===== -->
+    <div class="section" id="sec-performance">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">🏆 Full Performance Report</h3>
+          <button class="btn btn-primary btn-sm" onclick="exportPerformance()">⬇ Export</button>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Rank</th><th>Name</th><th>Reg No</th><th>Score</th>
+              <th>Attempted</th><th>Accuracy</th><th>Weak Area</th>
+            </tr>
+          </thead>
+          <tbody id="perfTable"></tbody>
+        </table>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">📊 Aptitude Course Progress</h3>
+        </div>
+        <table>
+          <thead>
+            <tr><th>Name</th><th>Verbal</th><th>Algebra</th><th>Series</th><th>Overall</th></tr>
+          </thead>
+          <tbody id="aptProgress"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ===== ACTIVITY LOG ===== -->
+    <div class="section" id="sec-activity">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">📈 User Activity Log</h3>
+          <button class="btn btn-danger btn-sm" onclick="clearActivity()">🗑 Clear Log</button>
+        </div>
+        <div id="activityLog"></div>
+      </div>
+    </div>
+
+    <!-- ===== USERS ===== -->
+    <div class="section" id="sec-users">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">👥 User Management</h3>
+          <button class="btn btn-primary" onclick="openAddUser()">+ Add User</button>
+        </div>
+        <table>
+          <thead>
+            <tr><th>Name</th><th>Reg No</th><th>Dept</th><th>Batch</th><th>Status</th><th>Actions</th></tr>
+          </thead>
+          <tbody id="userTable"></tbody>
+        </table>
+
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">🗑 Clear User Answers</h3>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Select User</label>
+          <select class="form-input" id="clearUserSel"></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Clear Which Answers?</label>
+          <select class="form-input" id="clearTopicSel">
+            <option value="all">All Topics + Assessment</option>
+            <option value="Verbal Ability">Verbal Ability</option>
+            <option value="Algebra">Algebra</option>
+            <option value="Series &amp; Sequence">Series &amp; Sequence</option>
+            <option value="Assessment">Assessment (Reset test attempt)</option>
+          </select>
+        </div>
+        <button class="btn btn-danger" onclick="clearUserAnswers()">🗑 Clear Answers</button>
+      </div>
+    </div>
+
+    <!-- ===== QUESTIONS ===== -->
+    <div class="section" id="sec-questions">
+      <!-- AI GENERATOR -->
+      <div class="card" style="margin-bottom:20px;border-color:rgba(124,58,237,0.3);background:rgba(124,58,237,0.06);">
+        <div class="card-header">
+          <h3 class="card-title">🤖 AI Question Generator</h3>
+        </div>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;">
+          <div style="flex:1;min-width:150px;"><label class="form-label">Category</label>
+            <select class="form-input" id="aiQCat"><option value="Verbal Ability">Verbal Ability</option><option value="Algebra">Algebra</option><option value="Series &amp; Sequence">Series &amp; Sequence</option><option value="Assessment">Assessment</option></select></div>
+          <div style="flex:0 0 110px;"><label class="form-label">Count</label>
+            <select class="form-input" id="aiQCount"><option value="5">5 Questions</option><option value="10" selected>10 Questions</option><option value="15">15 Questions</option></select></div>
+          <div style="flex:0 0 120px;"><label class="form-label">Difficulty</label>
+            <select class="form-input" id="aiQDiff"><option value="easy">Easy</option><option value="medium" selected>Medium</option><option value="hard">Hard</option></select></div>
+          <button class="btn btn-primary" onclick="generateAIQuestions()" id="aiGenBtn">✨ Generate</button>
+        </div>
+        <div id="aiGenStatus" style="display:none;margin-top:12px;font-size:13px;padding:10px 14px;border-radius:10px;background:rgba(255,255,255,0.05);"></div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">❓ Question Bank</h3>
+          <div style="display:flex;gap:10px;align-items:center;">
+            <select class="form-input" id="qCategoryFilter" onchange="renderQuestions()" style="width:180px;padding:7px 10px;">
+              <option value="all">All Categories</option>
+              <option value="Verbal Ability">Verbal Ability</option>
+              <option value="Algebra">Algebra</option>
+              <option value="Series & Sequence">Series & Sequence</option>
+              <option value="Assessment">Assessment</option>
+            </select>
+            <button class="btn btn-primary" onclick="openAddQuestion()">+ Add Question</button>
+          </div>
+        </div>
+        <table>
+          <thead>
+            <tr><th>#</th><th>Question</th><th>Category</th><th>Options</th><th>Answer</th><th>Actions</th></tr>
+          </thead>
+          <tbody id="questionTable"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ===== LEADERBOARD ===== -->
+    <div class="section" id="sec-leaderboard">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">🎯 Assessment Leaderboard</h3>
+          <button class="btn btn-danger" onclick="adminClearLeaderboard()">🧹 Clear All</button>
+        </div>
+        <table>
+          <thead>
+            <tr><th>Rank</th><th>Name</th><th>Score</th><th>Attempted</th><th>Actions</th></tr>
+          </thead>
+          <tbody id="lbTable"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ===== BATCHES ===== -->
+    <div class="section" id="sec-batches">
+      <div class="card" style="margin-bottom:20px;">
+        <div class="card-header">
+          <h3 class="card-title">🏫 Batch Management</h3>
+          <button class="btn btn-primary" onclick="addBatch()">+ New Batch</button>
+        </div>
+        <div id="batchList" style="display:flex;flex-direction:column;gap:12px;margin-top:4px;"></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><h3 class="card-title">➕ Create New Batch</h3></div>
+        <div class="grid2">
+          <div class="form-group"><label class="form-label">Batch Name</label><input class="form-input" id="batchName" placeholder="e.g. CSE 2024-2028"></div>
+          <div class="form-group"><label class="form-label">Department</label>
+            <select class="form-input" id="batchDept"><option>IT</option><option>CSE</option><option>ECE</option><option>EEE</option><option>MECH</option><option>CIVIL</option></select>
+          </div>
+          <div class="form-group"><label class="form-label">Year</label>
+            <select class="form-input" id="batchYear"><option>2024-2028</option><option>2023-2027</option><option>2022-2026</option><option>2025-2029</option></select>
+          </div>
+          <div class="form-group"><label class="form-label">Assessment Set</label>
+            <select class="form-input" id="batchAssessSet"><option value="Assessment">Default Assessment</option><option value="Verbal Ability">Verbal Only</option><option value="Algebra">Algebra Only</option></select>
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="saveBatch()" style="margin-top:4px;">💾 Create Batch</button>
+        <div id="batchMsg" style="margin-top:10px;font-size:13px;display:none;"></div>
+      </div>
+    </div>
+
+    <!-- ===== NOTIFICATIONS ===== -->
+    <div class="section" id="sec-notifications">
+      <div class="grid2">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">📢 Send Announcement</h3>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Type</label>
+            <select class="form-input" id="notifType">
+              <option>📣 Announcement</option>
+              <option>🆕 New Test Available</option>
+              <option>⚠️ Warning</option>
+              <option>✅ Result Published</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Message</label>
+            <textarea class="form-input" id="notifMsg" rows="4" placeholder="Type your message..."></textarea>
+          </div>
+          <button class="btn btn-primary" onclick="sendNotification()">📤 Send to All Users</button>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">📬 Sent Notifications</h3>
+            <button class="btn btn-danger btn-sm" onclick="clearNotifs()">Clear</button>
+          </div>
+          <div id="sentNotifs"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== SETTINGS ===== -->
+    <div class="section" id="sec-settings">
+      <div class="grid2">
+        <div class="card">
+          <div class="card-header"><h3 class="card-title">⚙️ Assessment Settings</h3></div>
+
+          <div class="setting-row">
+            <div class="setting-info"><h4>Admin Username</h4><p>Panel login username</p></div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <input type="text" class="form-input" id="adminUsername" placeholder="admin@balaji" style="width:150px;">
+              <button class="btn btn-primary btn-sm" onclick="saveAdminCreds()">Save</button>
+            </div>
+          </div>
+          <div class="setting-row">
+            <div class="setting-info"><h4>Admin Password</h4><p>Panel login password</p></div>
+            <input type="password" class="form-input" id="adminPassword" placeholder="balaji@123" style="width:150px;">
+          </div>
+          <div class="setting-row">
+            <div class="setting-info"><h4>🔥 Sync to Firebase</h4><p>Push all data to Firestore DB</p></div>
+            <button class="btn btn-success btn-sm" onclick="syncToFirebase()">Sync Now</button>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <h4>Assessment Time (minutes)</h4>
+              <p>Current timer for assessment test</p>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <input type="number" class="form-input" id="assessTime" style="width:80px;" min="5" max="120">
+              <button class="btn btn-primary btn-sm" onclick="saveAssessTime()">Save</button>
+            </div>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <h4>Secure Code</h4>
+              <p>6-digit code to enter assessment</p>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <input type="text" class="form-input" id="secureCode" maxlength="6" style="width:100px;" placeholder="123456">
+              <button class="btn btn-primary btn-sm" onclick="saveSecureCode()">Save</button>
+            </div>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <h4>Allow Retake</h4>
+              <p>Let users retake the assessment</p>
+            </div>
+            <label class="toggle-sw">
+              <input type="checkbox" id="allowRetake" onchange="saveToggle('allowRetake')">
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <h4>Anti-Cheat (Tab Lock)</h4>
+              <p>Block tab switch during assessment</p>
+            </div>
+            <label class="toggle-sw">
+              <input type="checkbox" id="antiCheat" checked onchange="saveToggle('antiCheat')">
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <h4>Fullscreen Mode</h4>
+              <p>Force fullscreen during assessment</p>
+            </div>
+            <label class="toggle-sw">
+              <input type="checkbox" id="forceFullscreen" checked onchange="saveToggle('forceFullscreen')">
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <h4>Shuffle Questions</h4>
+              <p>Randomize question order per user</p>
+            </div>
+            <label class="toggle-sw">
+              <input type="checkbox" id="shuffleQ" checked onchange="saveToggle('shuffleQ')">
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><h3 class="card-title">🔑 Reset User Password</h3></div>
+          <div class="form-group">
+            <label class="form-label">Select User</label>
+            <select class="form-input" id="resetUserSel"></select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">New Password</label>
+            <input type="text" class="form-input" id="newPassInput" placeholder="Enter new password">
+          </div>
+          <button class="btn btn-warning" onclick="resetPassword()">🔄 Reset Password</button>
+
+          <div class="card-header" style="margin-top:24px;"><h3 class="card-title">🎓 Aptitude Course Duration</h3></div>
+          <div class="form-group">
+            <label class="form-label">Start Date</label>
+            <input type="date" class="form-input" id="courseStart">
+          </div>
+          <div class="form-group">
+            <label class="form-label">End Date</label>
+            <input type="date" class="form-input" id="courseEnd">
+          </div>
+          <button class="btn btn-success" onclick="saveCourseDates()">💾 Save Aptitude Dates</button>
+
+          <div class="card-header" style="margin-top:20px;"><h3 class="card-title">📝 Assessment Duration</h3></div>
+          <div class="form-group">
+            <label class="form-label">Assessment Start Date</label>
+            <input type="date" class="form-input" id="assessStart">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Assessment End Date</label>
+            <input type="date" class="form-input" id="assessEnd">
+          </div>
+          <button class="btn btn-primary" onclick="saveAssessDates()">💾 Save Assessment Dates</button>
+
+          <div class="card-header" style="margin-top:20px;"><h3 class="card-title">📜 Certificate Settings</h3></div>
+          <div class="setting-row">
+            <div class="setting-info">
+              <h4>Allow Certificate Download</h4>
+              <p>Students can download their certificate</p>
+            </div>
+            <label class="toggle-sw">
+              <input type="checkbox" id="certDownload" checked onchange="saveToggle('certDownload')">
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<script>
+// ==================== INIT DATA ====================
+const ADMIN_CREDS = { user:"admin", pass:"admin123" };
+
+function getUsers(){
+  let def = {
+    "714524205005":{name:"Balaji",password:"1234",dept:"IT",batch:"2024-2028",active:true},
+    "714524205053":{name:"Vicky",password:"1234",dept:"IT",batch:"2024-2028",active:true},
+    "714524205027":{name:"Ismail",password:"1234",dept:"IT",batch:"2024-2028",active:true},
+    "714524205041":{name:"Sakthivel",password:"1234",dept:"IT",batch:"2024-2028",active:true}
+  };
+  return JSON.parse(localStorage.getItem("users")) || def;
+}
+
+function getQuestions(){
+  let def = {
+    "Verbal Ability":[
+      {q:"Synonym of Happy",o:["Sad","Joyful","Angry","Cry"],a:1},
+      {q:"Antonym of Big",o:["Large","Huge","Small","Wide"],a:2},
+      {q:"Plural of Child",o:["Childs","Children","Childes","Child"],a:1},
+      {q:"Which is a Verb?",o:["Run","Blue","Table","Chair"],a:0},
+      {q:"Correct tense?",o:["I eat","I ate","I eating","I eats"],a:1},
+      {q:"Synonym of Fast",o:["Quick","Slow","Late","Stop"],a:0},
+      {q:"Antonym of Hot",o:["Warm","Cold","Heat","Fire"],a:1},
+      {q:"Correct sentence",o:["He go","He goes","He going","He gone"],a:1},
+      {q:"She ___ playing",o:["is","are","am","be"],a:0},
+      {q:"Correct spelling",o:["Receive","Recieve","Receeve","Receve"],a:0}
+    ],
+    "Algebra":[
+      {q:"2+3=?",o:["4","5","6","7"],a:1},
+      {q:"5×2=?",o:["10","12","8","15"],a:0},
+      {q:"10-4=?",o:["5","6","7","4"],a:1},
+      {q:"x+2=5, x=?",o:["2","3","4","5"],a:1},
+      {q:"3²=?",o:["6","9","12","3"],a:1},
+      {q:"√16=?",o:["2","4","8","6"],a:1},
+      {q:"7+8=?",o:["14","15","16","13"],a:1},
+      {q:"9÷3=?",o:["2","3","4","1"],a:1},
+      {q:"4×4=?",o:["8","12","16","14"],a:2},
+      {q:"6+7=?",o:["12","13","14","11"],a:1}
+    ],
+    "Series & Sequence":[
+      {q:"2,4,8,?",o:["10","12","16","18"],a:2},
+      {q:"3,9,27,?",o:["30","81","18","54"],a:1},
+      {q:"5,10,20,?",o:["30","35","40","50"],a:2},
+      {q:"7,14,28,?",o:["30","56","60","40"],a:1},
+      {q:"1,1,2,3,5,?",o:["6","7","8","9"],a:2},
+      {q:"10,20,40,?",o:["60","80","100","120"],a:1},
+      {q:"6,12,24,?",o:["36","48","60","72"],a:1},
+      {q:"9,18,36,?",o:["45","54","72","81"],a:2},
+      {q:"2,6,18,?",o:["36","54","72","108"],a:1},
+      {q:"4,8,16,?",o:["20","24","32","40"],a:2}
+    ],
+    "Assessment":[
+      {q:"2+3=?",o:["4","5","6","7"],a:1},
+      {q:"5×2=?",o:["10","12","8","15"],a:0},
+      {q:"7+8=?",o:["14","15","16","13"],a:1},
+      {q:"√16=?",o:["2","4","8","6"],a:1},
+      {q:"10-4=?",o:["5","6","7","4"],a:1},
+      {q:"1,1,2,3,5,?",o:["6","7","8","9"],a:2},
+      {q:"6,12,24,?",o:["36","48","60","72"],a:1},
+      {q:"4×4=?",o:["8","12","16","14"],a:2},
+      {q:"9÷3=?",o:["2","3","4","1"],a:1},
+      {q:"10,20,40,?",o:["60","80","100","120"],a:1},
+      {q:"Synonym of 'Happy'",o:["Sad","Joyful","Cry","Angry"],a:1},
+      {q:"Antonym of 'Big'",o:["Large","Small","Huge","Wide"],a:1},
+      {q:"Synonym of 'Fast'",o:["Quick","Slow","Late","Stop"],a:0},
+      {q:"Plural of 'Child'",o:["Childs","Children","Childes","Child"],a:1},
+      {q:"Which is a Verb?",o:["Run","Blue","Table","Chair"],a:0},
+      {q:"Correct tense?",o:["I eat","I ate","I eating","I eats"],a:1},
+      {q:"3²=?",o:["6","9","12","3"],a:1},
+      {q:"Series: 2,4,8,?",o:["10","12","16","18"],a:2},
+      {q:"Series: 3,9,27,?",o:["30","81","18","54"],a:1},
+      {q:"Series: 5,10,20,?",o:["30","35","40","50"],a:2}
+    ]
+  };
+  return JSON.parse(localStorage.getItem("questionBank")) || def;
+}
+
+function saveQuestions(q){ localStorage.setItem("questionBank",JSON.stringify(q)); }
+function saveUsers(u){ localStorage.setItem("users",JSON.stringify(u)); }
+
+function getSettings(){
+  return JSON.parse(localStorage.getItem("adminSettings")) || {
+    assessTime:45, secureCode:"123456",
+    allowRetake:false, antiCheat:true,
+    forceFullscreen:true, shuffleQ:true,
+    courseStart:"2026-03-25", courseEnd:"2026-04-05"
+  };
+}
+function saveSettings(s){ localStorage.setItem("adminSettings",JSON.stringify(s)); }
+
+function logActivity(msg, color="#6366f1"){
+  let logs = JSON.parse(localStorage.getItem("activityLog")) || [];
+  logs.unshift({msg, color, time: new Date().toLocaleString()});
+  if(logs.length>100) logs=logs.slice(0,100);
+  localStorage.setItem("activityLog", JSON.stringify(logs));
+}
+
+// ==================== LOGIN ====================
+function adminLogin(){
+  let u = document.getElementById("adminUser").value;
+  let p = document.getElementById("adminPass").value;
+  if(u===ADMIN_CREDS.user && p===ADMIN_CREDS.pass){
+    document.getElementById("loginOverlay").style.display="none";
+    localStorage.setItem("adminLoggedIn","yes");
+    loadAll();
+    logActivity("Admin logged in","#22c55e");
+    showNotif("✅ Welcome Admin!","success");
+  } else {
+    document.getElementById("loginErr").style.display="block";
+  }
+}
+function adminLogout(){
+  localStorage.removeItem("adminLoggedIn");
+  location.href="login.html";
+}
+
+// ── BATCH MANAGEMENT ──
+function getBatches(){return JSON.parse(localStorage.getItem("batches"))||[{id:"batch_default",name:"IT 2024-2028",dept:"IT",year:"2024-2028",assessSet:"Assessment",created:"25 Mar 2026",studentCount:0}];}
+function saveBatches(b){localStorage.setItem("batches",JSON.stringify(b));}
+function renderBatches(){
+  let batches=getBatches();
+  let el=document.getElementById("batchList");if(!el)return;
+  if(!batches.length){el.innerHTML='<div style="color:rgba(255,255,255,0.4);font-size:13px;text-align:center;padding:20px;">No batches yet. Create one below.</div>';return;}
+  el.innerHTML=batches.map((b,i)=>`<div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+    <div><div style="font-weight:700;font-size:14px;">${b.name}</div><div style="font-size:12px;color:rgba(255,255,255,0.45);margin-top:3px;">📚 ${b.assessSet} · 👥 ${b.studentCount||0} students · 📅 ${b.created}</div></div>
+    <div style="display:flex;gap:8px;"><button class="btn btn-danger" onclick="deleteBatch(${i})" style="padding:6px 14px;font-size:12px;">🗑 Delete</button></div>
+  </div>`).join("");
+}
+function saveBatch(){
+  let name=document.getElementById("batchName").value.trim();
+  if(!name){alert("Batch name required!");return;}
+  let batches=getBatches();
+  batches.push({id:"batch_"+Date.now(),name,dept:document.getElementById("batchDept").value,year:document.getElementById("batchYear").value,assessSet:document.getElementById("batchAssessSet").value,created:new Date().toLocaleDateString("en-IN"),studentCount:0});
+  saveBatches(batches);
+  let msg=document.getElementById("batchMsg");msg.style.display="block";msg.style.color="#86efac";msg.innerText="✅ Batch created!";
+  document.getElementById("batchName").value="";
+  renderBatches();showNotif("✅ Batch created!","success");
+  setTimeout(()=>msg.style.display="none",2500);
+}
+function deleteBatch(i){if(!confirm("Delete this batch?"))return;let b=getBatches();b.splice(i,1);saveBatches(b);renderBatches();showNotif("🗑 Batch deleted","error");}
+function addBatch(){showSection("batches");document.getElementById("batchName").focus();}
+
+// ── MOBILE SIDEBAR ──
+function toggleSidebar(){
+  let s=document.getElementById("sidebar"),o=document.getElementById("mobOverlay");
+  s.classList.toggle("mobile-open");o.classList.toggle("on");
+}
+function closeSidebar(){
+  document.getElementById("sidebar").classList.remove("mobile-open");
+  document.getElementById("mobOverlay").classList.remove("on");
+}
+
+// ── AI QUESTION GENERATOR ──
+async function generateAIQuestions(){
+  let cat=document.getElementById("aiQCat").value;
+  let count=parseInt(document.getElementById("aiQCount").value);
+  let diff=document.getElementById("aiQDiff").value;
+  let btn=document.getElementById("aiGenBtn"),status=document.getElementById("aiGenStatus");
+  btn.disabled=true;btn.innerText="Generating...";
+  status.style.display="block";status.style.color="rgba(255,255,255,0.6)";
+  status.innerText=`🤖 AI is creating ${count} ${diff} questions for ${cat}...`;
+  try{
+    let prompt=`Generate exactly ${count} multiple-choice aptitude questions for the topic "${cat}" at ${diff} difficulty. These are for B.Tech college students.\n\nReturn ONLY a valid JSON array, no markdown, no other text:\n[{"q":"question text","o":["option A","option B","option C","option D"],"a":0},{"q":"...","o":[...],"a":1},...]\n\nWhere "a" is the 0-based index of the correct answer. Make every question original.`;
+    let resp=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:1800,messages:[{role:"user",content:prompt}]})});
+    let data=await resp.json();
+    let raw=(data.content&&data.content[0]&&data.content[0].text)||"[]";
+    let clean=raw.replace(/```json|```/g,"").trim();
+    let newQs=JSON.parse(clean);
+    let bank=getQuestions();
+    if(!bank[cat])bank[cat]=[];
+    newQs.forEach(q=>bank[cat].push({q:q.q,o:q.o,a:q.a}));
+    saveQuestions(bank);
+    status.style.color="#86efac";
+    status.innerText=`✅ Added ${newQs.length} new ${diff} questions to "${cat}" successfully!`;
+    showNotif(`✅ ${newQs.length} AI questions added!`,"success");
+    renderQuestions();
+  }catch(e){
+    status.style.color="#fca5a5";
+    status.innerText="❌ Error: "+e.message+". Please try again.";
+  }
+  btn.disabled=false;btn.innerText="✨ Generate";
+}
+
+document.addEventListener("keydown",e=>{ if(e.key==="Enter") adminLogin(); });
+if(localStorage.getItem("adminLoggedIn")==="yes"){
+  document.getElementById("loginOverlay").style.display="none";
+  loadAll();
+}
+
+// ==================== DARK/LIGHT MODE ====================
+function toggleDark(){
+  let isLight = document.body.classList.toggle("light-mode");
+  localStorage.setItem("adminDark", isLight ? "0" : "1");
+  document.querySelector(".dark-toggle").innerText = isLight ? "🌙 Dark" : "☀️ Light";
+}
+if(localStorage.getItem("adminDark")==="0"){
+  document.body.classList.add("light-mode");
+  document.addEventListener("DOMContentLoaded",()=>{
+    let btn=document.querySelector(".dark-toggle");
+    if(btn) btn.innerText="🌙 Dark";
+  });
+}
+
+// ==================== NAVIGATION ====================
+const sections = ["dashboard","performance","activity","users","questions","leaderboard","notifications","settings"];
+const titles = {
+  dashboard:"📊 Dashboard", performance:"🏆 Performance",
+  activity:"📈 Activity Log", users:"👥 Users",
+  questions:"❓ Questions", leaderboard:"🎯 Leaderboard",
+  notifications:"🔔 Notifications", settings:"⚙️ Settings"
+};
+
+function showSection(id){
+  sections.forEach(s=>{
+    document.getElementById("sec-"+s).classList.remove("active");
+  });
+  document.getElementById("sec-"+id).classList.add("active");
+  document.querySelectorAll(".nav-item").forEach(n=>n.classList.remove("active"));
+  event.currentTarget.classList.add("active");
+  document.getElementById("pageTitle").innerText = titles[id];
+
+  if(id==="dashboard") renderDashboard();
+  if(id==="performance") renderPerformance();
+  if(id==="activity") renderActivity();
+  if(id==="users") renderUsers();
+  if(id==="questions") renderQuestions();
+  if(id==="leaderboard") renderLeaderboard();
+  if(id==="notifications") renderNotifications();
+  if(id==="settings") loadSettings();
+  if(id==="batches") renderBatches();
+}
+
+function loadAll(){
+  renderDashboard();
+  loadSettings();
+}
+
+// ==================== DASHBOARD ====================
+function renderDashboard(){
+  let users = getUsers();
+  let board = JSON.parse(localStorage.getItem("leaderboard")) || [];
+  let logs = JSON.parse(localStorage.getItem("activityLog")) || [];
+  let qs = getQuestions();
+  let totalQ = Object.values(qs).reduce((a,b)=>a+b.length,0);
+
+  // Stats
+  document.getElementById("statsGrid").innerHTML = `
+    <div class="stat-card">
+      <div class="stat-icon" style="background:#ede9fe;">👥</div>
+      <div class="stat-info"><h3>${Object.keys(users).length}</h3><p>Total Users</p></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background:#dcfce7;">🏆</div>
+      <div class="stat-info"><h3>${board.length}</h3><p>Assessment Taken</p></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background:#dbeafe;">❓</div>
+      <div class="stat-info"><h3>${totalQ}</h3><p>Total Questions</p></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background:#fef3c7;">📊</div>
+      <div class="stat-info"><h3>${board.length>0?(board.reduce((a,b)=>a+(b.score||0),0)/board.length).toFixed(1):0}</h3><p>Avg Score</p></div>
+    </div>
+  `;
+
+  // Mini podium
+  let sorted = [...board].sort((a,b)=>b.score-a.score);
+  let colors = ["#f59e0b","#94a3b8","#b45309"];
+  let heights = ["80px","60px","50px"];
+  let medals = ["🥇","🥈","🥉"];
+  let podiumOrder = sorted.length>=2 ? [sorted[1],sorted[0],sorted[2]] : sorted;
+
+  document.getElementById("miniPodium").innerHTML = podiumOrder.slice(0,3).map((u,i)=>{
+    let realRank = sorted.indexOf(u);
+    return u ? `
+      <div class="podium-item">
+        <div class="podium-avatar" style="background:${colors[realRank]||'#6366f1'}">${u.name.charAt(0)}</div>
+        <div class="podium-name">${medals[realRank]||''} ${u.name}</div>
+        <div class="podium-score">${u.score}/20</div>
+        <div class="podium-block" style="background:${colors[realRank]||'#6366f1'};height:${heights[realRank]||'40px'};opacity:0.3;width:70px;"></div>
+      </div>` : '';
+  }).join('');
+
+  // Recent activity
+  let recentHtml = logs.slice(0,5).map(l=>`
+    <div class="activity-item">
+      <div class="activity-dot" style="background:${l.color}"></div>
+      <div>
+        <div class="activity-text">${l.msg}</div>
+        <div class="activity-time">${l.time}</div>
+      </div>
+    </div>`).join('') || '<p style="color:var(--text2);font-size:13px;">No activity yet.</p>';
+  document.getElementById("recentActivity").innerHTML = recentHtml;
+
+  // Weak area
+  let cats = ["Verbal Ability","Algebra","Series & Sequence"];
+  let weakHtml = cats.map(cat=>{
+    let userList = Object.keys(users);
+    let total=0,correct=0;
+    userList.forEach(reg=>{
+      let hist = JSON.parse(localStorage.getItem("scoreHistory_"+reg)) || [];
+      hist.filter(h=>h.topic===cat).forEach(h=>{ total+=h.total; correct+=h.score; });
+    });
+    let pct = total>0 ? Math.round((correct/total)*100) : 0;
+    return `
+      <div style="margin-bottom:14px;">
+        <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:600;">
+          <span>${cat}</span><span>${pct}%</span>
+        </div>
+        <div class="weak-bar"><div class="weak-fill" style="width:${pct}%"></div></div>
+      </div>`;
+  }).join('');
+  document.getElementById("weakOverview").innerHTML = weakHtml;
+}
+
+// ==================== PERFORMANCE ====================
+function renderPerformance(){
+  let users = getUsers();
+  let board = JSON.parse(localStorage.getItem("leaderboard")) || [];
+  board.sort((a,b)=>b.score-a.score);
+
+  // Assessment table
+  let perfHtml = board.map((u,i)=>{
+    let medals=["🥇","🥈","🥉"];
+    let acc = u.attempted>0 ? Math.round((u.score/u.attempted)*100) : 0;
+    let reg = Object.keys(users).find(r=>users[r].name===u.name) || "-";
+    return `
+      <tr>
+        <td>${medals[i]||i+1}</td>
+        <td><strong>${u.name}</strong></td>
+        <td>${reg}</td>
+        <td><span class="badge badge-blue">${u.score}/20</span></td>
+        <td>${u.attempted||u.score}/20</td>
+        <td>${acc}%</td>
+        <td>${getWeakArea(reg)}</td>
+      </tr>`;
+  }).join('') || '<tr><td colspan="7" style="text-align:center;color:var(--text2);">No data yet</td></tr>';
+  document.getElementById("perfTable").innerHTML = perfHtml;
+
+  // Aptitude progress
+  let aptHtml = Object.keys(users).map(reg=>{
+    let u=users[reg];
+    let p1=localStorage.getItem("p1_done_"+reg)||localStorage.getItem("p1_done")||0;
+    let p2=localStorage.getItem("p2_done_"+reg)||localStorage.getItem("p2_done")||0;
+    let p3=localStorage.getItem("p3_done_"+reg)||localStorage.getItem("p3_done")||0;
+    let overall=Math.floor((parseInt(p1)+parseInt(p2)+parseInt(p3))/3);
+    return `
+      <tr>
+        <td><strong>${u.name}</strong></td>
+        <td><div class="weak-bar"><div class="weak-fill" style="width:${p1}%"></div></div><small>${p1}%</small></td>
+        <td><div class="weak-bar"><div class="weak-fill" style="width:${p2}%"></div></div><small>${p2}%</small></td>
+        <td><div class="weak-bar"><div class="weak-fill" style="width:${p3}%"></div></div><small>${p3}%</small></td>
+        <td><span class="badge ${overall>=70?'badge-green':'badge-yellow'}">${overall}%</span></td>
+      </tr>`;
+  }).join('');
+  document.getElementById("aptProgress").innerHTML = aptHtml;
+}
+
+function getWeakArea(reg){
+  let cats=["Verbal Ability","Algebra","Series & Sequence"];
+  let weakest=null,lowestPct=101;
+  cats.forEach(cat=>{
+    let hist=JSON.parse(localStorage.getItem("scoreHistory_"+reg))||[];
+    let rel=hist.filter(h=>h.topic===cat);
+    if(rel.length>0){
+      let pct=Math.round(rel.reduce((a,b)=>a+(b.score/b.total)*100,0)/rel.length);
+      if(pct<lowestPct){lowestPct=pct;weakest=cat;}
+    }
+  });
+  return weakest ? `<span class="badge badge-red">${weakest}</span>` : '-';
+}
+
+// ==================== ACTIVITY ====================
+function renderActivity(){
+  let logs=JSON.parse(localStorage.getItem("activityLog"))||[];
+  document.getElementById("activityLog").innerHTML=logs.map(l=>`
+    <div class="activity-item">
+      <div class="activity-dot" style="background:${l.color}"></div>
+      <div>
+        <div class="activity-text">${l.msg}</div>
+        <div class="activity-time">${l.time}</div>
+      </div>
+    </div>`).join('')||'<p style="color:var(--text2);font-size:13px;padding:12px 0;">No activity recorded.</p>';
+}
+function clearActivity(){
+  if(confirm("Clear all activity logs?")){
+    localStorage.removeItem("activityLog");
+    renderActivity();
+    showNotif("🗑 Activity cleared","info");
+  }
+}
+
+// ==================== USERS ====================
+function renderUsers(){
+  let users=getUsers();
+  let html=Object.keys(users).map(reg=>{
+    let u=users[reg];
+    return `
+      <tr>
+        <td><strong>${u.name}</strong></td>
+        <td><code>${reg}</code></td>
+        <td>${u.dept||'IT'}</td>
+        <td>${u.batch||'2024-2028'}</td>
+        <td><span class="badge ${u.active!==false?'badge-green':'badge-red'}">${u.active!==false?'Active':'Inactive'}</span></td>
+        <td>
+          <button class="btn btn-warning btn-sm" onclick="openEditUser('${reg}')">✏️ Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteUser('${reg}')">🗑</button>
+        </td>
+      </tr>`;
+  }).join('');
+  document.getElementById("userTable").innerHTML=html;
+  // populate clear user select
+  let clrSel=document.getElementById("clearUserSel");
+  if(clrSel) clrSel.innerHTML=Object.keys(users).map(r=>`<option value="${r}">${users[r].name} (${r})</option>`).join('');
+  // populate reset select
+  let sel=document.getElementById("resetUserSel");
+  if(sel){
+    sel.innerHTML=Object.keys(users).map(r=>`<option value="${r}">${users[r].name} (${r})</option>`).join('');
+  }
+}
+
+function openAddUser(){
+  showModal("➕ Add New User",`
+    <div class="form-group"><label class="form-label">Register No</label><input class="form-input" id="m_reg" placeholder="714524205XXX"></div>
+    <div class="form-group"><label class="form-label">Full Name</label><input class="form-input" id="m_name" placeholder="Student Name"></div>
+    <div class="form-group"><label class="form-label">Password</label><input class="form-input" id="m_pass" placeholder="1234"></div>
+    <div class="form-group"><label class="form-label">Department</label><input class="form-input" id="m_dept" value="IT"></div>
+    <div class="form-group"><label class="form-label">Batch</label><input class="form-input" id="m_batch" value="2024-2028"></div>
+    <button class="btn btn-success" onclick="addUser()" style="width:100%;margin-top:8px;">✅ Add User</button>
+  `);
+}
+
+function addUser(){
+  let reg=document.getElementById("m_reg").value.trim();
+  let name=document.getElementById("m_name").value.trim();
+  let pass=document.getElementById("m_pass").value.trim();
+  let dept=document.getElementById("m_dept").value.trim();
+  let batch=document.getElementById("m_batch").value.trim();
+  if(!reg||!name||!pass){showNotif("Fill all fields!","error");return;}
+  let users=getUsers();
+  users[reg]={name,password:pass,dept,batch,active:true};
+  saveUsers(users);
+  closeModal();renderUsers();
+  logActivity(`User added: ${name} (${reg})`,"#22c55e");
+  showNotif("✅ User added!","success");
+}
+
+function openEditUser(reg){
+  let u=getUsers()[reg];
+  showModal("✏️ Edit User",`
+    <div class="form-group"><label class="form-label">Register No</label><input class="form-input" id="e_reg" value="${reg}" placeholder="New Register No"></div>
+    <div class="form-group"><label class="form-label">Name</label><input class="form-input" id="e_name" value="${u.name}"></div>
+    <div class="form-group"><label class="form-label">Password</label><input class="form-input" id="e_pass" value="${u.password}"></div>
+    <div class="form-group"><label class="form-label">Email (for OTP reset)</label><input class="form-input" type="email" id="e_email" value="${u.email||''}" placeholder="student@email.com"></div>
+    <div class="form-group"><label class="form-label">Department</label><input class="form-input" id="e_dept" value="${u.dept||'IT'}"></div>
+    <div class="form-group"><label class="form-label">Batch</label><input class="form-input" id="e_batch" value="${u.batch||'2024-2028'}"></div>
+    <div style="display:flex;gap:10px;margin-top:8px;">
+      <button class="btn btn-success" onclick="saveEditUser('${reg}')" style="flex:1;">💾 Save</button>
+    </div>
+  `);
+}
+
+function saveEditUser(reg){
+  let users=getUsers();
+  let newReg=document.getElementById("e_reg").value.trim();
+  let email=document.getElementById("e_email")?document.getElementById("e_email").value.trim():(users[reg].email||"");
+  let userData={
+    name:document.getElementById("e_name").value,
+    password:document.getElementById("e_pass").value,
+    email:email,
+    dept:document.getElementById("e_dept").value,
+    batch:document.getElementById("e_batch").value,
+    active:users[reg].active!==false
+  };
+  if(newReg && newReg !== reg){
+    delete users[reg];
+    users[newReg]=userData;
+    saveUsers(users);closeModal();renderUsers();
+    logActivity("Register No changed: "+reg+" → "+newReg,"#f59e0b");
+    showNotif("✅ Register No updated!","success");
+    return;
+  }
+  users[reg]=userData;
+  saveUsers(users);closeModal();renderUsers();
+  logActivity("User updated: "+userData.name,"#f59e0b");
+  showNotif("✅ User updated!","success");
+}
+
+function deleteUser(reg){
+  let users=getUsers();
+  if(!confirm(`Delete ${users[reg].name}?`))return;
+  logActivity(`User deleted: ${users[reg].name}`,"#ef4444");
+  delete users[reg];
+  saveUsers(users);renderUsers();
+  showNotif("🗑 User deleted","info");
+}
+
+// ==================== QUESTIONS ====================
+function renderQuestions(){
+  let qs=getQuestions();
+  let cat=document.getElementById("qCategoryFilter").value;
+  let html="";let idx=0;
+
+  let cats=cat==="all"?Object.keys(qs):[cat];
+  cats.forEach(c=>{
+    (qs[c]||[]).forEach((q,i)=>{
+      idx++;
+      html+=`
+        <tr>
+          <td>${idx}</td>
+          <td style="max-width:220px;font-size:13px;">${q.q}</td>
+          <td><span class="badge badge-blue">${c}</span></td>
+          <td style="font-size:12px;">${q.o.join(" / ")}</td>
+          <td><span class="badge badge-green">${q.o[q.a]}</span></td>
+          <td>
+            <button class="btn btn-warning btn-sm" onclick="openEditQ('${c}',${i})">✏️</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteQ('${c}',${i})">🗑</button>
+          </td>
+        </tr>`;
+    });
+  });
+  document.getElementById("questionTable").innerHTML=html||'<tr><td colspan="6" style="text-align:center;color:var(--text2);">No questions</td></tr>';
+}
+
+function openAddQuestion(){
+  showModal("➕ Add Question",`
+    <div class="form-group">
+      <label class="form-label">Category</label>
+      <select class="form-input" id="q_cat">
+        <option>Verbal Ability</option>
+        <option>Algebra</option>
+        <option>Series & Sequence</option>
+        <option>Assessment</option>
+      </select>
+    </div>
+    <div class="form-group"><label class="form-label">Question</label><input class="form-input" id="q_text" placeholder="Enter question"></div>
+    <label class="form-label">Options (select correct one)</label>
+    ${[0,1,2,3].map(i=>`
+      <div class="option-row">
+        <input type="radio" name="correctOpt" class="correct-radio" value="${i}" ${i===0?'checked':''}>
+        <input type="text" class="form-input" id="q_o${i}" placeholder="Option ${i+1}">
+      </div>`).join('')}
+    <button class="btn btn-success" onclick="addQuestion()" style="width:100%;margin-top:12px;">✅ Add Question</button>
+  `);
+}
+
+function addQuestion(){
+  let cat=document.getElementById("q_cat").value;
+  let text=document.getElementById("q_text").value.trim();
+  let opts=[0,1,2,3].map(i=>document.getElementById("q_o"+i).value.trim());
+  let ans=parseInt(document.querySelector('input[name="correctOpt"]:checked').value);
+  if(!text||opts.some(o=>!o)){showNotif("Fill all fields!","error");return;}
+  let qs=getQuestions();
+  qs[cat]=qs[cat]||[];
+  qs[cat].push({q:text,o:opts,a:ans});
+  saveQuestions(qs);closeModal();renderQuestions();
+  logActivity(`Question added to ${cat}`,"#6366f1");
+  showNotif("✅ Question added!","success");
+}
+
+function openEditQ(cat,idx){
+  let q=getQuestions()[cat][idx];
+  showModal("✏️ Edit Question",`
+    <div class="form-group"><label class="form-label">Question</label><input class="form-input" id="eq_text" value="${q.q}"></div>
+    <label class="form-label">Options (select correct one)</label>
+    ${q.o.map((opt,i)=>`
+      <div class="option-row">
+        <input type="radio" name="eCorrect" class="correct-radio" value="${i}" ${i===q.a?'checked':''}>
+        <input type="text" class="form-input" id="eq_o${i}" value="${opt}">
+      </div>`).join('')}
+    <button class="btn btn-success" onclick="saveEditQ('${cat}',${idx})" style="width:100%;margin-top:12px;">💾 Save</button>
+  `);
+}
+
+function saveEditQ(cat,idx){
+  let qs=getQuestions();
+  qs[cat][idx].q=document.getElementById("eq_text").value;
+  qs[cat][idx].o=[0,1,2,3].map(i=>document.getElementById("eq_o"+i).value);
+  qs[cat][idx].a=parseInt(document.querySelector('input[name="eCorrect"]:checked').value);
+  saveQuestions(qs);closeModal();renderQuestions();
+  showNotif("✅ Question updated!","success");
+}
+
+function deleteQ(cat,idx){
+  if(!confirm("Delete this question?"))return;
+  let qs=getQuestions();
+  qs[cat].splice(idx,1);
+  saveQuestions(qs);renderQuestions();
+  showNotif("🗑 Question deleted","info");
+}
+
+// ==================== LEADERBOARD ====================
+function renderLeaderboard(){
+  let board=JSON.parse(localStorage.getItem("leaderboard"))||[];
+  board.sort((a,b)=>b.score-a.score);
+  let medals=["🥇","🥈","🥉"];
+  let html=board.map((u,i)=>`
+    <tr>
+      <td>${medals[i]||i+1}</td>
+      <td><strong>${u.name}</strong></td>
+      <td><span class="badge badge-blue">${u.score}/20</span></td>
+      <td>${u.attempted||u.score}/20</td>
+      <td><button class="btn btn-danger btn-sm" onclick="removeFromLB(${i})">🗑 Remove</button></td>
+    </tr>`).join('')||'<tr><td colspan="5" style="text-align:center;color:var(--text2);">No entries</td></tr>';
+  document.getElementById("lbTable").innerHTML=html;
+}
+
+function removeFromLB(idx){
+  let board=JSON.parse(localStorage.getItem("leaderboard"))||[];
+  board.sort((a,b)=>b.score-a.score);
+  logActivity(`Removed ${board[idx].name} from leaderboard`,"#ef4444");
+  board.splice(idx,1);
+  localStorage.setItem("leaderboard",JSON.stringify(board));
+  renderLeaderboard();
+  showNotif("🗑 Entry removed","info");
+}
+
+function adminClearLeaderboard(){
+  if(!confirm("Clear entire leaderboard?"))return;
+  localStorage.removeItem("leaderboard");
+  renderLeaderboard();
+  logActivity("Leaderboard cleared by admin","#ef4444");
+  showNotif("🧹 Leaderboard cleared!","info");
+}
+
+// ==================== NOTIFICATIONS ====================
+function sendNotification(){
+  let type=document.getElementById("notifType").value;
+  let msg=document.getElementById("notifMsg").value.trim();
+  if(!msg){showNotif("Enter a message!","error");return;}
+  let notifs=JSON.parse(localStorage.getItem("userNotifs"))||[];
+  notifs.unshift({type,msg,time:new Date().toLocaleString(),read:false});
+  localStorage.setItem("userNotifs",JSON.stringify(notifs));
+  document.getElementById("notifMsg").value="";
+  renderNotifications();
+  logActivity(`Notification sent: ${msg.substring(0,40)}`,"#3b82f6");
+  showNotif("📤 Notification sent!","success");
+}
+
+function renderNotifications(){
+  let notifs=JSON.parse(localStorage.getItem("userNotifs"))||[];
+  document.getElementById("sentNotifs").innerHTML=notifs.map(n=>`
+    <div class="activity-item">
+      <div class="activity-dot" style="background:#3b82f6"></div>
+      <div>
+        <div class="activity-text"><strong>${n.type}</strong> — ${n.msg}</div>
+        <div class="activity-time">${n.time}</div>
+      </div>
+    </div>`).join('')||'<p style="color:var(--text2);font-size:13px;">No notifications sent.</p>';
+}
+
+function clearNotifs(){
+  localStorage.removeItem("userNotifs");
+  renderNotifications();
+  showNotif("🗑 Notifications cleared","info");
+}
+
+// ==================== SETTINGS ====================
+function loadSettings(){
+  let s=getSettings();
+  document.getElementById("assessTime").value=s.assessTime||45;
+  if(document.getElementById("adminUsername")) document.getElementById("adminUsername").value=s.adminUsername||"admin@balaji";
+  document.getElementById("secureCode").value=s.secureCode||"123456";
+  document.getElementById("allowRetake").checked=s.allowRetake||false;
+  document.getElementById("antiCheat").checked=s.antiCheat!==false;
+  document.getElementById("forceFullscreen").checked=s.forceFullscreen!==false;
+  document.getElementById("shuffleQ").checked=s.shuffleQ!==false;
+  document.getElementById("courseStart").value=s.courseStart||"2026-03-25";
+  if(document.getElementById("assessStart")) document.getElementById("assessStart").value=s.assessStart||"";
+  if(document.getElementById("assessEnd")) document.getElementById("assessEnd").value=s.assessEnd||"";
+  if(document.getElementById("certDownload")) document.getElementById("certDownload").checked=s.certDownload!==false;
+  document.getElementById("courseEnd").value=s.courseEnd||"2026-04-05";
+  renderUsers(); // populate user select
+}
+
+function saveAssessTime(){
+  let s=getSettings();
+  s.assessTime=parseInt(document.getElementById("assessTime").value)||45;
+  saveSettings(s);showNotif("✅ Time saved!","success");
+  logActivity(`Assessment time set to ${s.assessTime} min`,"#f59e0b");
+}
+
+function saveSecureCode(){
+  let s=getSettings();
+  let code=document.getElementById("secureCode").value.trim();
+  if(code.length!==6||isNaN(code)){showNotif("Enter 6-digit code!","error");return;}
+  s.secureCode=code;saveSettings(s);
+  showNotif("✅ Secure code saved!","success");
+  logActivity(`Secure code updated`,"#f59e0b");
+}
+
+function saveToggle(key){
+  let s=getSettings();
+  s[key]=document.getElementById(key).checked;
+  saveSettings(s);
+  showNotif(`✅ ${key} ${s[key]?'enabled':'disabled'}!`,"success");
+}
+
+function resetPassword(){
+  let reg=document.getElementById("resetUserSel").value;
+  let newPass=document.getElementById("newPassInput").value.trim();
+  if(!newPass){showNotif("Enter new password!","error");return;}
+  let users=getUsers();
+  if(users[reg]){
+    users[reg].password=newPass;
+    saveUsers(users);
+    document.getElementById("newPassInput").value="";
+    logActivity(`Password reset for ${users[reg].name}`,"#f59e0b");
+    showNotif(`✅ Password reset for ${users[reg].name}!`,"success");
+  }
+}
+
+function saveAssessDates(){
+  let s=getSettings();
+  s.assessStart=document.getElementById("assessStart").value;
+  s.assessEnd=document.getElementById("assessEnd").value;
+  saveSettings(s);
+  showNotif("✅ Assessment dates saved!","success");
+  logActivity("Assessment dates updated","#22c55e");
+}
+function saveCourseDates(){
+  let s=getSettings();
+  s.courseStart=document.getElementById("courseStart").value;
+  s.courseEnd=document.getElementById("courseEnd").value;
+  saveSettings(s);
+  showNotif("✅ Course dates saved!","success");
+  logActivity("Course dates updated","#22c55e");
+}
+
+function exportPerformance(){
+  let board=JSON.parse(localStorage.getItem("leaderboard"))||[];
+  let csv="Rank,Name,Score,Attempted\n";
+  board.sort((a,b)=>b.score-a.score).forEach((u,i)=>{
+    csv+=`${i+1},${u.name},${u.score},${u.attempted||u.score}\n`;
+  });
+  let blob=new Blob([csv],{type:"text/csv"});
+  let a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download="performance.csv";a.click();
+  showNotif("⬇ Exported!","success");
+}
+
+// ==================== MODAL ====================
+function showModal(title,body){
+  document.getElementById("modalTitle").innerText=title;
+  document.getElementById("modalBody").innerHTML=body;
+  document.getElementById("modalOverlay").classList.add("show");
+}
+function closeModal(){
+  document.getElementById("modalOverlay").classList.remove("show");
+}
+document.getElementById("modalOverlay").addEventListener("click",function(e){
+  if(e.target===this)closeModal();
+});
+
+// ==================== NOTIF TOAST ====================
+function showNotif(msg,type="info"){
+  let n=document.getElementById("notif");
+  n.innerHTML=msg;n.className=`notif ${type} show`;
+  setTimeout(()=>n.classList.remove("show"),3000);
+}
+
+// ADMIN CREDS
+function saveAdminCreds(){
+  let s=getSettings();
+  let u=document.getElementById("adminUsername").value.trim();
+  let p=document.getElementById("adminPassword").value.trim();
+  if(u) s.adminUsername=u;
+  if(p) s.adminPassword=p;
+  saveSettings(s);
+  showNotif("✅ Admin credentials saved!","success");
+  logActivity("Admin credentials updated","#f59e0b");
+}
+
+// FIREBASE SYNC
+async function syncToFirebase(){
+  showNotif("🔄 Syncing...","info");
+  try {
+    let users=getUsers();
+    let board=JSON.parse(localStorage.getItem("leaderboard"))||[];
+    let qs=getQuestions();
+    let fb=window._fb2,db=window._db2;
+    // Sync users
+    for(let reg of Object.keys(users)){
+      await fb.setDoc(fb.doc(db,"users",reg),users[reg]);
+    }
+    // Sync leaderboard
+    for(let u of board){
+      await fb.setDoc(fb.doc(db,"leaderboard",u.name),u);
+    }
+    // Sync questions
+    await fb.setDoc(fb.doc(db,"questionBank","all"),qs);
+    logActivity("Data synced to Firebase","#22c55e");
+    showNotif("✅ Firebase sync complete!","success");
+  } catch(e){
+    showNotif("⚠️ Firebase offline - data saved locally","error");
+  }
+}
+
+
+// CLEAR USER ANSWERS
+function clearUserAnswers(){
+  let reg = document.getElementById("clearUserSel").value;
+  let topic = document.getElementById("clearTopicSel").value;
+  let users = getUsers();
+  let name = (users[reg]||{}).name || reg;
+  if(!confirm(`Clear answers for ${name}?`)) return;
+
+  if(topic === "all"){
+    // Clear all practice answers
+    ["Verbal Ability","Algebra","Series & Sequence"].forEach(t=>{
+      localStorage.removeItem("answers_"+reg+"_"+t);
+      localStorage.removeItem("p1_done_"+reg);
+      localStorage.removeItem("p2_done_"+reg);
+      localStorage.removeItem("p3_done_"+reg);
+    });
+    // Clear assessment
+    localStorage.removeItem("answers_"+reg+"_Assessment");
+    localStorage.removeItem("assessTaken_"+reg);
+    localStorage.removeItem("shuffledOrder_"+reg);
+    logActivity(`All answers cleared for ${name}`,"#ef4444");
+    showNotif(`✅ All answers cleared for ${name}!`,"success");
+  } else if(topic === "Assessment"){
+    localStorage.removeItem("answers_"+reg+"_Assessment");
+    localStorage.removeItem("assessTaken_"+reg);
+    localStorage.removeItem("shuffledOrder_"+reg);
+    logActivity(`Assessment reset for ${name}`,"#ef4444");
+    showNotif(`✅ Assessment reset for ${name}!`,"success");
+  } else {
+    localStorage.removeItem("answers_"+reg+"_"+topic);
+    // Reset that topic's progress
+    let topicNum = {"Verbal Ability":1,"Algebra":2,"Series & Sequence":3}[topic];
+    if(topicNum) localStorage.removeItem("p"+topicNum+"_done_"+reg);
+    logActivity(`${topic} answers cleared for ${name}`,"#ef4444");
+    showNotif(`✅ ${topic} answers cleared for ${name}!`,"success");
+  }
+}
+
+</script>
+</body>
+</html>

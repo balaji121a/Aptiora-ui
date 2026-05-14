@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Aptitude Course — APTIORA</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700;800&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{--gold:#f5c842;--purple:#7c3aed;--blue:#3b82f6;--dark:#050508;--dark2:#0d0d14;--dark3:#13131f;--text:#ffffff;--text2:rgba(255,255,255,0.55);--border:rgba(255,255,255,0.08);}
+html,body{width:100%;min-height:100%;font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);overflow-x:hidden;}
+body::before{content:"";position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:0.4;}
+canvas{position:fixed;inset:0;z-index:1;pointer-events:none;}
+.orb{position:fixed;border-radius:50%;filter:blur(80px);pointer-events:none;z-index:1;}
+.orb1{width:400px;height:400px;background:radial-gradient(circle,rgba(124,58,237,0.15),transparent 70%);top:-100px;left:-100px;animation:f1 12s ease-in-out infinite;}
+.orb2{width:300px;height:300px;background:radial-gradient(circle,rgba(245,200,66,0.06),transparent 70%);bottom:-60px;right:-60px;animation:f2 10s ease-in-out infinite;}
+@keyframes f1{0%,100%{transform:translate(0,0);}50%{transform:translate(30px,30px);}}
+@keyframes f2{0%,100%{transform:translate(0,0);}50%{transform:translate(-20px,-20px);}}
+
+/* NAVBAR */
+.navbar{position:fixed;top:0;left:0;right:0;z-index:100;padding:16px 32px;display:flex;align-items:center;justify-content:space-between;background:rgba(5,5,8,0.7);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);}
+.nav-logo{font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:800;letter-spacing:2px;background:linear-gradient(135deg,#fff 30%,var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.nav-right{display:flex;align-items:center;gap:10px;}
+.nav-icon-btn{background:rgba(255,255,255,0.07);border:1px solid var(--border);color:white;width:36px;height:36px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;transition:all 0.2s;}
+.nav-icon-btn:hover{background:rgba(255,255,255,0.12);}
+.profile-icon{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--purple),#6d28d9);color:white;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;box-shadow:0 4px 12px rgba(124,58,237,0.3);}
+.exit-btn{background:rgba(255,255,255,0.07);border:1px solid var(--border);color:white;padding:8px 16px;border-radius:10px;cursor:pointer;font-size:13px;font-weight:600;font-family:'Inter',sans-serif;transition:all 0.2s;}
+.exit-btn:hover{background:rgba(239,68,68,0.15);border-color:rgba(239,68,68,0.3);}
+
+/* PAGE */
+.page{position:relative;z-index:10;padding:96px 32px 48px;max-width:900px;margin:0 auto;}
+
+/* COURSE HEADER CARD */
+.course-header-card{
+  background:linear-gradient(135deg,rgba(124,58,237,0.2),rgba(109,40,217,0.1));
+  border:1px solid rgba(124,58,237,0.2);border-radius:24px;padding:32px;
+  text-align:center;margin-bottom:24px;
+  animation:fadeIn 0.6s ease;position:relative;overflow:hidden;
+}
+.course-header-card::before{content:"";position:absolute;top:-60px;right:-60px;width:180px;height:180px;border-radius:50%;background:rgba(124,58,237,0.08);}
+@keyframes fadeIn{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+.course-icon{width:72px;height:72px;background:linear-gradient(135deg,var(--purple),#6d28d9);border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:30px;margin:0 auto 16px;box-shadow:0 8px 24px rgba(124,58,237,0.35);}
+.course-header-card h3{font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;margin-bottom:6px;}
+.course-dates{font-size:13px;color:var(--text2);margin-bottom:12px;}
+.total-prog{font-family:'Space Grotesk',sans-serif;font-size:38px;font-weight:800;background:linear-gradient(135deg,var(--gold),#f97316);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.overall-label{font-size:12px;color:var(--text2);margin-top:4px;letter-spacing:0.5px;}
+
+/* TABLE CARD */
+.table-card{background:var(--dark3);border:1px solid var(--border);border-radius:20px;overflow:hidden;animation:fadeIn 0.6s ease 0.15s both;}
+.table-header{display:grid;grid-template-columns:2fr 1.5fr 2fr 1fr;padding:14px 24px;background:rgba(124,58,237,0.12);border-bottom:1px solid var(--border);}
+.th{font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:1px;}
+.topic-row{display:grid;grid-template-columns:2fr 1.5fr 2fr 1fr;padding:18px 24px;border-bottom:1px solid var(--border);align-items:center;transition:background 0.2s;opacity:0;animation:rowUp 0.5s ease forwards;}
+@keyframes rowUp{to{opacity:1;transform:translateY(0);}}
+.topic-row:nth-child(1){animation-delay:0.3s;transform:translateY(12px);}
+.topic-row:nth-child(2){animation-delay:0.45s;transform:translateY(12px);}
+.topic-row:nth-child(3){animation-delay:0.6s;transform:translateY(12px);}
+.topic-row:last-child{border-bottom:none;}
+.topic-row:hover{background:rgba(255,255,255,0.02);}
+.topic-cell{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:500;}
+.schedule-cell{font-size:12px;color:var(--text2);}
+.prog-bar{width:100%;height:6px;background:rgba(255,255,255,0.08);border-radius:4px;overflow:hidden;margin-top:4px;}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--purple),#a78bfa);border-radius:4px;transition:width 0.8s ease;}
+.pct{font-size:11px;color:var(--text2);margin-top:3px;}
+.start-btn{
+  padding:8px 18px;border:none;border-radius:10px;
+  background:linear-gradient(135deg,var(--purple),#6d28d9);
+  color:white;cursor:pointer;font-weight:700;font-size:13px;
+  font-family:'Inter',sans-serif;transition:all 0.3s;
+  box-shadow:0 4px 12px rgba(124,58,237,0.3);
+}
+.start-btn:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(124,58,237,0.4);}
+.start-btn:disabled{background:rgba(255,255,255,0.1);box-shadow:none;cursor:not-allowed;transform:none;color:var(--text2);}
+.fade-out{opacity:0!important;transform:translateY(-20px)!important;transition:0.5s;}
+
+@media(max-width:600px){
+  .page{padding:80px 16px 40px;}
+  .navbar{padding:14px 16px;}
+  .table-header,.topic-row{grid-template-columns:1fr 1fr;gap:8px;}
+  .th:nth-child(2),.schedule-cell{display:none;}
+}
+
+/* LIGHT MODE */
+body.light-mode{background:#f0f2f7!important;color:#1a1a2e!important;}
+body.light-mode .navbar{background:rgba(240,242,247,0.85)!important;border-bottom:1px solid rgba(0,0,0,0.08)!important;}
+body.light-mode .nav-logo{background:linear-gradient(135deg,#1a1a2e 30%,#7c3aed)!important;-webkit-background-clip:text!important;-webkit-text-fill-color:transparent!important;}
+body.light-mode .exit-btn,.light-mode .profile-icon{border-color:rgba(0,0,0,0.1)!important;color:#1a1a2e!important;background:rgba(0,0,0,0.05)!important;}
+body.light-mode .course-header-card{background:linear-gradient(135deg,rgba(124,58,237,0.12),rgba(109,40,217,0.06))!important;border-color:rgba(124,58,237,0.15)!important;}
+body.light-mode .course-header-card h3{color:#1a1a2e!important;}
+body.light-mode .table-card{background:#ffffff!important;border-color:rgba(0,0,0,0.08)!important;}
+body.light-mode .table-header{background:rgba(124,58,237,0.08)!important;border-bottom-color:rgba(0,0,0,0.08)!important;}
+body.light-mode .th{color:rgba(26,26,46,0.55)!important;}
+body.light-mode .topic-row{border-bottom-color:rgba(0,0,0,0.06)!important;color:#1a1a2e!important;}
+body.light-mode .schedule-cell{color:rgba(26,26,46,0.55)!important;}
+body.light-mode .prog-bar{background:rgba(0,0,0,0.08)!important;}
+body.light-mode .pct{color:rgba(26,26,46,0.55)!important;}
+body.light-mode .overall-label,.light-mode .course-dates{color:rgba(26,26,46,0.55)!important;}
+body.light-mode canvas{opacity:0.2!important;}
+</style>
+</head>
+<body>
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+<canvas id="c"></canvas>
+
+<nav class="navbar">
+  <div class="nav-logo">📘 Aptitude Course</div>
+  <div class="nav-right">
+    <button onclick="toggleDark()" id="themeBtn" style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.08);color:white;padding:7px 14px;border-radius:20px;cursor:pointer;font-size:13px;font-weight:600;transition:all 0.2s;font-family:'Inter',sans-serif;">🌙</button>
+    <div class="profile-icon" id="icon"></div>
+    <button class="exit-btn" onclick="exitPage()">🚪 Exit</button>
+  </div>
+</nav>
+
+<div class="page">
+  <div class="course-header-card">
+    <div class="course-icon">📊</div>
+    <h3>APTITUDE COURSE</h3>
+    <div class="course-dates" id="courseDates">📅 25 Mar 2026 – 05 Apr 2026</div>
+    <div class="total-prog" id="totalProgress">0%</div>
+    <div class="overall-label">OVERALL PROGRESS</div>
+  </div>
+
+  <div class="table-card">
+    <div class="table-header">
+      <div class="th">Topic</div>
+      <div class="th">Schedule</div>
+      <div class="th">Progress</div>
+      <div class="th">Action</div>
+    </div>
+    <div class="topic-row">
+      <div class="topic-cell"><span id="l1">🔓</span><span>Verbal Ability</span></div>
+      <div class="schedule-cell"><div id="d1s" style="font-size:11px;">25 Mar 2026</div><div id="d1e" style="font-size:11px;">05 Apr 2026</div></div>
+      <div><div class="prog-bar"><div id="p1" class="prog-fill" style="width:0%"></div></div><div class="pct" id="pct1">0%</div></div>
+      <div><button id="b1" class="start-btn" onclick="startTopic(1)">Start</button></div>
+    </div>
+    <div class="topic-row">
+      <div class="topic-cell"><span id="l2">🔒</span><span>Algebra</span></div>
+      <div class="schedule-cell"><div id="d2s" style="font-size:11px;">25 Mar 2026</div><div id="d2e" style="font-size:11px;">05 Apr 2026</div></div>
+      <div><div class="prog-bar"><div id="p2" class="prog-fill" style="width:0%"></div></div><div class="pct" id="pct2">0%</div></div>
+      <div><button id="b2" class="start-btn" onclick="startTopic(2)" disabled>Start</button></div>
+    </div>
+    <div class="topic-row">
+      <div class="topic-cell"><span id="l3">🔒</span><span>Series &amp; Sequence</span></div>
+      <div class="schedule-cell"><div id="d3s" style="font-size:11px;">25 Mar 2026</div><div id="d3e" style="font-size:11px;">05 Apr 2026</div></div>
+      <div><div class="prog-bar"><div id="p3" class="prog-fill" style="width:0%"></div></div><div class="pct" id="pct3">0%</div></div>
+      <div><button id="b3" class="start-btn" onclick="startTopic(3)" disabled>Start</button></div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){let m=localStorage.getItem('darkMode')||(window.matchMedia&&window.matchMedia('(prefers-color-scheme:light)').matches?'light':'dark');if(m==='light')document.body.classList.add('light-mode');})();
+function toggleDark(){let isLight=document.body.classList.toggle("light-mode");localStorage.setItem("darkMode",isLight?"light":"dark");let b=document.getElementById("themeBtn");if(b)b.innerText=isLight?"☀️":"🌙";}
+(function(){let b=document.getElementById("themeBtn");if(b)b.innerText=localStorage.getItem("darkMode")==="light"?"☀️":"🌙";})();
+let reg=localStorage.getItem("username")||"";
+function getUsers(){return JSON.parse(localStorage.getItem("users"))||{"714524205005":{name:"Balaji"},"714524205053":{name:"Vicky"},"714524205027":{name:"Ismail"},"714524205041":{name:"Sakthivel"}};}
+let users=getUsers();
+let name=(users[reg]||{}).name||"U";
+document.getElementById("icon").innerText=name.charAt(0);
+
+let settings=JSON.parse(localStorage.getItem("adminSettings"))||{};
+if(settings.courseStart)document.getElementById("courseDates").innerText=`📅 ${settings.courseStart} – ${settings.courseEnd||''}`;
+
+function exitPage(){document.body.classList.add("fade-out");setTimeout(()=>location.href="dashboard.html",500);}
+
+function loadProgress(){
+  let p1=parseInt(localStorage.getItem("p1_done_"+reg))||0;
+  let p2=parseInt(localStorage.getItem("p2_done_"+reg))||0;
+  let p3=parseInt(localStorage.getItem("p3_done_"+reg))||0;
+  setTimeout(()=>{
+    document.getElementById("p1").style.width=p1+"%";
+    document.getElementById("p2").style.width=p2+"%";
+    document.getElementById("p3").style.width=p3+"%";
+  },400);
+  document.getElementById("pct1").innerText=p1+"%";
+  document.getElementById("pct2").innerText=p2+"%";
+  document.getElementById("pct3").innerText=p3+"%";
+  if(p1>=100){document.getElementById("l2").innerText="🔓";document.getElementById("b2").disabled=false;document.getElementById("b1").innerText="Redo";}
+  if(p2>=100){document.getElementById("l3").innerText="🔓";document.getElementById("b3").disabled=false;document.getElementById("b2").innerText="Redo";}
+  if(p3>=100)document.getElementById("b3").innerText="Redo";
+  let total=Math.floor((p1+p2+p3)/3);
+  document.getElementById("totalProgress").innerText=total+"%";
+}
+loadProgress();
+
+function startTopic(id){
+  document.body.classList.add("fade-out");
+  setTimeout(()=>{
+    let topics=["Verbal Ability","Algebra","Series & Sequence"];
+    localStorage.setItem("topic",topics[id-1]);localStorage.setItem("mode","practice");localStorage.setItem("currentTopic",id);
+    location.href="test.html";
+  },500);
+}
+
+const cv=document.getElementById("c"),ctx=cv.getContext("2d");
+let W=cv.width=innerWidth,H=cv.height=innerHeight;
+class P2{constructor(){this.reset();}reset(){this.x=Math.random()*W;this.y=Math.random()*H;this.r=Math.random()*1.5+0.3;this.dx=(Math.random()-.5)*.35;this.dy=(Math.random()-.5)*.35;this.a=Math.random()*.5+0.1;}
+draw(){ctx.beginPath();ctx.arc(this.x,this.y,this.r,0,Math.PI*2);ctx.fillStyle=`rgba(255,255,255,${this.a})`;ctx.fill();}
+update(){this.x+=this.dx;this.y+=this.dy;if(this.x<0||this.x>W||this.y<0||this.y>H)this.reset();this.draw();}}
+const pts=Array.from({length:60},()=>new P2());
+function draw(){ctx.clearRect(0,0,W,H);pts.forEach(p=>p.update());for(let i=0;i<pts.length;i++)for(let j=i+1;j<pts.length;j++){let d=Math.hypot(pts[i].x-pts[j].x,pts[i].y-pts[j].y);if(d<120){ctx.beginPath();ctx.strokeStyle=`rgba(124,58,237,${(1-d/120)*0.12})`;ctx.lineWidth=0.8;ctx.moveTo(pts[i].x,pts[i].y);ctx.lineTo(pts[j].x,pts[j].y);ctx.stroke();}}requestAnimationFrame(draw);}
+draw();addEventListener("resize",()=>{W=cv.width=innerWidth;H=cv.height=innerHeight;});
+</script>
+</body>
+</html>

@@ -1,0 +1,59 @@
+/* style.css — APTIORA Global Stylesheet */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700;800&display=swap');
+
+*{box-sizing:border-box;margin:0;padding:0;}
+
+:root{
+  --gold:#f5c842;
+  --purple:#7c3aed;
+  --blue:#3b82f6;
+  --dark:#050508;
+  --dark2:#0d0d14;
+  --dark3:#13131f;
+  --text:#ffffff;
+  --text2:rgba(255,255,255,0.55);
+  --border:rgba(255,255,255,0.08);
+}
+
+body{
+  font-family:'Inter',sans-serif;
+  background:var(--dark);
+  color:var(--text);
+  min-height:100vh;
+}
+
+/* Noise overlay */
+body::before{
+  content:"";
+  position:fixed;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events:none;z-index:0;opacity:0.4;
+}
+
+/* Glass card */
+.glass-card{
+  background:rgba(13,13,20,0.85);
+  backdrop-filter:blur(24px);
+  border:1px solid rgba(255,255,255,0.1);
+  border-radius:24px;
+  padding:32px;
+  position:relative;overflow:hidden;
+}
+.glass-card::before{
+  content:"";position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(124,58,237,0.5),transparent);
+}
+
+/* Primary button */
+.btn-primary{
+  padding:13px 28px;border:none;border-radius:12px;
+  background:linear-gradient(135deg,var(--purple),#6d28d9);
+  color:white;font-size:14px;font-weight:700;cursor:pointer;
+  font-family:'Inter',sans-serif;transition:all 0.3s;
+  box-shadow:0 8px 24px rgba(124,58,237,0.35);
+}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(124,58,237,0.45);}
+
+/* Fade up animation */
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px);}to{opacity:1;transform:translateY(0);}}
+.fade-up{animation:fadeUp 0.7s ease both;}
