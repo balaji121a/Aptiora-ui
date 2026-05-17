@@ -1,358 +1,231 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Test — APTIORA</title>
+<link rel="stylesheet" href="aptiora.css">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700;800&display=swap');
-*{margin:0;padding:0;box-sizing:border-box;}
-:root{--gold:#f5c842;--purple:#7c3aed;--dark:#050508;--dark3:#13131f;--text:#ffffff;--text2:rgba(255,255,255,0.55);--border:rgba(255,255,255,0.08);}
-html,body{width:100%;min-height:100%;font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);}
-body::before{content:"";position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:0.4;}
-#warnOverlay{position:fixed;inset:0;background:rgba(127,29,29,0.97);backdrop-filter:blur(10px);z-index:9999;display:none;align-items:center;justify-content:center;flex-direction:column;color:white;text-align:center;padding:30px;}
-#warnOverlay h1{font-family:'Space Grotesk',sans-serif;font-size:28px;margin-bottom:10px;}
-.warn-count{font-family:'Space Grotesk',sans-serif;font-size:72px;font-weight:800;margin:12px 0;color:#fca5a5;}
-#fsPrompt{position:fixed;inset:0;background:rgba(5,5,8,0.97);backdrop-filter:blur(12px);z-index:500;display:none;align-items:center;justify-content:center;flex-direction:column;color:white;text-align:center;padding:30px;}
-#fsPrompt h2{font-family:'Space Grotesk',sans-serif;font-size:28px;margin-bottom:10px;}
-#fsPrompt p{opacity:0.7;margin-bottom:28px;}
-#fsPrompt button{padding:14px 32px;border:none;border-radius:14px;background:linear-gradient(135deg,#7c3aed,#6d28d9);color:white;font-size:15px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;}
-.timer{position:fixed;top:14px;left:50%;transform:translateX(-50%);background:rgba(13,13,20,0.92);backdrop-filter:blur(12px);border:1px solid var(--border);color:#00e5ff;padding:10px 22px;border-radius:16px;font-weight:700;font-size:16px;display:none;z-index:100;font-family:'Space Grotesk',sans-serif;letter-spacing:2px;}
-.timer.warn{color:#ff4444;border-color:rgba(239,68,68,0.3);animation:blink 0.5s infinite;}
-@keyframes blink{0%,100%{opacity:1;}50%{opacity:0.3;}}
-/* REVIEW OVERLAY */
-#reviewOverlay{position:fixed;inset:0;background:rgba(5,5,8,0.98);backdrop-filter:blur(16px);z-index:800;display:none;overflow-y:auto;padding:32px 20px 60px;}
-.review-wrap{max-width:680px;margin:0 auto;}
-.review-title{font-family:'Space Grotesk',sans-serif;font-size:24px;font-weight:700;text-align:center;margin-bottom:6px;}
-.review-stats{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:24px;}
-.r-stat{background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:14px;padding:12px 20px;text-align:center;}
-.r-stat-num{font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;}
-.r-stat-lbl{font-size:11px;color:var(--text2);margin-top:2px;}
-.review-q{background:rgba(13,13,20,0.9);border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:14px;}
-.review-q-num{font-size:11px;color:var(--text2);margin-bottom:8px;font-weight:700;text-transform:uppercase;letter-spacing:1px;}
-.review-q-text{font-size:15px;font-weight:600;margin-bottom:12px;line-height:1.5;}
-.r-opt{padding:9px 14px;border-radius:10px;border:1px solid var(--border);margin-bottom:6px;font-size:13px;display:flex;align-items:center;gap:10px;}
-.r-opt.correct{border-color:rgba(34,197,94,0.5);background:rgba(34,197,94,0.1);color:#86efac;}
-.r-opt.wrong{border-color:rgba(239,68,68,0.5);background:rgba(239,68,68,0.08);color:#fca5a5;}
-.r-opt.neutral{color:var(--text2);}
-.ai-exp-box{margin-top:12px;background:rgba(124,58,237,0.08);border:1px solid rgba(124,58,237,0.2);border-radius:12px;padding:12px 16px;}
-.ai-exp-lbl{font-size:11px;font-weight:700;color:#a78bfa;margin-bottom:5px;}
-.ai-exp-txt{font-size:13px;color:rgba(255,255,255,0.8);line-height:1.6;}
-.review-close-btn{display:block;width:100%;max-width:380px;margin:24px auto 0;padding:14px;border:none;border-radius:14px;background:linear-gradient(135deg,var(--purple),#6d28d9);color:white;font-size:15px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;}
-/* MAIN LAYOUT */
-.main{display:flex;min-height:100vh;position:relative;z-index:10;}
-.sidebar{width:72px;background:rgba(13,13,20,0.8);backdrop-filter:blur(12px);padding:80px 8px 16px;border-right:1px solid var(--border);position:sticky;top:0;height:100vh;overflow-y:auto;display:flex;flex-direction:column;gap:6px;}
-.sidebar::-webkit-scrollbar{width:3px;}.sidebar::-webkit-scrollbar-thumb{background:rgba(124,58,237,0.3);border-radius:4px;}
-.qbox{width:48px;height:48px;margin:0 auto;display:flex;align-items:center;justify-content:center;border-radius:10px;background:rgba(255,255,255,0.05);border:1px solid var(--border);cursor:pointer;font-size:12px;font-weight:600;transition:all 0.2s;color:var(--text2);position:relative;}
+.test-layout{display:flex;min-height:100vh;}
+.q-sidebar{width:68px;background:rgba(13,13,20,0.85);backdrop-filter:blur(12px);border-right:1px solid var(--border);padding:70px 7px 16px;position:sticky;top:0;height:100vh;overflow-y:auto;display:flex;flex-direction:column;gap:5px;flex-shrink:0;}
+.q-sidebar::-webkit-scrollbar{width:3px;}.q-sidebar::-webkit-scrollbar-thumb{background:rgba(124,58,237,0.3);border-radius:4px;}
+.qbox{width:46px;height:46px;margin:0 auto;display:flex;align-items:center;justify-content:center;border-radius:9px;background:rgba(255,255,255,0.05);border:1px solid var(--border);cursor:pointer;font-size:12px;font-weight:600;transition:all 0.2s;color:var(--text2);position:relative;}
 .qbox:hover{background:rgba(124,58,237,0.15);border-color:rgba(124,58,237,0.3);}
 .qbox.active{background:linear-gradient(135deg,var(--purple),#6d28d9);color:white;border-color:transparent;box-shadow:0 4px 12px rgba(124,58,237,0.3);}
 .qbox.saved{background:rgba(34,197,94,0.15);border-color:rgba(34,197,94,0.3);color:#86efac;}
-.qbox.flagged::after{content:"🚩";position:absolute;top:-5px;right:-5px;font-size:9px;line-height:1;}
-.content{flex:1;padding:24px 28px;min-height:100vh;}
-.ptimer-bar{display:none;height:4px;background:rgba(255,255,255,0.08);border-radius:2px;margin-bottom:16px;overflow:hidden;}
-.ptimer-fill{height:100%;background:linear-gradient(90deg,var(--purple),#a78bfa);transition:width 1s linear;border-radius:2px;}
-.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;padding-top:10px;flex-wrap:wrap;gap:10px;}
-.topbar h3{font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:700;}
-.topbar-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
-.top-btn{padding:8px 14px;border-radius:10px;cursor:pointer;font-weight:700;font-size:13px;font-family:'Inter',sans-serif;transition:all 0.2s;border:1px solid var(--border);}
-.end-btn{background:rgba(239,68,68,0.15);border-color:rgba(239,68,68,0.3);color:#fca5a5;}
-.end-btn:hover{background:rgba(239,68,68,0.25);}
-.sound-btn{background:rgba(255,255,255,0.07);color:white;}
-.sound-btn:hover{background:rgba(255,255,255,0.12);}
-.ptimer-btn{background:rgba(245,200,66,0.1);border-color:rgba(245,200,66,0.25);color:#f5c842;display:none;}
-.q-card{background:var(--dark3);border:1px solid var(--border);border-radius:20px;padding:28px;position:relative;overflow:hidden;}
+.qbox.flagged::after{content:"🚩";position:absolute;top:-5px;right:-5px;font-size:9px;}
+.test-content{flex:1;padding:70px 22px 20px;min-width:0;}
+.test-topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:8px;}
+.q-card{background:rgba(13,13,20,0.9);border:1px solid var(--border);border-radius:var(--radius-xl);padding:26px;position:relative;overflow:hidden;}
 .q-card::before{content:"";position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(124,58,237,0.4),transparent);}
-.q-num{font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;}
-.q-text{font-size:18px;font-weight:600;margin-bottom:24px;line-height:1.5;}
-.option{margin:10px 0;padding:14px 18px;border:1.5px solid var(--border);border-radius:12px;cursor:pointer;transition:all 0.2s;font-size:14px;display:flex;align-items:center;gap:14px;background:rgba(255,255,255,0.02);}
+.q-num-row{font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;}
+.q-text{font-size:17px;font-weight:600;margin-bottom:22px;line-height:1.55;}
+.option{margin:9px 0;padding:13px 17px;border:1.5px solid var(--border);border-radius:var(--radius);cursor:pointer;transition:all 0.2s;font-size:14px;display:flex;align-items:center;gap:13px;background:rgba(255,255,255,0.02);position:relative;overflow:hidden;}
 .option:hover{border-color:rgba(124,58,237,0.4);background:rgba(124,58,237,0.06);}
 .option.selected{border-color:rgba(34,197,94,0.5);background:rgba(34,197,94,0.08);}
-.opt-letter{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;flex-shrink:0;color:var(--text2);}
+.opt-letter{width:27px;height:27px;border-radius:50%;background:rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;flex-shrink:0;color:var(--text2);transition:all 0.2s;}
 .option.selected .opt-letter{background:rgba(34,197,94,0.8);color:white;}
-.btns{display:flex;justify-content:space-between;align-items:center;margin-top:22px;flex-wrap:wrap;gap:8px;}
-.nav-btn{padding:11px 22px;border:none;border-radius:10px;cursor:pointer;font-weight:700;font-size:13px;font-family:'Inter',sans-serif;transition:all 0.2s;}
-.btn-prev{background:rgba(255,255,255,0.07);border:1px solid var(--border);color:white;}
-.btn-next{background:linear-gradient(135deg,var(--purple),#6d28d9);color:white;box-shadow:0 4px 12px rgba(124,58,237,0.3);}
-.btn-next:hover{transform:translateY(-2px);}
-.btn-hint{background:rgba(245,200,66,0.1);border:1px solid rgba(245,200,66,0.25);color:#f5c842;display:none;}
-.btn-flag{background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.2);color:#fca5a5;}
-.btn-flag.on{background:rgba(239,68,68,0.18);border-color:rgba(239,68,68,0.4);}
-.hint-panel{display:none;margin-top:14px;background:rgba(245,200,66,0.06);border:1px solid rgba(245,200,66,0.2);border-radius:14px;padding:16px 18px;}
-.hint-lbl{font-size:12px;font-weight:700;color:#f5c842;margin-bottom:6px;}
-.hint-txt{font-size:14px;color:rgba(255,255,255,0.85);line-height:1.65;}
-.bottom-info{margin-top:14px;display:flex;gap:8px;flex-wrap:wrap;}
-.info-pill{background:rgba(255,255,255,0.04);border:1px solid var(--border);padding:7px 14px;border-radius:20px;font-size:12px;color:var(--text2);}
-.warn-return-btn{margin-top:20px;padding:13px 28px;border:none;border-radius:12px;background:white;color:#ef4444;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;font-size:15px;}
-@media(max-width:600px){.sidebar{width:56px;}.content{padding:14px 12px;}.q-text{font-size:15px;}.btns{gap:6px;}.nav-btn{padding:10px 14px;font-size:12px;}}
-body.light-mode{background:#f0f2f7!important;color:#1a1a2e!important;}
-body.light-mode .q-card{background:#ffffff!important;border-color:rgba(0,0,0,0.08)!important;}
-body.light-mode .option{background:rgba(0,0,0,0.03)!important;border-color:rgba(0,0,0,0.1)!important;color:#1a1a2e!important;}
-body.light-mode .qbox{background:rgba(0,0,0,0.05)!important;border-color:rgba(0,0,0,0.1)!important;color:rgba(26,26,46,0.6)!important;}
-body.light-mode .sidebar{background:rgba(255,255,255,0.9)!important;border-right-color:rgba(0,0,0,0.08)!important;}
-body.light-mode .info-pill{background:rgba(0,0,0,0.04)!important;border-color:rgba(0,0,0,0.08)!important;color:rgba(26,26,46,0.6)!important;}
-body.light-mode .review-q{background:rgba(255,255,255,0.9)!important;border-color:rgba(0,0,0,0.08)!important;color:#1a1a2e!important;}
-body.light-mode .review-q-text{color:#1a1a2e!important;}
-body.light-mode .r-stat{background:rgba(0,0,0,0.04)!important;}
-body.light-mode #reviewOverlay{background:rgba(240,242,247,0.98)!important;}
-body.light-mode .review-title{color:#1a1a2e!important;}
+.nav-btns{display:flex;justify-content:space-between;align-items:center;margin-top:20px;gap:8px;flex-wrap:wrap;}
+.hint-panel{display:none;margin-top:13px;background:rgba(245,200,66,0.06);border:1px solid rgba(245,200,66,0.2);border-radius:var(--radius-lg);padding:15px 18px;}
+.hint-lbl{font-size:11px;font-weight:700;color:#f5c842;margin-bottom:6px;}
+.hint-txt{font-size:13px;color:rgba(255,255,255,0.85);line-height:1.65;}
+.bottom-pills{margin-top:12px;display:flex;gap:7px;flex-wrap:wrap;}
+.i-pill{background:rgba(255,255,255,0.04);border:1px solid var(--border);padding:6px 13px;border-radius:20px;font-size:11px;color:var(--text2);}
+.ptimer-bar{display:none;height:4px;background:rgba(255,255,255,0.08);border-radius:2px;margin-bottom:14px;overflow:hidden;}
+.ptimer-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--purple),#a78bfa);transition:width 1s linear;}
+.timer-box{position:fixed;top:12px;left:50%;transform:translateX(-50%);background:rgba(13,13,20,0.95);backdrop-filter:blur(12px);border:1px solid var(--border);color:#00e5ff;padding:9px 20px;border-radius:14px;font-weight:700;font-size:15px;display:none;z-index:300;font-family:'Space Grotesk',sans-serif;letter-spacing:2px;}
+.timer-box.warn{color:#ff4444;border-color:rgba(239,68,68,0.3);animation:blink 0.5s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+#warnOverlay{position:fixed;inset:0;background:rgba(127,29,29,0.97);backdrop-filter:blur(10px);z-index:9999;display:none;align-items:center;justify-content:center;flex-direction:column;color:white;text-align:center;padding:28px;}
+.warn-num{font-family:'Space Grotesk',sans-serif;font-size:72px;font-weight:800;color:#fca5a5;margin:10px 0;}
+#fsPrompt{position:fixed;inset:0;background:rgba(5,5,8,0.97);z-index:500;display:none;align-items:center;justify-content:center;flex-direction:column;color:white;text-align:center;padding:28px;}
+#reviewOverlay{position:fixed;inset:0;background:rgba(5,5,8,0.98);backdrop-filter:blur(16px);z-index:800;display:none;overflow-y:auto;padding:28px 16px 60px;}
+.rev-wrap{max-width:660px;margin:0 auto;}
+.rev-stat-row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:22px;}
+.rev-stat{background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:var(--radius-lg);padding:12px 20px;text-align:center;}
+.rev-q{background:rgba(13,13,20,0.9);border:1px solid var(--border);border-radius:var(--radius-lg);padding:18px;margin-bottom:12px;}
+.r-opt{padding:8px 14px;border-radius:9px;border:1px solid var(--border);margin-bottom:5px;font-size:13px;display:flex;align-items:center;gap:8px;}
+.r-opt.correct{border-color:rgba(34,197,94,0.5);background:rgba(34,197,94,0.1);color:#86efac;}
+.r-opt.wrong{border-color:rgba(239,68,68,0.5);background:rgba(239,68,68,0.08);color:#fca5a5;}
+.ai-exp-box{margin-top:10px;background:rgba(124,58,237,0.08);border:1px solid rgba(124,58,237,0.2);border-radius:10px;padding:11px 15px;}
+.ai-exp-lbl{font-size:10px;font-weight:700;color:#a78bfa;margin-bottom:5px;}
+.ai-exp-txt{font-size:13px;color:rgba(255,255,255,0.8);line-height:1.6;}
+@media(max-width:580px){.q-sidebar{width:52px;}.test-content{padding:70px 10px 16px;}.q-text{font-size:14px;}.nav-btns{gap:5px;}.btn{padding:9px 12px;font-size:12px;}}
+body.light .q-sidebar{background:rgba(255,255,255,0.88)!important;}
+body.light .q-card{background:#ffffff!important;border-color:rgba(0,0,0,0.08)!important;}
+body.light .option{background:rgba(0,0,0,0.03)!important;border-color:rgba(0,0,0,0.1)!important;color:#1a1a2e!important;}
+body.light .qbox{background:rgba(0,0,0,0.05)!important;border-color:rgba(0,0,0,0.1)!important;color:rgba(26,26,46,0.6)!important;}
+body.light .i-pill{background:rgba(0,0,0,0.04)!important;border-color:rgba(0,0,0,0.08)!important;color:rgba(26,26,46,0.55)!important;}
+body.light .rev-q{background:rgba(255,255,255,0.92)!important;border-color:rgba(0,0,0,0.08)!important;color:#1a1a2e!important;}
+body.light .rev-stat{background:rgba(0,0,0,0.04)!important;}
 </style>
 </head>
 <body>
 <div id="warnOverlay">
-  <h1>⚠️ Tab Switch Detected!</h1>
-  <div class="warn-count" id="warnCount">1</div>
-  <p style="font-size:15px;opacity:0.8;">Return to test immediately.<br>3 violations = Auto submit!</p>
-  <button class="warn-return-btn" onclick="dismissWarn()">↩ Return to Test</button>
+  <div style="font-family:'Space Grotesk',sans-serif;font-size:26px;font-weight:700;">⚠️ Tab Switch Detected!</div>
+  <div class="warn-num" id="warnNum">1</div>
+  <div style="opacity:0.8">Return immediately · 3 violations = auto-submit</div>
+  <button class="btn btn-primary" style="margin-top:20px" onclick="dismissWarn()">↩ Return to Test</button>
 </div>
 <div id="fsPrompt">
-  <div style="font-size:60px;margin-bottom:16px;">🔒</div>
-  <h2>Secure Test Mode</h2>
-  <p>Fullscreen required during assessment.<br>Do not exit fullscreen.</p>
-  <button onclick="enterFullscreen()">▶ Enter Fullscreen & Start</button>
+  <div style="font-size:60px;margin-bottom:16px">🔒</div>
+  <div style="font-family:'Space Grotesk',sans-serif;font-size:24px;font-weight:700;margin-bottom:8px">Secure Mode</div>
+  <div style="opacity:0.7;margin-bottom:24px">Fullscreen required for assessment</div>
+  <button class="btn btn-primary" onclick="enterFS()">▶ Enter Fullscreen</button>
 </div>
-<div id="timerBox" class="timer">45:00</div>
-
+<div id="timerBox" class="timer-box">45:00</div>
 <div id="reviewOverlay">
-  <div class="review-wrap">
-    <div class="review-title">📋 Answer Review</div>
-    <div class="review-stats" id="reviewStats"></div>
-    <div id="reviewBody"></div>
-    <button class="review-close-btn" onclick="closeReview()">✅ Done — Back to Course</button>
+  <div class="rev-wrap">
+    <div style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;text-align:center;margin-bottom:6px">📋 Answer Review</div>
+    <div class="rev-stat-row" id="revStats"></div>
+    <div id="revBody"></div>
+    <button class="btn btn-primary btn-full" style="max-width:380px;margin:20px auto 0;display:flex" onclick="closeReview()">✅ Done — Back to Course</button>
   </div>
 </div>
-
-<div class="main">
-  <div class="sidebar" id="numbers"></div>
-  <div class="content">
+<div class="test-layout">
+  <div class="q-sidebar" id="qSidebar"></div>
+  <div class="test-content">
     <div class="ptimer-bar" id="ptimerBar"><div class="ptimer-fill" id="ptimerFill" style="width:100%"></div></div>
-    <div class="topbar">
-      <h3 id="title">Loading...</h3>
-      <div class="topbar-right">
-        <button class="top-btn sound-btn" id="soundBtn" onclick="toggleSound()">🔊</button>
-        <button class="top-btn ptimer-btn" id="ptimerBtn" onclick="togglePracticeTimer()">⏱ Timer: OFF</button>
-        <button class="top-btn end-btn" onclick="endTest()">■ End Test</button>
+    <div class="test-topbar">
+      <div style="font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:700;" id="testTitle">Loading...</div>
+      <div style="display:flex;gap:7px;flex-wrap:wrap;">
+        <button class="btn btn-secondary btn-sm" id="soundBtn">🔊</button>
+        <button class="btn btn-secondary btn-sm" id="ptimerBtn" onclick="togglePTimer()" style="display:none">⏱ Timer</button>
+        <button class="btn btn-danger btn-sm" onclick="endTest()">■ End</button>
       </div>
     </div>
     <div class="q-card">
-      <div class="q-num">
-        <span id="qNum">Question 1</span>
-        <span id="flagIndicator" style="font-size:16px;display:none;">🚩</span>
-      </div>
-      <div class="q-text" id="question"></div>
-      <div id="options"></div>
-      <div class="btns">
-        <button class="nav-btn btn-prev" onclick="prevQ()">◀ Prev</button>
-        <button class="nav-btn btn-hint" id="hintBtn" onclick="getHint()">💡 Hint (<span id="hintsLeft">3</span>)</button>
-        <button class="nav-btn btn-flag" id="flagBtn" onclick="toggleFlag()">🚩 Flag</button>
-        <button class="nav-btn btn-next" onclick="nextQ()">Next ▶</button>
+      <div class="q-num-row"><span id="qNum">Q 1</span><span id="flagInd" style="display:none">🚩</span></div>
+      <div class="q-text" id="qText"></div>
+      <div id="opts"></div>
+      <div class="nav-btns">
+        <button class="btn btn-secondary btn-sm" onclick="prevQ()">◀ Prev</button>
+        <button class="btn btn-sm" id="hintBtn" onclick="getHint()" style="background:rgba(245,200,66,0.1);border:1px solid rgba(245,200,66,0.25);color:#f5c842;display:none">💡 Hint (<span id="hL">3</span>)</button>
+        <button class="btn btn-sm" id="flagBtn" onclick="toggleFlag()" style="background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.2);color:#fca5a5">🚩 Flag</button>
+        <button class="btn btn-primary btn-sm" onclick="nextQ()">Next ▶</button>
       </div>
     </div>
     <div class="hint-panel" id="hintPanel">
-      <div class="hint-lbl">💡 AI Hint <span id="hintLoading" style="font-size:11px;opacity:0.5;display:none;">Thinking...</span></div>
+      <div class="hint-lbl">💡 AI Hint <span id="hintLoad" style="font-size:11px;opacity:0.5;display:none">Thinking...</span></div>
       <div class="hint-txt" id="hintTxt"></div>
     </div>
-    <div class="bottom-info">
-      <div class="info-pill">✅ Saved: <strong id="saved">0</strong></div>
-      <div class="info-pill">⏳ Remaining: <strong id="remain">0</strong></div>
-      <div class="info-pill" id="flagPill" style="display:none;">🚩 Flagged: <strong id="flaggedCnt">0</strong></div>
-      <div class="info-pill" id="ptimerPill" style="display:none;">⏱ <strong id="ptimerLeft">10:00</strong></div>
+    <div class="bottom-pills">
+      <div class="i-pill">✅ Saved: <strong id="savedN">0</strong></div>
+      <div class="i-pill">⏳ Left: <strong id="remainN">0</strong></div>
+      <div class="i-pill" id="flagPill" style="display:none">🚩 Flagged: <strong id="flagN">0</strong></div>
+      <div class="i-pill" id="ptPill" style="display:none">⏱ <strong id="ptLeft">10:00</strong></div>
     </div>
   </div>
 </div>
-
+<script src="aptiora.js"></script>
 <script>
-if(localStorage.getItem("darkMode")==="light")document.body.classList.add("light-mode");
-
-let mode=localStorage.getItem("mode")||"practice";
-let topic=localStorage.getItem("topic")||"Verbal Ability";
-let currentTopic=parseInt(localStorage.getItem("currentTopic"))||1;
-let reg=localStorage.getItem("username")||"guest";
-let settings=JSON.parse(localStorage.getItem("adminSettings"))||{assessTime:45,antiCheat:true,forceFullscreen:true,shuffleQ:true};
-let isAssessment=(mode==="assessment"&&localStorage.getItem("allowTest")==="yes");
-if(mode==="assessment"&&!isAssessment){location.href="code.html";}
-
-let soundEnabled=localStorage.getItem("soundEnabled")!=="off";
-let answerKey="answers_"+reg+"_"+topic;
-let answers=JSON.parse(localStorage.getItem(answerKey))||{};
-let flaggedQs=JSON.parse(localStorage.getItem("flagged_"+reg+"_"+topic))||{};
-let hintsLeft=3;
-let warnCount=0;
-let ptActive=false,ptSecs=600,ptIv=null;
-
-// ── SOUND ──
-const AudioCtx=window.AudioContext||window.webkitAudioContext;
-let actx=null;
-function getCtx(){if(!actx)actx=new AudioCtx();return actx;}
-function tone(f,d,t="sine",v=0.25){if(!soundEnabled)return;try{let a=getCtx(),o=a.createOscillator(),g=a.createGain();o.connect(g);g.connect(a.destination);o.type=t;o.frequency.value=f;g.gain.setValueAtTime(v,a.currentTime);g.gain.exponentialRampToValueAtTime(0.001,a.currentTime+d);o.start();o.stop(a.currentTime+d);}catch(e){}}
-function sndClick(){tone(440,0.05);}
-function sndTimerWarn(){[0,200,400].forEach(d=>setTimeout(()=>tone(880,0.1),d));}
-function toggleSound(){soundEnabled=!soundEnabled;localStorage.setItem("soundEnabled",soundEnabled?"on":"off");document.getElementById("soundBtn").innerText=soundEnabled?"🔊":"🔇";sndClick();}
-document.getElementById("soundBtn").innerText=soundEnabled?"🔊":"🔇";
-
-// ── ANTI-CHEAT ──
-if(isAssessment&&settings.antiCheat!==false){document.addEventListener("visibilitychange",()=>{if(document.hidden){warnCount++;showWarn();}});}
-function showWarn(){document.getElementById("warnCount").innerText=warnCount;document.getElementById("warnOverlay").style.display="flex";if(warnCount>=3){alert("❌ Test terminated!");endTest();}}
-function dismissWarn(){document.getElementById("warnOverlay").style.display="none";if(isAssessment&&settings.forceFullscreen!==false&&!document.fullscreenElement)document.documentElement.requestFullscreen().catch(()=>{});}
-if(isAssessment&&settings.forceFullscreen!==false){document.getElementById("fsPrompt").style.display="flex";}
-else if(isAssessment){startTimer();}
-function enterFullscreen(){document.documentElement.requestFullscreen().then(()=>{document.getElementById("fsPrompt").style.display="none";startTimer();}).catch(()=>{document.getElementById("fsPrompt").style.display="none";startTimer();});}
-document.addEventListener("fullscreenchange",()=>{if(isAssessment&&!document.fullscreenElement&&document.getElementById("warnOverlay").style.display!=="flex"){warnCount++;showWarn();}});
-
-// ── ASSESSMENT TIMER ──
-function startTimer(){
-  let time=(parseInt(settings.assessTime)||45)*60;
-  let box=document.getElementById("timerBox");box.style.display="block";
-  let iv=setInterval(()=>{let m=Math.floor(time/60),s=time%60;box.innerText=(m<10?"0"+m:m)+":"+(s<10?"0"+s:s);if(time===300){box.classList.add("warn");sndTimerWarn();alert("⚠️ 5 minutes remaining!");}if(time===60)sndTimerWarn();time--;if(time<0){clearInterval(iv);if(document.fullscreenElement)document.exitFullscreen();endTest();}},1000);
-}
-
-// ── PRACTICE TIMER ──
-if(!isAssessment)document.getElementById("ptimerBtn").style.display="block";
-function togglePracticeTimer(){
-  ptActive=!ptActive;
-  let bar=document.getElementById("ptimerBar"),pill=document.getElementById("ptimerPill"),btn=document.getElementById("ptimerBtn");
-  if(ptActive){
-    ptSecs=600;bar.style.display="block";pill.style.display="block";btn.innerText="⏱ Timer: ON";
-    if(ptIv)clearInterval(ptIv);
-    ptIv=setInterval(()=>{ptSecs--;let m=Math.floor(ptSecs/60),s=ptSecs%60;document.getElementById("ptimerLeft").innerText=(m<10?"0"+m:m)+":"+(s<10?"0"+s:s);document.getElementById("ptimerFill").style.width=(ptSecs/600*100)+"%";if(ptSecs===120||ptSecs===60)sndTimerWarn();if(ptSecs<=0){clearInterval(ptIv);sndTimerWarn();alert("⏱ Practice time up!");}},1000);
-  } else {
-    bar.style.display="none";pill.style.display="none";btn.innerText="⏱ Timer: OFF";if(ptIv)clearInterval(ptIv);
-  }
-  sndClick();
-}
-
-// ── QUESTIONS ──
-function defaultQ(cat){
-  let b={
-    "Verbal Ability":[{q:"Synonym of 'Happy'",o:["Sad","Joyful","Angry","Cry"],a:1},{q:"Antonym of 'Big'",o:["Large","Huge","Small","Wide"],a:2},{q:"Plural of 'Child'",o:["Childs","Children","Childes","Child"],a:1},{q:"Which is a Verb?",o:["Run","Blue","Table","Chair"],a:0},{q:"Correct tense?",o:["I eat","I ate","I eating","I eats"],a:1},{q:"Synonym of 'Fast'",o:["Quick","Slow","Late","Stop"],a:0},{q:"Antonym of 'Hot'",o:["Warm","Cold","Heat","Fire"],a:1},{q:"Correct sentence",o:["He go","He goes","He going","He gone"],a:1},{q:"She ___ playing",o:["is","are","am","be"],a:0},{q:"Correct spelling",o:["Receive","Recieve","Receeve","Receve"],a:0}],
-    "Algebra":[{q:"2+3=?",o:["4","5","6","7"],a:1},{q:"5×2=?",o:["10","12","8","15"],a:0},{q:"10-4=?",o:["5","6","7","4"],a:1},{q:"x+2=5, x=?",o:["2","3","4","5"],a:1},{q:"3²=?",o:["6","9","12","3"],a:1},{q:"√16=?",o:["2","4","8","6"],a:1},{q:"7+8=?",o:["14","15","16","13"],a:1},{q:"9÷3=?",o:["2","3","4","1"],a:1},{q:"4×4=?",o:["8","12","16","14"],a:2},{q:"6+7=?",o:["12","13","14","11"],a:1}],
-    "Series & Sequence":[{q:"2,4,8,?",o:["10","12","16","18"],a:2},{q:"3,9,27,?",o:["30","81","18","54"],a:1},{q:"5,10,20,?",o:["30","35","40","50"],a:2},{q:"7,14,28,?",o:["30","56","60","40"],a:1},{q:"1,1,2,3,5,?",o:["6","7","8","9"],a:2},{q:"10,20,40,?",o:["60","80","100","120"],a:1},{q:"6,12,24,?",o:["36","48","60","72"],a:1},{q:"9,18,36,?",o:["45","54","72","81"],a:2},{q:"2,6,18,?",o:["36","54","72","108"],a:1},{q:"4,8,16,?",o:["20","24","32","40"],a:2}],
-    "Assessment":[{q:"2+3=?",o:["4","5","6","7"],a:1},{q:"5×2=?",o:["10","12","8","15"],a:0},{q:"7+8=?",o:["14","15","16","13"],a:1},{q:"√16=?",o:["2","4","8","6"],a:1},{q:"10-4=?",o:["5","6","7","4"],a:1},{q:"1,1,2,3,5,?",o:["6","7","8","9"],a:2},{q:"6,12,24,?",o:["36","48","60","72"],a:1},{q:"4×4=?",o:["8","12","16","14"],a:2},{q:"9÷3=?",o:["2","3","4","1"],a:1},{q:"10,20,40,?",o:["60","80","100","120"],a:1},{q:"Synonym of 'Happy'",o:["Sad","Joyful","Cry","Angry"],a:1},{q:"Antonym of 'Big'",o:["Large","Small","Huge","Wide"],a:1},{q:"Synonym of 'Fast'",o:["Quick","Slow","Late","Stop"],a:0},{q:"Plural of 'Child'",o:["Childs","Children","Childes","Child"],a:1},{q:"Which is a Verb?",o:["Run","Blue","Table","Chair"],a:0},{q:"Correct tense?",o:["I eat","I ate","I eating","I eats"],a:1},{q:"3²=?",o:["6","9","12","3"],a:1},{q:"2,4,8,?",o:["10","12","16","18"],a:2},{q:"3,9,27,?",o:["30","81","18","54"],a:1},{q:"5,10,20,?",o:["30","35","40","50"],a:2}]
-  };
+let user=getCurrentUser();if(!user)throw'';
+let {reg,name}=user;
+let mode=localStorage.getItem('mode')||'practice';
+let topic=localStorage.getItem('topic')||'Verbal Ability';
+let topicN=parseInt(localStorage.getItem('currentTopic'))||1;
+let s=getSettings();
+let isAssess=(mode==='assessment'&&localStorage.getItem('allowTest')==='yes');
+if(mode==='assessment'&&!isAssess){nav('code.html');}
+let aKey='ans_'+reg+'_'+topic;
+let answers=JSON.parse(localStorage.getItem(aKey))||{};
+let flags=JSON.parse(localStorage.getItem('flags_'+reg+'_'+topic))||{};
+let hintsLeft=3,warnN=0,ptActive=false,ptSecs=600,ptIv=null;
+function defQ(cat){
+  let b={'Verbal Ability':[{q:"Synonym of 'Happy'",o:["Sad","Joyful","Angry","Cry"],a:1},{q:"Antonym of 'Big'",o:["Large","Huge","Small","Wide"],a:2},{q:"Plural of 'Child'",o:["Childs","Children","Childes","Child"],a:1},{q:"Which is a Verb?",o:["Run","Blue","Table","Chair"],a:0},{q:"Correct tense?",o:["I eat","I ate","I eating","I eats"],a:1},{q:"Synonym of 'Fast'",o:["Quick","Slow","Late","Stop"],a:0},{q:"Antonym of 'Hot'",o:["Warm","Cold","Heat","Fire"],a:1},{q:"Correct sentence",o:["He go","He goes","He going","He gone"],a:1},{q:"She ___ playing",o:["is","are","am","be"],a:0},{q:"Correct spelling",o:["Receive","Recieve","Receeve","Receve"],a:0}],
+  'Algebra':[{q:"2+3=?",o:["4","5","6","7"],a:1},{q:"5×2=?",o:["10","12","8","15"],a:0},{q:"10-4=?",o:["5","6","7","4"],a:1},{q:"x+2=5, x=?",o:["2","3","4","5"],a:1},{q:"3²=?",o:["6","9","12","3"],a:1},{q:"√16=?",o:["2","4","8","6"],a:1},{q:"7+8=?",o:["14","15","16","13"],a:1},{q:"9÷3=?",o:["2","3","4","1"],a:1},{q:"4×4=?",o:["8","12","16","14"],a:2},{q:"6+7=?",o:["12","13","14","11"],a:1}],
+  'Series & Sequence':[{q:"2,4,8,?",o:["10","12","16","18"],a:2},{q:"3,9,27,?",o:["30","81","18","54"],a:1},{q:"5,10,20,?",o:["30","35","40","50"],a:2},{q:"7,14,28,?",o:["30","56","60","40"],a:1},{q:"1,1,2,3,5,?",o:["6","7","8","9"],a:2},{q:"10,20,40,?",o:["60","80","100","120"],a:1},{q:"6,12,24,?",o:["36","48","60","72"],a:1},{q:"9,18,36,?",o:["45","54","72","81"],a:2},{q:"2,6,18,?",o:["36","54","72","108"],a:1},{q:"4,8,16,?",o:["20","24","32","40"],a:2}],
+  'Assessment':[{q:"2+3=?",o:["4","5","6","7"],a:1},{q:"5×2=?",o:["10","12","8","15"],a:0},{q:"7+8=?",o:["14","15","16","13"],a:1},{q:"√16=?",o:["2","4","8","6"],a:1},{q:"10-4=?",o:["5","6","7","4"],a:1},{q:"1,1,2,3,5,?",o:["6","7","8","9"],a:2},{q:"6,12,24,?",o:["36","48","60","72"],a:1},{q:"4×4=?",o:["8","12","16","14"],a:2},{q:"9÷3=?",o:["2","3","4","1"],a:1},{q:"10,20,40,?",o:["60","80","100","120"],a:1},{q:"Synonym 'Happy'",o:["Sad","Joyful","Cry","Angry"],a:1},{q:"Antonym 'Big'",o:["Large","Small","Huge","Wide"],a:1},{q:"Synonym 'Fast'",o:["Quick","Slow","Late","Stop"],a:0},{q:"Plural 'Child'",o:["Childs","Children","Childes","Child"],a:1},{q:"Which Verb?",o:["Run","Blue","Table","Chair"],a:0},{q:"Correct tense?",o:["I eat","I ate","I eating","I eats"],a:1},{q:"3²=?",o:["6","9","12","3"],a:1},{q:"2,4,8,?",o:["10","12","16","18"],a:2},{q:"3,9,27,?",o:["30","81","18","54"],a:1},{q:"5,10,20,?",o:["30","35","40","50"],a:2}]};
   return b[cat]||[];
 }
-let qBank=JSON.parse(localStorage.getItem("questionBank"))||{};
-let rawQ=isAssessment?(qBank["Assessment"]||defaultQ("Assessment")).slice(0,20):(qBank[topic]||defaultQ(topic));
-function shuffle(arr){let a=[...arr];for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
-let questions=[],correctAnswers=[];
-if(isAssessment&&settings.shuffleQ!==false){
-  let sk="shuffledOrder_"+reg,ex=localStorage.getItem(sk);
-  if(ex){let o=JSON.parse(ex);questions=o.map(i=>rawQ[i]);correctAnswers=o.map(i=>rawQ[i].a);}
-  else{let idx=shuffle([...Array(rawQ.length).keys()]);localStorage.setItem(sk,JSON.stringify(idx));questions=idx.map(i=>rawQ[i]);correctAnswers=idx.map(i=>rawQ[i].a);}
-}else{questions=rawQ;correctAnswers=rawQ.map(q=>q.a);}
-
-document.getElementById("title").innerText=isAssessment?"📝 Assessment Test":"📖 "+topic;
-if(!isAssessment)document.getElementById("hintBtn").style.display="block";
-
-let current=0,letters=["A","B","C","D"];
-
-function loadNumbers(){
-  document.getElementById("numbers").innerHTML=questions.map((q,i)=>`<div class="qbox${i===current?" active":""}${answers[i]!==undefined?" saved":""}${flaggedQs[i]?" flagged":""}" onclick="goQ(${i})">${i+1}</div>`).join("");
-}
+let qBank=JSON.parse(localStorage.getItem('questionBank'))||{};
+let rawQ=isAssess?(qBank['Assessment']||defQ('Assessment')).slice(0,20):(qBank[topic]||defQ(topic));
+function shuffle(a){let r=[...a];for(let i=r.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[r[i],r[j]]=[r[j],r[i]];}return r;}
+let qs=[],cas=[];
+if(isAssess&&s.shuffleQ!==false){let sk='shuf_'+reg,ex=localStorage.getItem(sk);if(ex){let o=JSON.parse(ex);qs=o.map(i=>rawQ[i]);cas=o.map(i=>rawQ[i].a);}else{let idx=shuffle([...Array(rawQ.length).keys()]);localStorage.setItem(sk,JSON.stringify(idx));qs=idx.map(i=>rawQ[i]);cas=idx.map(i=>rawQ[i].a);}}else{qs=rawQ;cas=rawQ.map(q=>q.a);}
+document.getElementById('testTitle').innerText=isAssess?'📝 Assessment':'📖 '+topic;
+if(!isAssess){document.getElementById('hintBtn').style.display='block';document.getElementById('ptimerBtn').style.display='block';}
+if(isAssess&&s.antiCheat!==false){document.addEventListener('visibilitychange',()=>{if(document.hidden){warnN++;document.getElementById('warnNum').innerText=warnN;document.getElementById('warnOverlay').style.display='flex';if(warnN>=3){alert('❌ Test terminated!');endTest();}}});}
+function dismissWarn(){document.getElementById('warnOverlay').style.display='none';if(isAssess&&s.forceFullscreen!==false&&!document.fullscreenElement)document.documentElement.requestFullscreen().catch(()=>{});}
+if(isAssess&&s.forceFullscreen!==false)document.getElementById('fsPrompt').style.display='flex';
+else if(isAssess)startTimer();
+function enterFS(){document.documentElement.requestFullscreen().then(()=>{document.getElementById('fsPrompt').style.display='none';startTimer();}).catch(()=>{document.getElementById('fsPrompt').style.display='none';startTimer();});}
+document.addEventListener('fullscreenchange',()=>{if(isAssess&&!document.fullscreenElement&&document.getElementById('warnOverlay').style.display!=='flex'){warnN++;document.getElementById('warnNum').innerText=warnN;document.getElementById('warnOverlay').style.display='flex';}});
+function startTimer(){let t=(parseInt(s.assessTime)||45)*60,box=document.getElementById('timerBox');box.style.display='block';let iv=setInterval(()=>{let m=Math.floor(t/60),sc=t%60;box.innerText=(m<10?'0'+m:m)+':'+(sc<10?'0'+sc:sc);if(t===300){box.classList.add('warn');sndWarn();alert('⚠️ 5 minutes left!');}if(t===60)sndWarn();t--;if(t<0){clearInterval(iv);if(document.fullscreenElement)document.exitFullscreen();endTest();}},1000);}
+function togglePTimer(){ptActive=!ptActive;let bar=document.getElementById('ptimerBar'),pill=document.getElementById('ptPill'),btn=document.getElementById('ptimerBtn');if(ptActive){ptSecs=600;bar.style.display='block';pill.style.display='block';btn.innerText='⏱ Stop';if(ptIv)clearInterval(ptIv);ptIv=setInterval(()=>{ptSecs--;let m=Math.floor(ptSecs/60),sc=ptSecs%60;document.getElementById('ptLeft').innerText=(m<10?'0'+m:m)+':'+(sc<10?'0'+sc:sc);document.getElementById('ptimerFill').style.width=(ptSecs/600*100)+'%';if(ptSecs===120||ptSecs===60)sndWarn();if(ptSecs<=0){clearInterval(ptIv);sndWarn();alert('⏱ Time up!');}},1000);}else{bar.style.display='none';pill.style.display='none';btn.innerText='⏱ Timer';if(ptIv)clearInterval(ptIv);}sndClick();}
+let cur=0,L=['A','B','C','D'];
+function loadNums(){document.getElementById('qSidebar').innerHTML=qs.map((q,i)=>`<div class="qbox${i===cur?' active':''}${answers[i]!==undefined?' saved':''}${flags[i]?' flagged':''}" onclick="goQ(${i})">${i+1}</div>`).join('');}
 function loadQ(){
-  let q=questions[current];
-  document.getElementById("qNum").innerText=`Question ${current+1} of ${questions.length}`;
-  document.getElementById("question").innerText=q.q;
-  document.getElementById("options").innerHTML=q.o.map((opt,i)=>`<div class="option${answers[current]===i?" selected":""}" onclick="selectAns(${i})"><div class="opt-letter">${letters[i]}</div>${opt}</div>`).join("");
-  let isFlag=!!flaggedQs[current];
-  document.getElementById("flagBtn").className="nav-btn btn-flag"+(isFlag?" on":"");
-  document.getElementById("flagBtn").innerText=isFlag?"🚩 Flagged":"🚩 Flag";
-  document.getElementById("flagIndicator").style.display=isFlag?"block":"none";
-  document.getElementById("hintPanel").style.display="none";
-  updateBottom();loadNumbers();
+  let q=qs[cur];
+  document.getElementById('qNum').innerText='Q '+(cur+1)+' / '+qs.length;
+  document.getElementById('qText').innerText=q.q;
+  document.getElementById('opts').innerHTML=q.o.map((o,i)=>`<div class="option${answers[cur]===i?' selected':''}" onclick="selAns(${i})"><div class="opt-letter">${L[i]}</div>${o}</div>`).join('');
+  let isFlag=!!flags[cur];
+  document.getElementById('flagBtn').className='btn btn-sm'+(isFlag?' btn-danger':' ');
+  document.getElementById('flagBtn').style.cssText=isFlag?'':'background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.2);color:#fca5a5';
+  document.getElementById('flagBtn').innerText=isFlag?'🚩 Flagged':'🚩 Flag';
+  document.getElementById('flagInd').style.display=isFlag?'block':'none';
+  document.getElementById('hintPanel').style.display='none';
+  updateBottom();loadNums();
 }
-function selectAns(i){answers[current]=i;localStorage.setItem(answerKey,JSON.stringify(answers));sndClick();loadQ();}
-function nextQ(){if(current<questions.length-1){current++;loadQ();sndClick();}}
-function prevQ(){if(current>0){current--;loadQ();sndClick();}}
-function goQ(i){current=i;loadQ();sndClick();}
-function toggleFlag(){if(flaggedQs[current])delete flaggedQs[current];else flaggedQs[current]=true;localStorage.setItem("flagged_"+reg+"_"+topic,JSON.stringify(flaggedQs));sndClick();loadQ();}
-function updateBottom(){
-  let fc=Object.keys(flaggedQs).length;
-  document.getElementById("saved").innerText=Object.keys(answers).length;
-  document.getElementById("remain").innerText=questions.length-Object.keys(answers).length;
-  document.getElementById("flagPill").style.display=fc>0?"block":"none";
-  document.getElementById("flaggedCnt").innerText=fc;
+function selAns(i){
+  answers[cur]=i;localStorage.setItem(aKey,JSON.stringify(answers));
+  // ripple
+  let opts=document.querySelectorAll('.option');if(opts[i]){let r=document.createElement('span');r.className='ripple-el';r.style.cssText='width:300px;height:300px;left:-100px;top:-100px;';opts[i].appendChild(r);setTimeout(()=>r.remove(),550);}
+  sndClick();loadQ();
 }
-
-// ── AI HINT ──
+function nextQ(){if(cur<qs.length-1){cur++;loadQ();sndClick();}}
+function prevQ(){if(cur>0){cur--;loadQ();sndClick();}}
+function goQ(i){cur=i;loadQ();sndClick();}
+function toggleFlag(){if(flags[cur])delete flags[cur];else flags[cur]=true;localStorage.setItem('flags_'+reg+'_'+topic,JSON.stringify(flags));sndClick();loadQ();}
+function updateBottom(){let fc=Object.keys(flags).length;document.getElementById('savedN').innerText=Object.keys(answers).length;document.getElementById('remainN').innerText=qs.length-Object.keys(answers).length;document.getElementById('flagPill').style.display=fc>0?'block':'none';document.getElementById('flagN').innerText=fc;}
 async function getHint(){
-  if(hintsLeft<=0){alert("No hints left for this session!");return;}
-  let q=questions[current];
-  let panel=document.getElementById("hintPanel"),txt=document.getElementById("hintTxt"),ld=document.getElementById("hintLoading");
-  panel.style.display="block";txt.innerText="";ld.style.display="inline";
-  document.getElementById("hintBtn").disabled=true;
-  hintsLeft--;document.getElementById("hintsLeft").innerText=hintsLeft;
-  try{
-    let resp=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:180,messages:[{role:"user",content:`Aptitude tutor: Give a 2-sentence hint for this question WITHOUT revealing the answer. Focus on the approach.\nQ: "${q.q}"\nOptions: ${q.o.map((o,i)=>letters[i]+") "+o).join(", ")}`}]})});
-    let data=await resp.json();
-    txt.innerText=(data.content&&data.content[0]&&data.content[0].text)||"Think about the rule or pattern. Work through each option step by step.";
-  }catch(e){txt.innerText="Think about the concept or pattern. Try eliminating wrong options first.";}
-  ld.style.display="none";document.getElementById("hintBtn").disabled=false;
-  if(hintsLeft===0){document.getElementById("hintBtn").disabled=true;document.getElementById("hintBtn").style.opacity="0.4";}
-  tone(440,0.1);
+  if(hintsLeft<=0){alert('No hints left!');return;}
+  let q=qs[cur];let panel=document.getElementById('hintPanel'),txt=document.getElementById('hintTxt'),ld=document.getElementById('hintLoad');
+  panel.style.display='block';txt.innerText='';ld.style.display='inline';document.getElementById('hintBtn').disabled=true;
+  hintsLeft--;document.getElementById('hL').innerText=hintsLeft;
+  try{let resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:160,messages:[{role:'user',content:`Aptitude tutor: 2-sentence hint for this question WITHOUT revealing the answer. Focus on approach.\nQ: "${q.q}"\nOptions: ${q.o.map((o,i)=>L[i]+') '+o).join(', ')}`}]})});
+  let data=await resp.json();txt.innerText=(data.content&&data.content[0]&&data.content[0].text)||'Think about the pattern. Eliminate wrong options first.';}catch(e){txt.innerText='Think about the rule or pattern. Eliminate options one by one.';}
+  ld.style.display='none';document.getElementById('hintBtn').disabled=false;
+  if(hintsLeft===0){document.getElementById('hintBtn').disabled=true;document.getElementById('hintBtn').style.opacity='0.4';}
 }
-
-// ── END TEST ──
 function endTest(){
-  if(document.fullscreenElement)document.exitFullscreen();
-  if(ptIv)clearInterval(ptIv);
-  if(isAssessment){
-    let users=JSON.parse(localStorage.getItem("users"))||{"714524205005":{name:"Balaji"},"714524205053":{name:"Vicky"},"714524205027":{name:"Ismail"},"714524205041":{name:"Sakthivel"}};
-    let n=(users[reg]||{}).name||"User",score=0;
-    for(let i=0;i<questions.length;i++){if(answers[i]===correctAnswers[i])score++;}
+  if(document.fullscreenElement)document.exitFullscreen();if(ptIv)clearInterval(ptIv);
+  if(isAssess){
+    let score=0;for(let i=0;i<qs.length;i++){if(answers[i]===cas[i])score++;}
     let attempted=Object.keys(answers).length;
-    let board=JSON.parse(localStorage.getItem("leaderboard"))||[];
-    board=board.filter(u=>u.name!==n);board.push({name:n,score,attempted});
-    localStorage.setItem("leaderboard",JSON.stringify(board));
-    localStorage.setItem("assessTaken_"+reg,"yes");
-    let hist=JSON.parse(localStorage.getItem("scoreHistory_"+reg))||[];
-    hist.push({topic:"Assessment",score,total:20,attempted,date:new Date().toLocaleDateString("en-IN"),time:new Date().toLocaleTimeString()});
-    localStorage.setItem("scoreHistory_"+reg,JSON.stringify(hist));
-    localStorage.setItem("cert_score",score);localStorage.setItem("cert_attempted",attempted);
-    let sortedB=[...board].sort((a,b)=>b.score-a.score);
-    localStorage.setItem("rank",sortedB.findIndex(u=>u.name===n)+1);
-    let wrongs=[];for(let i=0;i<questions.length;i++){if(answers[i]!==correctAnswers[i])wrongs.push({q:questions[i].q,correct:questions[i].o[correctAnswers[i]],chosen:questions[i].o[answers[i]]||"Not answered"});}
-    localStorage.setItem("wrongAnswers_"+reg,JSON.stringify(wrongs));
-    localStorage.removeItem(answerKey);localStorage.removeItem("allowTest");localStorage.removeItem("mode");localStorage.removeItem("shuffledOrder_"+reg);
-    location.href="leaderboard.html";
+    let users=getUsers(),n=(users[reg]||{}).name||'User';
+    let board=JSON.parse(localStorage.getItem('leaderboard'))||[];board=board.filter(u=>u.name!==n);board.push({name:n,score,attempted});localStorage.setItem('leaderboard',JSON.stringify(board));
+    localStorage.setItem('assessTaken_'+reg,'yes');saveScoreHistory(reg,'Assessment',score,20,{attempted});
+    localStorage.setItem('cert_score',score);localStorage.setItem('cert_attempted',attempted);
+    let sorted=[...board].sort((a,b)=>b.score-a.score);localStorage.setItem('rank',sorted.findIndex(u=>u.name===n)+1);
+    let wrongs=[];for(let i=0;i<qs.length;i++){if(answers[i]!==cas[i])wrongs.push({q:qs[i].q,correct:qs[i].o[cas[i]],chosen:qs[i].o[answers[i]]||'Not answered'});}
+    localStorage.setItem('wrongAnswers_'+reg,JSON.stringify(wrongs));
+    awardBadge(reg,'assessment_done');if(sorted.findIndex(u=>u.name===n)<3)awardBadge(reg,'top_3');
+    localStorage.removeItem(aKey);localStorage.removeItem('allowTest');localStorage.removeItem('mode');localStorage.removeItem('shuf_'+reg);
+    nav('leaderboard.html');
   } else {
-    let score=0;questions.forEach((q,i)=>{if(answers[i]===q.a)score++;});
-    let pct=Math.floor((Object.keys(answers).length/questions.length)*100);
-    localStorage.setItem("p"+currentTopic+"_done_"+reg,pct);
-    let hist=JSON.parse(localStorage.getItem("scoreHistory_"+reg))||[];
-    hist.push({topic,score,total:questions.length,date:new Date().toLocaleDateString("en-IN"),time:new Date().toLocaleTimeString()});
-    localStorage.setItem("scoreHistory_"+reg,JSON.stringify(hist));
-    localStorage.removeItem("flagged_"+reg+"_"+topic);
+    let score=0;qs.forEach((q,i)=>{if(answers[i]===q.a)score++;});
+    let pct=Math.floor((Object.keys(answers).length/qs.length)*100);
+    localStorage.setItem('p'+topicN+'_done_'+reg,pct);
+    saveScoreHistory(reg,topic,score,qs.length);
+    if(score===qs.length)awardBadge(reg,'perfect_score');
+    awardBadge(reg,'first_practice');
+    localStorage.removeItem('flags_'+reg+'_'+topic);
     showReview(score);
   }
 }
-
-// ── ANSWER REVIEW ──
 function showReview(score){
-  let total=questions.length,pct=Math.round(score/total*100);
-  document.getElementById("reviewStats").innerHTML=`<div class="r-stat"><div class="r-stat-num" style="color:#86efac">${score}</div><div class="r-stat-lbl">Correct</div></div><div class="r-stat"><div class="r-stat-num" style="color:#fca5a5">${total-score}</div><div class="r-stat-lbl">Wrong</div></div><div class="r-stat"><div class="r-stat-num" style="color:#f5c842">${pct}%</div><div class="r-stat-lbl">Score</div></div>`;
-  let body=document.getElementById("reviewBody");body.innerHTML="";
-  questions.forEach((q,i)=>{
-    let ua=answers[i],ca=q.a,right=ua===ca;
-    let div=document.createElement("div");div.className="review-q";
-    div.innerHTML=`<div class="review-q-num">Q${i+1} ${right?"✅":"❌"}</div><div class="review-q-text">${q.q}</div>${q.o.map((o,oi)=>`<div class="r-opt ${oi===ca?"correct":oi===ua&&!right?"wrong":"neutral"}"><span style="font-weight:700;margin-right:8px;">${letters[oi]}</span>${o}${oi===ca?" ✓":""}${oi===ua&&!right?" (Your answer)":""}</div>`).join("")}<div class="ai-exp-box"><div class="ai-exp-lbl">🤖 AI Explanation</div><div class="ai-exp-txt" id="exp_${i}" style="opacity:0.5;">Loading...</div></div>`;
-    body.appendChild(div);
-  });
-  document.getElementById("reviewOverlay").style.display="block";
-  document.getElementById("reviewOverlay").scrollTop=0;
-  loadExplanations();
+  let total=qs.length,pct=Math.round(score/total*100);
+  document.getElementById('revStats').innerHTML=`<div class="rev-stat"><div style="font-size:22px;font-weight:700;color:#86efac">${score}</div><div style="font-size:11px;color:var(--text2)">Correct</div></div><div class="rev-stat"><div style="font-size:22px;font-weight:700;color:#fca5a5">${total-score}</div><div style="font-size:11px;color:var(--text2)">Wrong</div></div><div class="rev-stat"><div style="font-size:22px;font-weight:700;color:#f5c842">${pct}%</div><div style="font-size:11px;color:var(--text2)">Score</div></div>`;
+  let body=document.getElementById('revBody');body.innerHTML='';
+  qs.forEach((q,i)=>{let ua=answers[i],ca=q.a,right=ua===ca;let d=document.createElement('div');d.className='rev-q';d.innerHTML=`<div style="font-size:11px;color:var(--text2);margin-bottom:6px;font-weight:700">Q${i+1} ${right?'✅':'❌'}</div><div style="font-size:14px;font-weight:600;margin-bottom:10px;line-height:1.4">${q.q}</div>${q.o.map((o,oi)=>`<div class="r-opt ${oi===ca?'correct':oi===ua&&!right?'wrong':'neutral'}"><span style="font-weight:700;margin-right:6px;min-width:18px">${L[oi]}</span>${o}${oi===ca?' ✓':''}${oi===ua&&!right?' ✗':''}</div>`).join('')}<div class="ai-exp-box"><div class="ai-exp-lbl">🤖 AI Explanation</div><div class="ai-exp-txt" id="exp${i}" style="opacity:0.5">Loading...</div></div>`;body.appendChild(d);});
+  document.getElementById('reviewOverlay').style.display='block';document.getElementById('reviewOverlay').scrollTop=0;
+  loadExps();
 }
-async function loadExplanations(){
-  try{
-    let prompt=`For each question below, give a SHORT 1-2 sentence explanation of why the correct answer is correct. Return ONLY a JSON array of strings, no markdown.\n\n${questions.map((q,i)=>`${i+1}. "${q.q}" — Correct: "${q.o[q.a]}"`).join("\n")}`;
-    let resp=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:900,messages:[{role:"user",content:prompt}]})});
-    let data=await resp.json();
-    let raw=(data.content&&data.content[0]&&data.content[0].text)||"[]";
-    let exps=JSON.parse(raw.replace(/```json|```/g,"").trim());
-    exps.forEach((e,i)=>{let el=document.getElementById("exp_"+i);if(el){el.innerText=e;el.style.opacity="1";}});
-  }catch(e){questions.forEach((_,i)=>{let el=document.getElementById("exp_"+i);if(el){el.innerText="Review this concept and practice similar problems.";el.style.opacity="1";}});}
-}
-function closeReview(){document.getElementById("reviewOverlay").style.display="none";localStorage.removeItem(answerKey);location.href="aptitude.html";}
-
+async function loadExps(){try{let prompt=`For each question, give a 1-sentence explanation of why the correct answer is correct. Return ONLY a JSON array of strings.\n${qs.map((q,i)=>`${i+1}. "${q.q}" — Correct: "${q.o[q.a]}"`).join('\n')}`;let resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:900,messages:[{role:'user',content:prompt}]})});let data=await resp.json();let exps=JSON.parse((data.content&&data.content[0]&&data.content[0].text||'[]').replace(/```json|```/g,'').trim());exps.forEach((e,i)=>{let el=document.getElementById('exp'+i);if(el){el.innerText=e;el.style.opacity='1';}});}catch(e){qs.forEach((_,i)=>{let el=document.getElementById('exp'+i);if(el){el.innerText='Review this concept and practice similar problems.';el.style.opacity='1';}});}}
+function closeReview(){document.getElementById('reviewOverlay').style.display='none';localStorage.removeItem(aKey);nav('aptitude.html');}
+// Keyboard shortcuts
+initTestKeyboard(selAns,prevQ,nextQ,toggleFlag);
 loadQ();
 </script>
 </body>

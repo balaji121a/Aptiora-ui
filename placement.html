@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Placement — APTIORA</title>
+<link rel="stylesheet" href="aptiora.css">
+<style>
+.company-card{background:rgba(13,13,20,0.88);border:1px solid rgba(6,182,212,0.18);border-radius:var(--radius-lg);padding:16px 18px;display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;transition:all 0.2s;flex-wrap:wrap;gap:8px;}
+.company-card:hover{border-color:rgba(6,182,212,0.35);transform:translateY(-1px);}
+.status-pill{padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;}
+.s-applied{background:rgba(59,130,246,0.15);color:#93c5fd;}.s-interview{background:rgba(245,158,11,0.15);color:#fcd34d;}.s-offered{background:rgba(16,185,129,0.15);color:#6ee7b7;}.s-rejected{background:rgba(239,68,68,0.15);color:#fca5a5;}.s-pending{background:rgba(255,255,255,0.08);color:var(--text2);}
+.tab-nav{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;}
+.tnav{padding:8px 18px;border-radius:var(--radius);border:1px solid var(--border);background:rgba(255,255,255,0.04);color:var(--text2);font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.2s;}
+.tnav.on{background:rgba(6,182,212,0.15);border-color:rgba(6,182,212,0.35);color:#67e8f9;}
+.resume-section{background:rgba(13,13,20,0.88);border:1px solid rgba(6,182,212,0.18);border-radius:var(--radius-xl);padding:22px;margin-bottom:14px;}
+.gd-card{background:rgba(6,182,212,0.06);border:1px solid rgba(6,182,212,0.18);border-radius:var(--radius-lg);padding:16px;margin-bottom:10px;cursor:pointer;transition:all 0.22s;}
+.gd-card:hover{border-color:rgba(6,182,212,0.35);transform:translateY(-1px);}
+.ai-fb-cyan{background:rgba(6,182,212,0.07);border:1px solid rgba(6,182,212,0.2);border-radius:var(--radius-lg);padding:14px 18px;margin-top:10px;font-size:13px;line-height:1.7;display:none;}
+body.light .company-card,.body.light .resume-section,.body.light .gd-card{background:rgba(255,255,255,0.88)!important;}
+</style>
+</head>
+<body>
+<div class="orb orb1"></div><div class="orb orb2"></div>
+<canvas class="bg-canvas" id="bgCanvas"></canvas>
+<div id="sb"></div>
+<div class="app-main" id="appMain">
+  <div class="app-topbar">
+    <div class="topbar-left"><button class="collapse-btn" id="collapseBtn">☰</button><div class="page-title">🏢 Placement Portal</div></div>
+    <div class="topbar-right"><button class="tb-btn" id="themeBtn">🌙</button></div>
+  </div>
+  <div class="app-page">
+    <div class="tab-nav">
+      <button class="tnav on" onclick="showTab('tracker',this)">📋 Tracker</button>
+      <button class="tnav" onclick="showTab('resume',this)">📄 Resume AI</button>
+      <button class="tnav" onclick="showTab('gd',this)">🗣 GD Topics</button>
+      <button class="tnav" onclick="showTab('hr',this)">💼 HR Questions</button>
+    </div>
+
+    <!-- TRACKER -->
+    <div id="tab-tracker">
+      <div class="glass-card anim-fadeUp" style="margin-bottom:14px;">
+        <div style="font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;margin-bottom:14px;">➕ Add Application</div>
+        <div class="grid2" style="margin-bottom:12px;">
+          <div class="form-group" style="margin:0"><label class="form-label">Company Name</label><input class="form-input" id="cmpName" placeholder="e.g. TCS, Infosys"></div>
+          <div class="form-group" style="margin:0"><label class="form-label">Role</label><input class="form-input" id="cmpRole" placeholder="e.g. Software Engineer"></div>
+          <div class="form-group" style="margin:0"><label class="form-label">Status</label>
+            <select class="form-input" id="cmpStatus"><option value="pending">⏳ Pending</option><option value="applied">📤 Applied</option><option value="interview">🎯 Interview</option><option value="offered">✅ Offered</option><option value="rejected">❌ Rejected</option></select></div>
+          <div class="form-group" style="margin:0"><label class="form-label">Date</label><input class="form-input" type="date" id="cmpDate"></div>
+        </div>
+        <div class="form-group" style="margin-bottom:12px"><label class="form-label">Notes</label><input class="form-input" id="cmpNotes" placeholder="Package, rounds, etc."></div>
+        <button class="btn btn-primary" onclick="addCompany()">+ Add Application</button>
+        <div style="font-size:12px;color:#86efac;margin-top:8px;display:none;" id="cmpMsg">✅ Added!</div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;" id="statsCards"></div>
+      <div style="font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:700;margin-bottom:10px;">📋 Applications</div>
+      <div id="companyList"><div style="text-align:center;padding:24px;color:var(--text2);font-size:13px">No applications yet. Add your first one above!</div></div>
+    </div>
+
+    <!-- RESUME AI -->
+    <div id="tab-resume" style="display:none">
+      <div class="resume-section anim-fadeUp">
+        <div style="font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:700;margin-bottom:6px;">📄 AI Resume Reviewer</div>
+        <div style="font-size:13px;color:var(--text2);margin-bottom:16px;line-height:1.6">Paste your resume text below and get instant AI feedback on clarity, keywords, and improvements.</div>
+        <textarea class="form-input" id="resumeText" placeholder="Paste your resume content here..." rows="8"></textarea>
+        <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;">
+          <button class="btn btn-primary" onclick="reviewResume()">🤖 AI Review</button>
+          <button class="btn btn-secondary" onclick="generateResume()">✨ Generate Sample</button>
+        </div>
+        <div class="ai-fb-cyan" id="resumeFb"></div>
+      </div>
+    </div>
+
+    <!-- GD TOPICS -->
+    <div id="tab-gd" style="display:none">
+      <div class="glass-card anim-fadeUp" style="margin-bottom:14px;">
+        <div style="font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;margin-bottom:4px;">🗣 GD / PI Preparation</div>
+        <div style="font-size:12px;color:var(--text2);margin-bottom:14px;">Click a topic to get AI-generated key points and arguments</div>
+        <div id="gdTopics"></div>
+      </div>
+      <div class="ai-fb-cyan" id="gdFb" style="display:block;min-height:80px;">Select a topic above to get key points for Group Discussion.</div>
+    </div>
+
+    <!-- HR QUESTIONS -->
+    <div id="tab-hr" style="display:none">
+      <div class="glass-card anim-fadeUp">
+        <div style="font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;margin-bottom:14px;">💼 HR Interview Questions</div>
+        <div id="hrQs"></div>
+        <button class="btn btn-primary" style="margin-top:14px;" onclick="practiceHR()">🤖 Practice with AI</button>
+        <div class="ai-fb-cyan" id="hrFb"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="aptiora.js"></script>
+<script>
+let user=getCurrentUser();if(!user)throw'';
+let {reg,name}=user;
+document.getElementById('sb').innerHTML=buildSidebar('placement',name,reg);
+initSidebar();
+function showTab(t,el){['tracker','resume','gd','hr'].forEach(x=>{let d=document.getElementById('tab-'+x);if(d)d.style.display=x===t?'block':'none';});document.querySelectorAll('.tnav').forEach(b=>b.classList.remove('on'));el.classList.add('on');}
+
+// TRACKER
+function getApps(){return JSON.parse(localStorage.getItem('placementApps_'+reg))||[];}
+function saveApps(a){localStorage.setItem('placementApps_'+reg,JSON.stringify(a));let p=Math.min(100,a.length*10);localStorage.setItem('placeProg_'+reg,p);}
+function addCompany(){
+  let n=document.getElementById('cmpName').value.trim();if(!n){alert('Company name required!');return;}
+  let apps=getApps();
+  apps.unshift({company:n,role:document.getElementById('cmpRole').value||'N/A',status:document.getElementById('cmpStatus').value,date:document.getElementById('cmpDate').value||new Date().toLocaleDateString('en-IN'),notes:document.getElementById('cmpNotes').value,id:Date.now()});
+  saveApps(apps);['cmpName','cmpRole','cmpNotes'].forEach(id=>document.getElementById(id).value='');
+  let msg=document.getElementById('cmpMsg');msg.style.display='block';setTimeout(()=>msg.style.display='none',2000);
+  renderApps();
+}
+function delApp(id){let apps=getApps().filter(a=>a.id!==id);saveApps(apps);renderApps();}
+function renderApps(){
+  let apps=getApps();
+  let stats={pending:0,applied:0,interview:0,offered:0,rejected:0};apps.forEach(a=>stats[a.status]=(stats[a.status]||0)+1);
+  document.getElementById('statsCards').innerHTML=[{k:'applied',l:'Applied',i:'📤'},{k:'interview',l:'Interview',i:'🎯'},{k:'offered',l:'Offered',i:'✅'},{k:'rejected',l:'Rejected',i:'❌'}].map(s=>`<div class="stat-card" style="padding:12px 16px;text-align:center;flex:1;min-width:80px"><div style="font-size:20px">${s.i}</div><div class="stat-val" style="font-size:20px">${stats[s.k]||0}</div><div class="stat-lbl">${s.l}</div></div>`).join('');
+  let cls={pending:'s-pending',applied:'s-applied',interview:'s-interview',offered:'s-offered',rejected:'s-rejected'};
+  document.getElementById('companyList').innerHTML=apps.length?apps.map(a=>`<div class="company-card"><div><div style="font-weight:600;font-size:14px">${a.company}</div><div style="font-size:12px;color:var(--text2);margin-top:2px">${a.role} · ${a.date}</div>${a.notes?`<div style="font-size:11px;color:var(--text2);margin-top:2px">${a.notes}</div>`:''}</div><div style="display:flex;align-items:center;gap:8px"><span class="status-pill ${cls[a.status]}">${a.status.charAt(0).toUpperCase()+a.status.slice(1)}</span><button class="btn btn-danger btn-sm" onclick="delApp(${a.id})">✕</button></div></div>`).join(''):'<div style="text-align:center;padding:24px;color:var(--text2);font-size:13px">No applications yet.</div>';
+}
+renderApps();
+
+// RESUME AI
+async function reviewResume(){
+  let txt=document.getElementById('resumeText').value.trim();if(!txt){alert('Paste your resume first!');return;}
+  let fb=document.getElementById('resumeFb');fb.style.display='block';fb.innerHTML='🤖 Reviewing your resume...';
+  try{let resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:350,messages:[{role:'user',content:`Review this B.Tech student resume for placement:\n\n${txt}\n\nFeedback:\n1. Overall strength (score/10)\n2. Missing sections\n3. Keywords to add\n4. Top 3 improvements\n\nBe specific and actionable.`}]})});
+  let data=await resp.json();fb.innerHTML='<div style="color:#67e8f9;font-size:11px;font-weight:700;margin-bottom:8px">🤖 AI RESUME REVIEW</div><div style="white-space:pre-wrap">'+(data.content&&data.content[0]&&data.content[0].text||'Good resume!')+'</div>';}catch(e){fb.innerHTML='<span style="color:#fca5a5">Connection error.</span>';}
+}
+async function generateResume(){
+  let fb=document.getElementById('resumeFb');fb.style.display='block';fb.innerHTML='✨ Generating sample resume...';
+  try{let resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:400,messages:[{role:'user',content:`Generate a professional resume template for ${name}, a B.Tech IT student (2024-2028) applying for software engineer roles. Include: Objective, Education, Skills, Projects, Activities sections. Keep it concise — 1 page format.`}]})});
+  let data=await resp.json();document.getElementById('resumeText').value=(data.content&&data.content[0]&&data.content[0].text||'');fb.style.display='none';}catch(e){fb.innerHTML='<span style="color:#fca5a5">Connection error.</span>';}
+}
+
+// GD TOPICS
+let gdTopics=['AI and the Future of Jobs','Social Media: Boon or Bane?','Work from Home vs Office','Climate Change — Whose Responsibility?','Brain Drain in India','Electric Vehicles Future','Cryptocurrency — Should India Adopt?','Space Exploration vs Poverty','Online Education vs Traditional','Women in Tech'];
+document.getElementById('gdTopics').innerHTML=gdTopics.map(t=>`<div class="gd-card" onclick="getGDPoints('${t.replace(/'/g,"\\'")}')"><div style="font-size:13px;font-weight:600">${t}</div><div style="font-size:11px;color:var(--text2);margin-top:3px">Click for AI key points →</div></div>`).join('');
+async function getGDPoints(topic){
+  let fb=document.getElementById('gdFb');fb.style.display='block';fb.innerHTML='🤖 Generating key points for "'+topic+'"...';
+  try{let resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:280,messages:[{role:'user',content:`For a Group Discussion on "${topic}", provide:\n1. 3 strong FOR points\n2. 3 strong AGAINST points\n3. A balanced concluding statement\n\nKeep each point to 1-2 sentences. Format clearly.`}]})});
+  let data=await resp.json();fb.innerHTML='<div style="color:#67e8f9;font-size:12px;font-weight:700;margin-bottom:8px">📋 '+topic+'</div><div style="white-space:pre-wrap;font-size:13px">'+(data.content&&data.content[0]&&data.content[0].text||'')+'</div>';}catch(e){fb.innerHTML='<span style="color:#fca5a5">Connection error.</span>';}
+}
+
+// HR QUESTIONS
+let hrQs=['Tell me about yourself.','Why do you want to join our company?','What are your strengths and weaknesses?','Where do you see yourself in 5 years?','Describe a challenge you overcame.','Why should we hire you?','What do you know about our company?','Describe your greatest achievement.'];
+document.getElementById('hrQs').innerHTML=hrQs.map((q,i)=>`<div style="display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);"><div style="width:24px;height:24px;border-radius:50%;background:rgba(6,182,212,0.15);border:1px solid rgba(6,182,212,0.3);color:#67e8f9;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">${i+1}</div><div style="font-size:13px;color:var(--text2);line-height:1.5">${q}</div></div>`).join('');
+async function practiceHR(){
+  let q=hrQs[Math.floor(Math.random()*hrQs.length)];
+  let fb=document.getElementById('hrFb');fb.style.display='block';fb.innerHTML=`<div style="color:#67e8f9;font-size:12px;font-weight:700;margin-bottom:8px">💼 Practice Question</div><div style="font-size:14px;font-weight:600;margin-bottom:10px">${q}</div><textarea class="form-input" id="hrAns" placeholder="Type your answer..." rows="3"></textarea><button class="btn btn-primary btn-sm" style="margin-top:8px" onclick="gradeHR('${q.replace(/'/g,"\\'")}')">🤖 Get Feedback</button><div id="hrGrade" style="margin-top:10px;display:none"></div>`;
+}
+async function gradeHR(q){
+  let ans=document.getElementById('hrAns').value.trim();if(!ans){alert('Write your answer first!');return;}
+  let gr=document.getElementById('hrGrade');gr.style.display='block';gr.innerHTML='Evaluating...';
+  try{let resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:200,messages:[{role:'user',content:`HR interview coach: Evaluate this answer.\nQ: "${q}"\nA: "${ans}"\nGive: Rating (1-5), what was good, one improvement. Be encouraging. 3 sentences max.`}]})});
+  let data=await resp.json();gr.innerHTML='<div style="color:#67e8f9;font-size:11px;font-weight:700;margin-bottom:5px">🤖 Feedback</div>'+(data.content&&data.content[0]&&data.content[0].text||'Good answer!');}catch(e){gr.innerHTML='<span style="color:#fca5a5">Error</span>';}
+}
+</script>
+</body>
+</html>

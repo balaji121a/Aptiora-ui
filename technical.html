@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Technical Quiz — APTIORA</title>
+<link rel="stylesheet" href="aptiora.css">
+<style>
+.sub-btn{padding:9px 18px;border-radius:var(--radius);border:1px solid var(--border);background:rgba(255,255,255,0.05);color:var(--text2);font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.2s;}
+.sub-btn.on{background:rgba(245,158,11,0.18);border-color:rgba(245,158,11,0.4);color:#fcd34d;}
+.tech-opt{padding:12px 16px;border:1.5px solid var(--border);border-radius:var(--radius);cursor:pointer;font-size:13px;margin-bottom:8px;transition:all 0.2s;display:flex;align-items:center;gap:10px;background:rgba(255,255,255,0.02);}
+.tech-opt:hover{border-color:rgba(245,158,11,0.4);background:rgba(245,158,11,0.05);}
+.tech-opt.correct{border-color:rgba(34,197,94,0.5);background:rgba(34,197,94,0.1);color:#86efac;}
+.tech-opt.wrong{border-color:rgba(239,68,68,0.5);background:rgba(239,68,68,0.08);color:#fca5a5;}
+.q-card-tech{background:rgba(13,13,20,0.9);border:1px solid var(--border);border-radius:var(--radius-xl);padding:24px;margin-bottom:14px;position:relative;overflow:hidden;}
+.q-card-tech::before{content:"";position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(245,158,11,0.4),transparent);}
+body.light .q-card-tech{background:rgba(255,255,255,0.88)!important;}
+body.light .tech-opt{background:rgba(0,0,0,0.03)!important;border-color:rgba(0,0,0,0.1)!important;color:#1a1a2e!important;}
+</style>
+</head>
+<body>
+<div class="orb orb1"></div><div class="orb orb2"></div>
+<canvas class="bg-canvas" id="bgCanvas"></canvas>
+<div id="sb"></div>
+<div class="app-main" id="appMain">
+  <div class="app-topbar">
+    <div class="topbar-left"><button class="collapse-btn" id="collapseBtn">☰</button><div class="page-title">🔬 Technical Quiz</div></div>
+    <div class="topbar-right"><button class="tb-btn" id="themeBtn">🌙</button></div>
+  </div>
+  <div class="app-page">
+    <div class="glass-card anim-fadeUp" style="margin-bottom:18px;">
+      <div style="font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;margin-bottom:12px;">📚 Select Subject</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;" id="subBtns"></div>
+    </div>
+    <div id="quizArea">
+      <div class="glass-card" style="text-align:center;padding:40px;">
+        <div style="font-size:48px;margin-bottom:12px">🔬</div>
+        <div style="font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:700;margin-bottom:8px">Technical Quiz</div>
+        <div style="font-size:13px;color:var(--text2)">Select a subject above to begin</div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="aptiora.js"></script>
+<script>
+let user=getCurrentUser();if(!user)throw'';
+let {reg,name}=user;
+document.getElementById('sb').innerHTML=buildSidebar('technical',name,reg);
+initSidebar();
+let subjects={
+  'DBMS':[{q:"What does DBMS stand for?",o:["Database Management System","Data Byte Management System","Digital Base Management System","Data Base Module System"],a:0,exp:"DBMS = Database Management System — software for storing and retrieving data."},{q:"Which SQL command retrieves data?",o:["INSERT","UPDATE","SELECT","DELETE"],a:2,exp:"SELECT is used to fetch data from a database table."},{q:"Primary key characteristic:",o:["Can be NULL","Must be unique","Can repeat","Optional"],a:1,exp:"Primary key uniquely identifies each row — must be unique and NOT NULL."},{q:"ACID stands for:",o:["Atomicity, Consistency, Isolation, Durability","Automation, Control, Integration, Data","Access, Create, Insert, Delete","None of these"],a:0,exp:"ACID ensures reliable database transactions."},{q:"Which is NOT a type of JOIN?",o:["INNER JOIN","OUTER JOIN","SQUARE JOIN","CROSS JOIN"],a:2,exp:"SQUARE JOIN doesn't exist. Valid types: INNER, LEFT, RIGHT, FULL OUTER, CROSS."},{q:"Normalization in DBMS means:",o:["Adding redundancy","Reducing redundancy","Deleting tables","Merging databases"],a:1,exp:"Normalization reduces data redundancy and improves data integrity."},{q:"SQL stands for:",o:["Simple Query Language","Structured Query Language","Standard Query Language","System Query Language"],a:1,exp:"SQL = Structured Query Language — used for managing relational databases."},{q:"Which command removes a table?",o:["DELETE","REMOVE","DROP","CLEAR"],a:2,exp:"DROP TABLE removes the entire table and its structure from the database."}],
+  'OS':[{q:"OS stands for:",o:["Output System","Operating System","Optimal Software","None"],a:1,exp:"OS = Operating System — manages hardware and software resources."},{q:"Which scheduling algorithm gives CPU to shortest job?",o:["FCFS","SJF","Round Robin","Priority"],a:1,exp:"SJF (Shortest Job First) gives CPU to the process with smallest burst time."},{q:"Deadlock condition — NOT required:",o:["Mutual Exclusion","Hold and Wait","No Preemption","Aging"],a:3,exp:"Deadlock requires: Mutual Exclusion, Hold & Wait, No Preemption, Circular Wait. Aging prevents starvation."},{q:"Virtual memory allows:",o:["Faster CPU","Running programs larger than RAM","More storage","Better graphics"],a:1,exp:"Virtual memory uses disk space as extended RAM, allowing larger programs."},{q:"Semaphore is used for:",o:["Memory management","Process synchronization","File management","CPU scheduling"],a:1,exp:"Semaphores are synchronization tools to control access to shared resources."},{q:"Page fault occurs when:",o:["CPU is busy","Required page not in RAM","Disk is full","Memory overflow"],a:1,exp:"A page fault happens when the required page is not in physical memory (RAM)."},{q:"Thrashing in OS means:",o:["High CPU utilization","Excessive paging causing low CPU use","Memory leak","Disk crash"],a:1,exp:"Thrashing occurs when processes spend more time paging than executing."},{q:"Critical section problem is about:",o:["CPU speed","Shared resource access","Memory size","I/O speed"],a:1,exp:"Critical section is a code segment that accesses shared resources — must be mutually exclusive."}],
+  'CN':[{q:"CN stands for:",o:["Computer Networks","Central Node","Control Network","None"],a:0,exp:"CN = Computer Networks — interconnected computers sharing resources."},{q:"IP address version 4 has how many bits?",o:["16","32","64","128"],a:1,exp:"IPv4 uses 32 bits, written as 4 octets (e.g., 192.168.1.1)."},{q:"HTTP uses which port?",o:["21","25","80","443"],a:2,exp:"HTTP uses port 80. HTTPS uses port 443."},{q:"OSI model has how many layers?",o:["4","5","7","9"],a:2,exp:"OSI model has 7 layers: Physical, Data Link, Network, Transport, Session, Presentation, Application."},{q:"DNS converts:",o:["IP to MAC","Domain name to IP","IP to domain name","URL to email"],a:1,exp:"DNS (Domain Name System) translates human-readable domain names to IP addresses."},{q:"Which protocol transfers files?",o:["HTTP","SMTP","FTP","DNS"],a:2,exp:"FTP (File Transfer Protocol) is used for transferring files between computers."},{q:"TCP is:",o:["Connectionless","Connection-oriented","Wireless protocol","None"],a:1,exp:"TCP (Transmission Control Protocol) is connection-oriented — ensures reliable delivery."},{q:"Bandwidth means:",o:["Speed of light","Data transfer rate","Memory size","CPU speed"],a:1,exp:"Bandwidth is the maximum data transfer rate of a network connection."}],
+  'DS':[{q:"DS stands for:",o:["Data Science","Data Structures","Digital Systems","None"],a:1,exp:"DS = Data Structures — ways of organizing data for efficient access."},{q:"Stack uses which principle?",o:["FIFO","LIFO","Random","Priority"],a:1,exp:"Stack uses LIFO (Last In First Out) — the last element added is first removed."},{q:"Queue uses which principle?",o:["LIFO","FIFO","Random","None"],a:1,exp:"Queue uses FIFO (First In First Out) — first added is first removed."},{q:"Binary search requires array to be:",o:["Unsorted","Sorted","Circular","Linked"],a:1,exp:"Binary search only works on sorted arrays — it divides the search space in half."},{q:"Time complexity of binary search:",o:["O(n)","O(n²)","O(log n)","O(1)"],a:2,exp:"Binary search has O(log n) time complexity — very efficient."},{q:"Linked list advantage over array:",o:["Faster access","Dynamic size","Less memory","Sorted always"],a:1,exp:"Linked lists have dynamic size — elements can be added/removed without resizing."},{q:"Height of balanced binary tree with n nodes:",o:["O(n)","O(log n)","O(n²)","O(1)"],a:1,exp:"A balanced binary tree has height O(log n)."},{q:"Which traversal visits root first?",o:["Inorder","Postorder","Preorder","Level order"],a:2,exp:"Preorder traversal visits: Root → Left → Right."}]
+};
+let curSub=null,curQidx=0,techAns={};
+document.getElementById('subBtns').innerHTML=Object.keys(subjects).map(s=>`<button class="sub-btn${curSub===s?' on':''}" onclick="selectSub('${s}',this)">${s}</button>`).join('');
+function selectSub(sub,el){curSub=sub;curQidx=0;techAns={};document.querySelectorAll('.sub-btn').forEach(b=>b.classList.remove('on'));el.classList.add('on');renderTechQ();}
+function renderTechQ(){
+  let qs=subjects[curSub],q=qs[curQidx],total=qs.length,score=Object.keys(techAns).length;
+  document.getElementById('quizArea').innerHTML=`
+  <div class="q-card-tech anim-fadeUp">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
+      <div><span class="badge badge-gold">${curSub}</span></div>
+      <div style="font-size:12px;color:var(--text2)">Q ${curQidx+1}/${total} · ✅ ${score}</div>
+    </div>
+    <div class="prog-bar" style="margin-bottom:16px"><div class="prog-fill prog-gold" style="width:${Math.round((curQidx/total)*100)}%"></div></div>
+    <div style="font-size:16px;font-weight:600;line-height:1.5;margin-bottom:18px">${q.q}</div>
+    ${q.o.map((o,i)=>`<div class="tech-opt${techAns[curQidx]!==undefined?(i===q.a?' correct':(i===techAns[curQidx]&&techAns[curQidx]!==q.a?' wrong':'')):''}\" onclick="ansTech(${i})"><div style="width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">${['A','B','C','D'][i]}</div>${o}</div>`).join('')}
+    ${techAns[curQidx]!==undefined?`<div style="background:rgba(245,158,11,0.07);border:1px solid rgba(245,158,11,0.2);border-radius:var(--radius);padding:10px 14px;margin-top:10px;font-size:13px;color:#fcd34d">💡 ${q.exp}</div>`:''}
+    <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;">
+      ${curQidx>0?`<button class="btn btn-secondary btn-sm" onclick="techPrev()">◀ Prev</button>`:''}
+      ${curQidx<total-1?`<button class="btn btn-primary btn-sm" onclick="techNext()">Next ▶</button>`:`<button class="btn btn-success btn-sm" onclick="techResult()">🏁 Finish</button>`}
+    </div>
+  </div>`;
+}
+function ansTech(i){if(techAns[curQidx]!==undefined)return;techAns[curQidx]=i;sndClick();renderTechQ();}
+function techNext(){if(curQidx<subjects[curSub].length-1){curQidx++;renderTechQ();}}
+function techPrev(){if(curQidx>0){curQidx--;renderTechQ();}}
+function techResult(){
+  let total=subjects[curSub].length,score=Object.keys(techAns).filter(k=>techAns[k]===subjects[curSub][k].a).length,pct=Math.round(score/total*100);
+  let prog=parseInt(localStorage.getItem('techProg_'+reg))||0;localStorage.setItem('techProg_'+reg,Math.min(100,prog+Math.floor(100/4)));
+  saveScoreHistory(reg,'Technical-'+curSub,score,total);
+  document.getElementById('quizArea').innerHTML=`<div class="glass-card anim-scaleIn" style="text-align:center;padding:36px"><div style="font-size:52px;margin-bottom:14px">${pct>=80?'🌟':pct>=60?'👏':'📚'}</div><div style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;margin-bottom:6px">${curSub} Result</div><div style="font-size:28px;font-weight:800;color:${pct>=60?'#86efac':'#fca5a5'};margin:14px 0">${score}/${total} (${pct}%)</div><div style="font-size:13px;color:var(--text2);margin-bottom:20px">${pct>=80?'Excellent! You have a strong grasp of '+curSub:pct>=60?'Good job! Review the questions you got wrong.':'Keep practicing! Focus on understanding core concepts.'}</div><div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;"><button class="btn btn-primary" onclick="selectSub('${curSub}',document.querySelector('.sub-btn.on')||document.querySelector('.sub-btn'))">🔄 Try Again</button><button class="btn btn-secondary" onclick="document.getElementById('quizArea').innerHTML=''">↩ Choose Subject</button></div></div>`;
+}
+</script>
+</body>
+</html>

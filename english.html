@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>English — APTIORA</title>
+<link rel="stylesheet" href="aptiora.css">
+<style>
+.module-card{background:rgba(13,13,20,0.88);border:1px solid rgba(16,185,129,0.2);border-radius:var(--radius-xl);padding:20px;cursor:pointer;transition:all 0.22s;margin-bottom:12px;}
+.module-card:hover{border-color:rgba(16,185,129,0.45);transform:translateY(-2px);}
+.module-card.active{border-color:rgba(16,185,129,0.6);background:rgba(16,185,129,0.07);}
+.q-card-eng{background:rgba(13,13,20,0.9);border:1px solid var(--border);border-radius:var(--radius-xl);padding:24px;margin-bottom:14px;}
+.eng-opt{padding:11px 16px;border:1.5px solid var(--border);border-radius:var(--radius);cursor:pointer;font-size:14px;margin-bottom:8px;transition:all 0.2s;display:flex;align-items:center;gap:10px;background:rgba(255,255,255,0.02);}
+.eng-opt:hover{border-color:rgba(16,185,129,0.4);background:rgba(16,185,129,0.05);}
+.eng-opt.correct{border-color:rgba(34,197,94,0.5);background:rgba(34,197,94,0.1);color:#86efac;}
+.eng-opt.wrong{border-color:rgba(239,68,68,0.5);background:rgba(239,68,68,0.08);color:#fca5a5;}
+.essay-area{background:rgba(13,13,20,0.9);border:1.5px solid var(--border);border-radius:var(--radius-lg);padding:16px;color:white;font-size:14px;font-family:'Inter',sans-serif;outline:none;resize:vertical;min-height:160px;line-height:1.7;width:100%;transition:border-color 0.2s;}
+.essay-area:focus{border-color:rgba(16,185,129,0.55);}
+.ai-fb-box{background:rgba(16,185,129,0.07);border:1px solid rgba(16,185,129,0.2);border-radius:var(--radius-lg);padding:16px 18px;margin-top:12px;font-size:13px;line-height:1.7;display:none;}
+body.light .module-card,.body.light .q-card-eng{background:rgba(255,255,255,0.88)!important;}
+body.light .essay-area{background:rgba(0,0,0,0.04)!important;color:#1a1a2e!important;}
+</style>
+</head>
+<body>
+<div class="orb orb1"></div><div class="orb orb2"></div>
+<canvas class="bg-canvas" id="bgCanvas"></canvas>
+<div id="sb"></div>
+<div class="app-main" id="appMain">
+  <div class="app-topbar">
+    <div class="topbar-left"><button class="collapse-btn" id="collapseBtn">☰</button><div class="page-title">🗣 English Communication</div></div>
+    <div class="topbar-right"><button class="tb-btn" id="themeBtn">🌙</button></div>
+  </div>
+  <div class="app-page">
+    <div class="grid2" style="align-items:start;">
+      <div>
+        <div style="font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;margin-bottom:10px;">📚 Modules</div>
+        <div id="modules"></div>
+      </div>
+      <div id="practiceArea">
+        <div class="glass-card anim-fadeUp" style="text-align:center;padding:40px;">
+          <div style="font-size:48px;margin-bottom:12px">🗣</div>
+          <div style="font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:700;margin-bottom:8px">English Communication</div>
+          <div style="font-size:13px;color:var(--text2)">Select a module from the left to start practicing</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="aptiora.js"></script>
+<script>
+let user=getCurrentUser();if(!user)throw'';
+let {reg,name}=user;
+document.getElementById('sb').innerHTML=buildSidebar('english',name,reg);
+initSidebar();
+let modules=[
+  {id:'grammar',icon:'📝',name:'Grammar MCQ',desc:'Test your grammar knowledge with multiple choice questions',type:'mcq',questions:[{q:"Choose the correct sentence:",o:["He go to school","He goes to school","He going to school","He goed to school"],a:1,exp:"Third person singular takes 's' - 'goes'"},{q:"Which is correct past tense?",o:["She writed","She wrote","She wrotes","She had write"],a:1,exp:"'Wrote' is the past tense of 'write'"},{q:"She ___ a doctor.",o:["am","is","are","be"],a:1,exp:"Third person singular uses 'is'"},{q:"They ___ playing cricket.",o:["is","am","are","was"],a:2,exp:"Plural subject 'They' uses 'are'"},{q:"Correct spelling:",o:["Recieve","Receive","Receeve","Recive"],a:1,exp:"I before E except after C — Receive"}]},
+  {id:'vocab',icon:'📖',name:'Vocabulary Builder',desc:'Expand your vocabulary with synonyms, antonyms and meanings',type:'mcq',questions:[{q:"Synonym of 'Eloquent':",o:["Silent","Articulate","Confused","Timid"],a:1,exp:"Eloquent = fluent and persuasive. Synonym: Articulate"},{q:"Antonym of 'Meticulous':",o:["Careful","Precise","Careless","Thorough"],a:2,exp:"Meticulous = very careful. Antonym: Careless"},{q:"'Ephemeral' means:",o:["Long-lasting","Short-lived","Strong","Bright"],a:1,exp:"Ephemeral = lasting for a very short time"},{q:"Synonym of 'Tenacious':",o:["Weak","Persistent","Gentle","Quiet"],a:1,exp:"Tenacious = persistent, not giving up"},{q:"'Ubiquitous' means:",o:["Rare","Present everywhere","Invisible","Confusing"],a:1,exp:"Ubiquitous = present, appearing, or found everywhere"}]},
+  {id:'reading',icon:'📰',name:'Reading Comprehension',desc:'Read passages and answer questions to improve comprehension',type:'mcq',questions:[{q:"In the sentence 'The diligent student completed all assignments on time', what does 'diligent' describe?",o:["assignments","time","student","completed"],a:2,exp:"Diligent is an adjective that modifies/describes 'student'"},{q:"Which word is a conjunction?",o:["quickly","beautiful","because","ran"],a:2,exp:"'Because' is a conjunction — it connects two clauses"},{q:"The prefix 'mis-' in 'misunderstand' means:",o:["again","before","wrongly","after"],a:2,exp:"The prefix 'mis-' means wrongly or badly"},{q:"Which sentence uses active voice?",o:["The ball was kicked by John","John kicked the ball","The ball is being kicked","Kicked was the ball"],a:1,exp:"Active voice: subject (John) performs the action (kicked)"},{q:"'Despite the rain, she went out.' What type of clause is 'Despite the rain'?",o:["Independent clause","Adverbial phrase","Noun clause","Relative clause"],a:1,exp:"'Despite the rain' is an adverbial phrase showing contrast"}]},
+  {id:'essay',icon:'✍️',name:'Essay Writing',desc:'Practice essay writing with AI feedback on grammar, structure and clarity',type:'essay',prompts:["Write a short paragraph (100-150 words) about the importance of teamwork in the workplace.","Write a brief essay (100-150 words) about how technology has changed education.","Write a paragraph (100-150 words) about your career goals and how you plan to achieve them.","Write a short essay (100-150 words) about the benefits of reading books regularly."]}
+];
+let curModule=null,curQ=0,engAnswers={};
+document.getElementById('modules').innerHTML=modules.map(m=>`<div class="module-card" onclick="selectModule('${m.id}')"><div style="display:flex;align-items:center;gap:10px"><div style="font-size:24px">${m.icon}</div><div><div style="font-size:14px;font-weight:600">${m.name}</div><div style="font-size:12px;color:var(--text2);margin-top:2px">${m.desc}</div></div></div></div>`).join('');
+function selectModule(id){
+  curModule=modules.find(m=>m.id===id);if(!curModule)return;curQ=0;engAnswers={};
+  document.querySelectorAll('.module-card').forEach(c=>c.classList.remove('active'));
+  document.querySelector(`.module-card[onclick*="${id}"]`).classList.add('active');
+  if(curModule.type==='mcq')renderMCQ();else renderEssay();
+}
+function renderMCQ(){
+  let q=curModule.questions[curQ];
+  let total=curModule.questions.length,score=Object.values(engAnswers).filter(Boolean).length;
+  document.getElementById('practiceArea').innerHTML=`
+  <div class="q-card-eng anim-fadeUp">
+    <div style="display:flex;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
+      <div class="badge badge-green">${curModule.icon} ${curModule.name}</div>
+      <div style="font-size:12px;color:var(--text2)">Q ${curQ+1} / ${total} · Score: ${score}</div>
+    </div>
+    <div style="font-size:16px;font-weight:600;margin-bottom:18px;line-height:1.5">${q.q}</div>
+    ${q.o.map((o,i)=>`<div class="eng-opt${engAnswers[curQ]!==undefined?(i===q.a?' correct':(i===engAnswers[curQ]&&engAnswers[curQ]!==q.a?' wrong':'')):''}\" onclick="ansEng(${i})"><div style="width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">${['A','B','C','D'][i]}</div>${o}</div>`).join('')}
+    ${engAnswers[curQ]!==undefined?`<div style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);border-radius:var(--radius);padding:10px 14px;margin-top:10px;font-size:13px;color:#6ee7b7">💡 ${q.exp}</div>`:''}
+    <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;">
+      ${curQ>0?`<button class="btn btn-secondary btn-sm" onclick="renderMCQ_prev()">◀ Prev</button>`:''}
+      ${curQ<total-1?`<button class="btn btn-primary btn-sm" onclick="renderMCQ_next()">Next ▶</button>`:`<button class="btn btn-success btn-sm" onclick="showEngResult()">🏁 Finish</button>`}
+    </div>
+  </div>`;
+}
+function ansEng(i){if(engAnswers[curQ]!==undefined)return;engAnswers[curQ]=(i===curModule.questions[curQ].a);sndClick();renderMCQ();}
+function renderMCQ_next(){if(curQ<curModule.questions.length-1){curQ++;renderMCQ();}}
+function renderMCQ_prev(){if(curQ>0){curQ--;renderMCQ();}}
+function showEngResult(){
+  let total=curModule.questions.length,score=Object.values(engAnswers).filter(Boolean).length,pct=Math.round(score/total*100);
+  let prog=parseInt(localStorage.getItem('engProg_'+reg))||0;localStorage.setItem('engProg_'+reg,Math.min(100,prog+10));
+  document.getElementById('practiceArea').innerHTML=`<div class="glass-card anim-scaleIn" style="text-align:center;padding:36px"><div style="font-size:52px;margin-bottom:14px">${pct>=80?'🌟':pct>=60?'👏':'📚'}</div><div style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;margin-bottom:6px">${pct>=80?'Excellent!':pct>=60?'Good job!':'Keep Practicing!'}</div><div style="font-size:24px;font-weight:800;color:${pct>=60?'#86efac':'#fca5a5'};margin:12px 0">${score}/${total} (${pct}%)</div><button class="btn btn-primary" style="margin:0 auto;display:flex" onclick="selectModule('${curModule.id}')">🔄 Try Again</button></div>`;
+}
+function renderEssay(){
+  let prompt=curModule.prompts[Math.floor(Math.random()*curModule.prompts.length)];
+  document.getElementById('practiceArea').innerHTML=`
+  <div class="q-card-eng anim-fadeUp">
+    <div class="badge badge-green" style="margin-bottom:14px">${curModule.icon} ${curModule.name}</div>
+    <div style="font-size:14px;font-weight:600;margin-bottom:16px;line-height:1.55;padding:12px 16px;background:rgba(16,185,129,0.07);border:1px solid rgba(16,185,129,0.2);border-radius:var(--radius)">📝 ${prompt}</div>
+    <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text2);margin-bottom:6px"><span>Your Essay</span><span id="wc">0 words</span></div>
+    <textarea class="essay-area" id="essayInput" placeholder="Start writing your essay here..." oninput="updateWC()"></textarea>
+    <button class="btn btn-primary" style="margin-top:12px" onclick="gradeEssay('${prompt.replace(/'/g,"\\'")}')">🤖 Get AI Feedback</button>
+    <div class="ai-fb-box" id="essayFb"></div>
+  </div>`;
+}
+function updateWC(){let w=document.getElementById('essayInput').value.trim().split(/\s+/).filter(Boolean).length;document.getElementById('wc').innerText=w+' words';}
+async function gradeEssay(prompt){
+  let essay=document.getElementById('essayInput').value.trim();if(essay.length<30){alert('Write at least a few sentences!');return;}
+  let fb=document.getElementById('essayFb');fb.style.display='block';fb.innerHTML='<span style="color:#a78bfa">🤖 AI is grading your essay...</span>';
+  try{let resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:280,messages:[{role:'user',content:`Grade this English essay for a B.Tech student.\nPrompt: "${prompt}"\nEssay: "${essay}"\n\nGive feedback on:\n1. Grammar & spelling (score/5)\n2. Structure & clarity (score/5)\n3. Vocabulary (score/5)\n4. One specific improvement\n\nBe encouraging. Keep it concise.`}]})});
+  let data=await resp.json();fb.innerHTML='<div style="color:#a78bfa;font-size:11px;font-weight:700;margin-bottom:7px">🤖 AI FEEDBACK</div><div style="white-space:pre-wrap">'+(data.content&&data.content[0]&&data.content[0].text||'Good attempt!')+'</div>';
+  let prog=parseInt(localStorage.getItem('engProg_'+reg))||0;localStorage.setItem('engProg_'+reg,Math.min(100,prog+15));}
+  catch(e){fb.innerHTML='<span style="color:#fca5a5">Connection error. Try again.</span>';}
+}
+</script>
+</body>
+</html>

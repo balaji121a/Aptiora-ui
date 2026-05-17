@@ -1,217 +1,128 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Certificate — APTIORA</title>
-<link rel="stylesheet" href="certificate.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<link rel="stylesheet" href="aptiora.css">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700;800&family=Playfair+Display:wght@400;700;900&display=swap');
-*{margin:0;padding:0;box-sizing:border-box;}
-:root{--gold:#f5c842;--purple:#7c3aed;--dark:#050508;--dark3:#13131f;--text:#ffffff;--text2:rgba(255,255,255,0.55);--border:rgba(255,255,255,0.08);}
-html,body{width:100%;min-height:100%;font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);overflow-x:hidden;}
-body::before{content:"";position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:0.4;}
-canvas.bg-canvas{position:fixed;inset:0;z-index:1;pointer-events:none;}
-.orb{position:fixed;border-radius:50%;filter:blur(80px);pointer-events:none;z-index:1;}
-.orb1{width:500px;height:500px;background:radial-gradient(circle,rgba(124,58,237,0.15),transparent 70%);top:-100px;left:-100px;animation:f1 12s ease-in-out infinite;}
-.orb2{width:300px;height:300px;background:radial-gradient(circle,rgba(245,200,66,0.08),transparent 70%);bottom:-60px;right:-60px;animation:f2 10s ease-in-out infinite;}
-@keyframes f1{0%,100%{transform:translate(0,0);}50%{transform:translate(30px,30px);}}
-@keyframes f2{0%,100%{transform:translate(0,0);}50%{transform:translate(-20px,-20px);}}
-
-/* NAVBAR */
-.navbar{position:fixed;top:0;left:0;right:0;z-index:100;padding:16px 32px;display:flex;align-items:center;justify-content:space-between;background:rgba(5,5,8,0.7);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);}
-.nav-logo{font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:800;letter-spacing:3px;background:linear-gradient(135deg,#fff 30%,var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-
-.page{position:relative;z-index:10;padding:96px 24px 60px;display:flex;flex-direction:column;align-items:center;}
-
-/* CERT CARD */
-.cert-card{
-  width:820px;max-width:95vw;
-  background:white;color:#222;border-radius:20px;
-  box-shadow:0 24px 80px rgba(0,0,0,0.6);
-  overflow:hidden;position:relative;
-  animation:fadeIn 0.8s ease;
-}
-@keyframes fadeIn{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
-.cert-card.rank-1{border:8px solid #d4af37;}
-.cert-card.rank-2{border:8px solid #94a3b8;}
-.cert-card.rank-3{border:8px solid #cd7f32;}
-.cert-card.participate{border:8px solid #6366f1;}
-
-.cert-header{padding:28px 40px 20px;position:relative;}
-.cert-card.rank-1 .cert-header{background:linear-gradient(135deg,#f6d365,#fda085,#f6d365);}
-.cert-card.rank-2 .cert-header{background:linear-gradient(135deg,#bdc3c7,#95a5a6,#bdc3c7);}
-.cert-card.rank-3 .cert-header{background:linear-gradient(135deg,#cd7f32,#e8a838,#cd7f32);}
-.cert-card.participate .cert-header{background:linear-gradient(135deg,#6366f1,#8b5cf6,#6366f1);}
-.cert-header h2{font-family:'Playfair Display',serif;font-size:36px;font-weight:900;letter-spacing:5px;color:white;text-shadow:0 2px 8px rgba(0,0,0,0.3);margin:0;text-align:center;}
-.cert-header h2::before,.cert-header h2::after{content:"✦";font-size:18px;margin:0 12px;opacity:0.8;}
-
-.medal-display{font-size:72px;display:block;text-align:center;margin:-16px auto 8px;position:relative;z-index:2;filter:drop-shadow(0 4px 12px rgba(0,0,0,0.3));animation:float 3s ease-in-out infinite;}
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&display=swap');
+.cert-card{width:820px;max-width:95vw;background:white;color:#222;border-radius:18px;box-shadow:0 24px 80px rgba(0,0,0,0.6);overflow:hidden;position:relative;animation:scaleIn 0.7s ease;}
+.cert-card.r1{border:8px solid #d4af37;}.cert-card.r2{border:8px solid #94a3b8;}.cert-card.r3{border:8px solid #cd7f32;}.cert-card.rp{border:8px solid #6366f1;}
+.cert-hd{padding:26px 38px 18px;text-align:center;}
+.cert-card.r1 .cert-hd{background:linear-gradient(135deg,#f6d365,#fda085,#f6d365);}
+.cert-card.r2 .cert-hd{background:linear-gradient(135deg,#bdc3c7,#95a5a6,#bdc3c7);}
+.cert-card.r3 .cert-hd{background:linear-gradient(135deg,#cd7f32,#e8a838,#cd7f32);}
+.cert-card.rp .cert-hd{background:linear-gradient(135deg,#6366f1,#8b5cf6,#6366f1);}
+.cert-hd h2{font-family:'Playfair Display',serif;font-size:34px;font-weight:900;letter-spacing:5px;color:white;text-shadow:0 2px 8px rgba(0,0,0,0.3);}
+.medal{font-size:68px;display:block;text-align:center;margin:-14px auto 6px;filter:drop-shadow(0 4px 12px rgba(0,0,0,0.3));animation:float 3s ease-in-out infinite;}
 @keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);}}
-
-.cert-body{padding:10px 50px 28px;text-align:center;}
-.cert-body p{font-size:16px;color:#555;margin:6px 0;}
-.cert-name{font-family:'Playfair Display',serif;font-size:42px;font-weight:700;color:#1a1a1a;letter-spacing:2px;margin:12px 0;display:inline-block;border-bottom:3px solid;padding-bottom:6px;}
-.cert-card.rank-1 .cert-name{border-color:#d4af37;}
-.cert-card.rank-2 .cert-name{border-color:#94a3b8;}
-.cert-card.rank-3 .cert-name{border-color:#cd7f32;}
-.cert-card.participate .cert-name{border-color:#6366f1;}
-
-.rank-badge{display:inline-block;padding:7px 22px;border-radius:30px;font-size:16px;font-weight:700;margin:8px 0;color:white;}
-.cert-card.rank-1 .rank-badge{background:linear-gradient(135deg,#d4af37,#f6e27a);}
-.cert-card.rank-2 .rank-badge{background:linear-gradient(135deg,#94a3b8,#cbd5e1);}
-.cert-card.rank-3 .rank-badge{background:linear-gradient(135deg,#cd7f32,#e8a838);}
-.cert-card.participate .rank-badge{background:linear-gradient(135deg,#6366f1,#8b5cf6);}
-
-.cert-msg{font-size:15px;color:#444;font-style:italic;margin:6px 0 12px;}
-.cert-meta{display:flex;justify-content:center;gap:16px;flex-wrap:wrap;margin:12px 0;}
-.meta-pill{background:#f8fafc;border:1px solid #e2e8f0;border-radius:20px;padding:5px 16px;font-size:13px;font-weight:500;color:#374151;}
-
-.cert-card::before{content:"";position:absolute;top:12px;left:12px;right:12px;bottom:12px;border:1.5px dashed rgba(0,0,0,0.08);border-radius:14px;pointer-events:none;}
-.corner-star{position:absolute;font-size:24px;color:rgba(0,0,0,0.07);}
-.corner-star.tl{top:20px;left:20px;}.corner-star.tr{top:20px;right:20px;}
-.corner-star.bl{bottom:20px;left:20px;}.corner-star.br{bottom:20px;right:20px;}
-
-.cert-footer{display:flex;justify-content:space-around;padding:0 50px 22px;margin-top:8px;}
+.cert-body{padding:10px 46px 24px;text-align:center;}
+.cert-name{font-family:'Playfair Display',serif;font-size:40px;font-weight:700;color:#1a1a1a;letter-spacing:2px;margin:12px 0;display:inline-block;border-bottom:3px solid;padding-bottom:5px;}
+.cert-card.r1 .cert-name{border-color:#d4af37;}.cert-card.r2 .cert-name{border-color:#94a3b8;}.cert-card.r3 .cert-name{border-color:#cd7f32;}.cert-card.rp .cert-name{border-color:#6366f1;}
+.rank-badge-c{display:inline-block;padding:6px 20px;border-radius:30px;font-size:15px;font-weight:700;margin:8px 0;color:white;}
+.cert-card.r1 .rank-badge-c{background:linear-gradient(135deg,#d4af37,#f6e27a);}.cert-card.r2 .rank-badge-c{background:linear-gradient(135deg,#94a3b8,#cbd5e1);}.cert-card.r3 .rank-badge-c{background:linear-gradient(135deg,#cd7f32,#e8a838);}.cert-card.rp .rank-badge-c{background:linear-gradient(135deg,#6366f1,#8b5cf6);}
+.cert-msg{font-size:14px;color:#555;font-style:italic;margin:6px 0 12px;}
+.cert-meta-row{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin:12px 0;}
+.meta-p{background:#f8fafc;border:1px solid #e2e8f0;border-radius:20px;padding:5px 14px;font-size:12px;font-weight:500;color:#374151;}
+.cert-foot{display:flex;justify-content:space-around;padding:0 46px 20px;margin-top:6px;}
 .sig-block{text-align:center;}
-.sig-line{border-top:1.5px solid #999;width:150px;margin:0 auto 5px;}
-.sig-label{font-size:11px;color:#888;}
-
-/* BUTTONS */
-.btn-row{text-align:center;margin-top:24px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
-.action-btn{padding:13px 28px;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;transition:all 0.3s;font-family:'Inter',sans-serif;}
-.dl-btn{background:linear-gradient(135deg,#6366f1,#8b5cf6);color:white;box-shadow:0 6px 20px rgba(99,102,241,0.35);}
-.dl-btn:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(99,102,241,0.45);}
-.dl-btn:disabled{background:rgba(255,255,255,0.1);box-shadow:none;cursor:not-allowed;transform:none;color:rgba(255,255,255,0.4);}
-.back-btn{background:rgba(255,255,255,0.07);border:1px solid var(--border);color:white;}
-.back-btn:hover{background:rgba(255,255,255,0.1);}
-
-/* NOT ELIGIBLE */
-.not-eligible{text-align:center;color:white;font-family:'Inter',sans-serif;padding:80px 30px;animation:fadeIn 0.8s ease;}
-.not-eligible h2{font-family:'Space Grotesk',sans-serif;font-size:28px;margin-bottom:12px;}
-.not-eligible p{font-size:15px;opacity:0.7;margin:8px 0;}
-
-@media(max-width:860px){.cert-card{border-width:5px;}.cert-header h2{font-size:26px;}.cert-name{font-size:32px;}.cert-body{padding:10px 22px 22px;}.cert-footer{padding:0 22px 18px;}}
-
-/* LIGHT MODE */
-body.light-mode{background:#f0f2f7!important;color:#1a1a2e!important;}
-body.light-mode .navbar{background:rgba(240,242,247,0.85)!important;border-bottom-color:rgba(0,0,0,0.08)!important;}
-body.light-mode .back-btn{background:rgba(0,0,0,0.05)!important;border-color:rgba(0,0,0,0.1)!important;color:#1a1a2e!important;}
-body.light-mode canvas{opacity:0.15!important;}
+.sig-line{border-top:1.5px solid #999;width:140px;margin:0 auto 5px;}
+.sig-lbl{font-size:11px;color:#888;}
+.cert-card::before{content:"";position:absolute;top:10px;left:10px;right:10px;bottom:10px;border:1.5px dashed rgba(0,0,0,0.07);border-radius:12px;pointer-events:none;}
+.corner-star{position:absolute;font-size:22px;color:rgba(0,0,0,0.07);}
+.corner-star.tl{top:18px;left:18px;}.corner-star.tr{top:18px;right:18px;}.corner-star.bl{bottom:18px;left:18px;}.corner-star.br{bottom:18px;right:18px;}
+.not-elig{text-align:center;color:white;padding:60px 28px;animation:scaleIn 0.5s ease;}
+@media(max-width:860px){.cert-card{border-width:5px;}.cert-hd h2{font-size:24px;}.cert-name{font-size:30px;}.cert-body{padding:10px 20px 20px;}.cert-foot{padding:0 20px 16px;}}
+body.light .not-elig{color:#1a1a2e!important;}
 </style>
 </head>
 <body>
-<div class="orb orb1"></div>
-<div class="orb orb2"></div>
-<canvas class="bg-canvas" id="c"></canvas>
-
-<nav class="navbar">
-  <div class="nav-logo">APTIORA</div>
-</nav>
-
-<div class="page">
-  <div id="certSection" style="width:100%;display:flex;flex-direction:column;align-items:center;">
-    <div id="certificate" class="cert-card">
-      <span class="corner-star tl">✦</span><span class="corner-star tr">✦</span>
-      <span class="corner-star bl">✦</span><span class="corner-star br">✦</span>
-      <div class="cert-header"><h2>CERTIFICATE</h2></div>
-      <div class="medal-display" id="medalDisplay"></div>
-      <div class="cert-body">
-        <p>This is to proudly certify that</p>
-        <div class="cert-name" id="certName"></div>
-        <div class="rank-badge" id="rankBadge"></div>
-        <p class="cert-msg" id="certMsg"></p>
-        <div class="cert-meta">
-          <div class="meta-pill">📊 Score: <strong id="certScore"></strong></div>
-          <div class="meta-pill">📅 <span id="certDate"></span></div>
-          <div class="meta-pill">🏫 APTIORA Exam System</div>
+<div class="orb orb1"></div><div class="orb orb2"></div>
+<canvas class="bg-canvas" id="bgCanvas"></canvas>
+<div id="sb"></div>
+<div class="app-main" id="appMain">
+  <div class="app-topbar">
+    <div class="topbar-left"><button class="collapse-btn" id="collapseBtn">☰</button><div class="page-title">🎓 Certificate</div></div>
+    <div class="topbar-right"><button class="tb-btn" id="themeBtn">🌙</button></div>
+  </div>
+  <div class="app-page" style="display:flex;flex-direction:column;align-items:center;">
+    <div id="certSection" style="width:100%;display:flex;flex-direction:column;align-items:center;">
+      <div id="certificate" class="cert-card">
+        <span class="corner-star tl">✦</span><span class="corner-star tr">✦</span><span class="corner-star bl">✦</span><span class="corner-star br">✦</span>
+        <div class="cert-hd"><h2>CERTIFICATE</h2></div>
+        <div class="medal" id="medal"></div>
+        <div class="cert-body">
+          <p style="font-size:15px;color:#555;">This is to proudly certify that</p>
+          <div class="cert-name" id="certName"></div>
+          <div class="rank-badge-c" id="rankBadge"></div>
+          <p class="cert-msg" id="certMsg"></p>
+          <div class="cert-meta-row">
+            <div class="meta-p">📊 Score: <strong id="certScore"></strong></div>
+            <div class="meta-p">📅 <span id="certDate"></span></div>
+            <div class="meta-p">🏫 APTIORA</div>
+          </div>
+        </div>
+        <div class="cert-foot">
+          <div class="sig-block"><div class="sig-line"></div><div class="sig-lbl">Examiner Signature</div></div>
+          <div class="sig-block"><div class="sig-line"></div><div class="sig-lbl">Director, APTIORA</div></div>
         </div>
       </div>
-      <div class="cert-footer">
-        <div class="sig-block"><div class="sig-line"></div><div class="sig-label">Examiner Signature</div></div>
-        <div class="sig-block"><div class="sig-line"></div><div class="sig-label">Director, APTIORA</div></div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:20px;">
+        <button class="btn btn-primary" id="dlBtn" onclick="downloadPDF()">⬇ Download PDF</button>
+        <button class="btn btn-success" onclick="shareCert()">📱 Share</button>
+        <button class="btn btn-secondary" onclick="nav('leaderboard.html')">🏆 Leaderboard</button>
       </div>
     </div>
-    <div class="btn-row">
-      <button class="action-btn dl-btn" id="dlBtn" onclick="downloadPDF()">⬇ Download Certificate</button>
-      <button class="action-btn back-btn" onclick="location.href='leaderboard.html'">🏆 Leaderboard</button>
-      <button class="action-btn" onclick="shareCert()" style="background:linear-gradient(135deg,#10b981,#059669);color:white;box-shadow:0 6px 20px rgba(16,185,129,0.35);">📱 Share</button>
+    <div id="notElig" class="not-elig" style="display:none;">
+      <div style="font-size:60px;margin-bottom:16px;">⚠️</div>
+      <div style="font-family:'Space Grotesk',sans-serif;font-size:24px;font-weight:700;margin-bottom:10px;">Not Eligible</div>
+      <p style="opacity:0.7;margin-bottom:6px;">You need at least <strong>15 questions</strong> attempted.</p>
+      <p>Your attempts: <strong id="attCnt"></strong> / 20</p>
+      <button class="btn btn-secondary" onclick="nav('leaderboard.html')" style="margin-top:20px;">⬅ Leaderboard</button>
     </div>
   </div>
-
-  <div id="notEligible" class="not-eligible" style="display:none;">
-    <div style="font-size:64px;margin-bottom:16px;">⚠️</div>
-    <h2>Not Eligible for Certificate</h2>
-    <p>You need to attempt at least <strong>15 questions</strong> to receive a certificate.</p>
-    <p>Your attempts: <strong id="attemptedCount"></strong> / 20</p>
-    <br>
-    <button class="action-btn back-btn" onclick="location.href='leaderboard.html'" style="margin-top:10px;">⬅ Back to Leaderboard</button>
-  </div>
 </div>
-
+<script src="aptiora.js"></script>
 <script>
-(function(){let m=localStorage.getItem('darkMode')||(window.matchMedia&&window.matchMedia('(prefers-color-scheme:light)').matches?'light':'dark');if(m==='light')document.body.classList.add('light-mode');})();
-function toggleDark(){let isLight=document.body.classList.toggle("light-mode");localStorage.setItem("darkMode",isLight?"light":"dark");let b=document.getElementById("themeBtn");if(b)b.innerText=isLight?"☀️":"🌙";}
-(function(){let b=document.getElementById("themeBtn");if(b)b.innerText=localStorage.getItem("darkMode")==="light"?"☀️":"🌙";})();
-let reg=localStorage.getItem("username");
-let rank=parseInt(localStorage.getItem("rank"))||0;
-let score=parseInt(localStorage.getItem("cert_score"))||0;
-let attempted=parseInt(localStorage.getItem("cert_attempted"))||0;
-function getUsers(){return JSON.parse(localStorage.getItem("users"))||{"714524205005":{name:"Balaji"},"714524205053":{name:"Vicky"},"714524205027":{name:"Ismail"},"714524205041":{name:"Sakthivel"}};}
-let users=getUsers();let name=(users[reg]||{}).name||"Student";
-let settings=JSON.parse(localStorage.getItem("adminSettings"))||{};
-let downloadEnabled=settings.certDownload!==false;
-
-if(attempted<15){
-  document.getElementById("certSection").style.display="none";
-  document.getElementById("notEligible").style.display="block";
-  document.getElementById("attemptedCount").innerText=attempted;
-} else {
-  document.getElementById("certName").innerText=name;
-  document.getElementById("certScore").innerText=score+" / 20";
-  document.getElementById("certDate").innerText=new Date().toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'});
-  let card=document.getElementById("certificate");
-  let medal=document.getElementById("medalDisplay");
-  let badge=document.getElementById("rankBadge");
-  let msg=document.getElementById("certMsg");
-  if(rank===1){card.classList.add("rank-1");medal.innerText="🥇";badge.innerText="🏆 1st Place — Gold";msg.innerText="has achieved the Highest Score in the Assessment";}
-  else if(rank===2){card.classList.add("rank-2");medal.innerText="🥈";badge.innerText="🥈 2nd Place — Silver";msg.innerText="has achieved an Outstanding Performance in the Assessment";}
-  else if(rank===3){card.classList.add("rank-3");medal.innerText="🥉";badge.innerText="🥉 3rd Place — Bronze";msg.innerText="has achieved an Excellent Performance in the Assessment";}
-  else{card.classList.add("participate");medal.innerText="🎓";badge.innerText="🎓 Participation Certificate";msg.innerText="has successfully participated and completed the Assessment";}
-  let dlBtn=document.getElementById("dlBtn");
-  if(!downloadEnabled){dlBtn.disabled=true;dlBtn.innerText="⛔ Download Disabled by Admin";}
-  setTimeout(()=>{
-    confetti({particleCount:150,spread:80,origin:{y:0.6}});
-    if(rank<=3&&rank>0){setTimeout(()=>confetti({particleCount:80,angle:60,spread:55,origin:{x:0}}),600);setTimeout(()=>confetti({particleCount:80,angle:120,spread:55,origin:{x:1}}),800);}
-  },500);
+let user=getCurrentUser();if(!user)throw'';
+let {reg,name}=user;
+document.getElementById('sb').innerHTML=buildSidebar('',name,reg);
+initSidebar();
+let rank=parseInt(localStorage.getItem('rank'))||0,score=parseInt(localStorage.getItem('cert_score'))||0,attempted=parseInt(localStorage.getItem('cert_attempted'))||0;
+let s=getSettings();
+if(attempted<15){document.getElementById('certSection').style.display='none';document.getElementById('notElig').style.display='block';document.getElementById('attCnt').innerText=attempted;}
+else{
+  document.getElementById('certName').innerText=name;
+  document.getElementById('certScore').innerText=score+' / 20';
+  document.getElementById('certDate').innerText=new Date().toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'});
+  let card=document.getElementById('certificate'),medal=document.getElementById('medal'),badge=document.getElementById('rankBadge'),msg=document.getElementById('certMsg');
+  if(rank===1){card.classList.add('r1');medal.innerText='🥇';badge.innerText='🏆 1st Place — Gold';msg.innerText='has achieved the Highest Score in the Assessment';}
+  else if(rank===2){card.classList.add('r2');medal.innerText='🥈';badge.innerText='🥈 2nd Place — Silver';msg.innerText='has achieved an Outstanding Performance in the Assessment';}
+  else if(rank===3){card.classList.add('r3');medal.innerText='🥉';badge.innerText='🥉 3rd Place — Bronze';msg.innerText='has achieved an Excellent Performance in the Assessment';}
+  else{card.classList.add('rp');medal.innerText='🎓';badge.innerText='🎓 Participation Certificate';msg.innerText='has successfully completed the Assessment';}
+  if(!s.certDownload){let b=document.getElementById('dlBtn');b.disabled=true;b.innerText='⛔ Download Disabled';}
+  setTimeout(()=>{launchConfetti(120);if(rank<=3&&rank>0){setTimeout(()=>launchConfetti(60),600);}},500);
 }
-
 async function downloadPDF(){
-  let s=JSON.parse(localStorage.getItem("adminSettings"))||{};
-  if(s.certDownload===false){alert("⛔ Certificate download is disabled by admin.");return;}
-  confetti({particleCount:100,spread:70,origin:{y:0.6}});
+  if(!getSettings().certDownload){alert('⛔ Download disabled by admin.');return;}
+  launchConfetti(80);
   const {jsPDF}=window.jspdf;
-  let el=document.getElementById("certificate");
-  document.querySelector(".btn-row").style.display="none";
-  let canvas=await html2canvas(el,{scale:2,useCORS:true,backgroundColor:"#ffffff"});
-  document.querySelector(".btn-row").style.display="flex";
-  let img=canvas.toDataURL("image/png");
-  let pdf=new jsPDF('landscape','px',[canvas.width/2,canvas.height/2]);
-  pdf.addImage(img,'PNG',0,0,canvas.width/2,canvas.height/2);
-  pdf.save("Certificate_"+name+"_APTIORA.pdf");
+  let el=document.getElementById('certificate');
+  document.querySelector('.app-page').querySelectorAll('.btn').forEach(b=>b.style.display='none');
+  let cv=await html2canvas(el,{scale:2,useCORS:true,backgroundColor:'#ffffff'});
+  document.querySelector('.app-page').querySelectorAll('.btn').forEach(b=>b.style.display='');
+  let img=cv.toDataURL('image/png');
+  let pdf=new jsPDF('landscape','px',[cv.width/2,cv.height/2]);
+  pdf.addImage(img,'PNG',0,0,cv.width/2,cv.height/2);
+  pdf.save('Certificate_'+name+'_APTIORA.pdf');
 }
-
-const cv=document.getElementById("c"),ctx=cv.getContext("2d");
-let W=cv.width=innerWidth,H=cv.height=innerHeight;
-class P{constructor(){this.reset();}reset(){this.x=Math.random()*W;this.y=Math.random()*H;this.r=Math.random()*1.5+0.3;this.dx=(Math.random()-.5)*.35;this.dy=(Math.random()-.5)*.35;this.a=Math.random()*.5+0.1;}
-draw(){ctx.beginPath();ctx.arc(this.x,this.y,this.r,0,Math.PI*2);ctx.fillStyle=`rgba(255,255,255,${this.a})`;ctx.fill();}
-update(){this.x+=this.dx;this.y+=this.dy;if(this.x<0||this.x>W||this.y<0||this.y>H)this.reset();this.draw();}}
-const pts=Array.from({length:80},()=>new P());const maxD=130;
-function draw(){ctx.clearRect(0,0,W,H);pts.forEach(p=>p.update());for(let i=0;i<pts.length;i++)for(let j=i+1;j<pts.length;j++){let d=Math.hypot(pts[i].x-pts[j].x,pts[i].y-pts[j].y);if(d<maxD){ctx.beginPath();ctx.strokeStyle=`rgba(124,58,237,${(1-d/maxD)*0.12})`;ctx.lineWidth=0.8;ctx.moveTo(pts[i].x,pts[i].y);ctx.lineTo(pts[j].x,pts[j].y);ctx.stroke();}}requestAnimationFrame(draw);}
-function shareCert(){let txt="I scored "+localStorage.getItem("cert_score")+"/20 in APTIORA Aptitude Assessment! 🎓 #APTIORA #Aptitude";if(navigator.share){navigator.share({title:"APTIORA Certificate",text:txt,url:location.href}).catch(()=>{});}else{navigator.clipboard.writeText(txt).then(()=>alert("✅ Copied to clipboard! Paste in WhatsApp or LinkedIn.")).catch(()=>alert(txt));}} draw();addEventListener("resize",()=>{W=cv.width=innerWidth;H=cv.height=innerHeight;});
+function shareCert(){
+  let txt=`I scored ${score}/20 in APTIORA Aptitude Assessment! 🎓 #APTIORA #Placement`;
+  if(navigator.share){navigator.share({title:'APTIORA Certificate',text:txt}).catch(()=>{});}
+  else{navigator.clipboard.writeText(txt).then(()=>alert('✅ Copied! Paste in WhatsApp or LinkedIn.')).catch(()=>alert(txt));}
+}
 </script>
 </body>
 </html>
