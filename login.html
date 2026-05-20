@@ -5,25 +5,22 @@
 <title>Login — APTIORA</title>
 <link rel="stylesheet" href="aptiora.css">
 <style>
-html,body{height:100%;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+html,body{min-height:100%;display:flex;align-items:center;justify-content:center;}
 .login-page{position:relative;z-index:10;width:100%;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;}
 .login-card{background:rgba(13,13,20,0.88);backdrop-filter:blur(24px);border:1px solid var(--border2);border-radius:var(--radius-xl);padding:44px 40px;width:420px;max-width:100%;position:relative;overflow:hidden;animation:scaleIn 0.5s ease;}
 .login-card::before{content:"";position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(124,58,237,0.5),transparent);}
-.login-logo{font-family:'Space Grotesk',sans-serif;font-size:28px;font-weight:800;letter-spacing:3px;background:linear-gradient(135deg,#fff 30%,var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-align:center;margin-bottom:6px;}
-.login-tagline{text-align:center;font-size:13px;color:var(--text2);margin-bottom:32px;}
-.tab-row{display:flex;gap:0;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:var(--radius);padding:3px;margin-bottom:24px;}
+.login-logo{font-family:'Space Grotesk',sans-serif;font-size:26px;font-weight:800;letter-spacing:3px;background:linear-gradient(135deg,#fff 30%,var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-align:center;margin-bottom:4px;}
+.login-tagline{text-align:center;font-size:13px;color:var(--text2);margin-bottom:28px;}
+.tab-row{display:flex;gap:0;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:var(--radius);padding:3px;margin-bottom:22px;}
 .tab-btn{flex:1;padding:9px;border:none;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.2s;color:var(--text2);background:none;}
 .tab-btn.on{background:linear-gradient(135deg,var(--purple),#6d28d9);color:white;box-shadow:0 4px 12px rgba(124,58,237,0.3);}
-.login-btn{width:100%;padding:14px;border:none;border-radius:var(--radius);background:linear-gradient(135deg,var(--purple),#6d28d9);color:white;font-size:15px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.3s;box-shadow:0 6px 20px rgba(124,58,237,0.35);margin-top:4px;}
+.login-btn{width:100%;padding:14px;border:none;border-radius:var(--radius);background:linear-gradient(135deg,var(--purple),#6d28d9);color:white;font-size:15px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.3s;box-shadow:0 6px 20px rgba(124,58,237,0.35);margin-top:4px;position:relative;overflow:hidden;}
 .login-btn:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(124,58,237,0.45);}
 .err-msg{color:#fca5a5;font-size:13px;text-align:center;padding:9px;background:rgba(239,68,68,0.1);border-radius:var(--radius);margin-top:10px;display:none;}
-.demo-chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:16px;justify-content:center;}
-.demo-chip{padding:5px 12px;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:20px;font-size:11px;color:var(--text2);cursor:pointer;transition:all 0.2s;}
-.demo-chip:hover{background:rgba(124,58,237,0.12);color:#a78bfa;}
+.success-msg{color:#86efac;font-size:14px;text-align:center;padding:10px;background:rgba(134,239,172,0.1);border-radius:var(--radius);margin-top:10px;display:none;font-weight:600;}
 body.light .login-card{background:rgba(255,255,255,0.93)!important;}
 body.light .tab-row{background:rgba(0,0,0,0.04)!important;border-color:rgba(0,0,0,0.1)!important;}
 body.light .tab-btn{color:rgba(26,26,46,0.6)!important;}
-body.light .demo-chip{background:rgba(0,0,0,0.04)!important;border-color:rgba(0,0,0,0.1)!important;color:rgba(26,26,46,0.6)!important;}
 </style>
 </head>
 <body>
@@ -32,22 +29,31 @@ body.light .demo-chip{background:rgba(0,0,0,0.04)!important;border-color:rgba(0,
 <div class="login-page">
   <div class="login-card">
     <div class="login-logo">📘 APTIORA</div>
-    <div class="login-tagline">Placement Training Portal · B.Tech</div>
+    <div class="login-tagline">Aptitude Online Examination Portal</div>
     <div class="tab-row">
       <button class="tab-btn on" id="stuTab" onclick="setTab('student')">🎓 Student</button>
       <button class="tab-btn" id="admTab" onclick="setTab('admin')">⚙️ Admin</button>
     </div>
     <div id="stuForm">
-      <div class="form-group"><label class="form-label">Register Number</label><input class="form-input" id="regInput" placeholder="e.g. 714524205005" type="text" inputmode="numeric" maxlength="15"></div>
-      <div class="form-group"><label class="form-label">Password</label><input class="form-input" id="passInput" placeholder="Enter password" type="password"></div>
-      <button class="login-btn" onclick="stuLogin()">🚀 Login</button>
-      <div class="err-msg" id="stuErr">❌ Invalid credentials. Try again.</div>
-      <div class="demo-chips" id="demoChips"></div>
+      <div class="form-group"><label class="form-label">Register Number</label>
+        <input class="form-input" id="regInput" placeholder="Enter your Register Number" type="text" inputmode="numeric" maxlength="15" autocomplete="username">
+      </div>
+      <div class="form-group"><label class="form-label">Password</label>
+        <input class="form-input" id="passInput" placeholder="Enter your password" type="password" autocomplete="current-password">
+      </div>
+      <button class="login-btn" onclick="stuLogin()" id="loginBtn">🚀 Login</button>
+      <div class="success-msg" id="stuSuccess">✅ Login Successful! Redirecting...</div>
+      <div class="err-msg" id="stuErr">❌ Invalid credentials. Please try again.</div>
     </div>
     <div id="admForm" style="display:none">
-      <div class="form-group"><label class="form-label">Admin Username</label><input class="form-input" id="admUser" placeholder="admin"></div>
-      <div class="form-group"><label class="form-label">Admin Password</label><input class="form-input" id="admPass" placeholder="Password" type="password"></div>
-      <button class="login-btn" onclick="admLogin()">🔐 Admin Login</button>
+      <div class="form-group"><label class="form-label">Admin Username</label>
+        <input class="form-input" id="admUser" placeholder="Enter admin username" autocomplete="username">
+      </div>
+      <div class="form-group"><label class="form-label">Admin Password</label>
+        <input class="form-input" id="admPass" placeholder="Enter admin password" type="password" autocomplete="current-password">
+      </div>
+      <button class="login-btn" onclick="admLogin()" id="admBtn">🔐 Admin Login</button>
+      <div class="success-msg" id="admSuccess">✅ Admin Login Successful!</div>
       <div class="err-msg" id="admErr">❌ Wrong credentials.</div>
     </div>
   </div>
@@ -55,38 +61,54 @@ body.light .demo-chip{background:rgba(0,0,0,0.04)!important;border-color:rgba(0,
 <script src="aptiora.js"></script>
 <script>
 if(localStorage.getItem('username'))location.href='dashboard.html';
+if(localStorage.getItem('adminLoggedIn')==='yes')location.href='admin.html';
 function setTab(t){
   document.getElementById('stuTab').classList.toggle('on',t==='student');
   document.getElementById('admTab').classList.toggle('on',t==='admin');
   document.getElementById('stuForm').style.display=t==='student'?'block':'none';
   document.getElementById('admForm').style.display=t==='admin'?'block':'none';
 }
-let users=getUsers();
-// Demo chips
-document.getElementById('demoChips').innerHTML=Object.entries(users).slice(0,4).map(([r,u])=>`<div class="demo-chip" onclick="fillDemo('${r}','${u.password||'1234'}')">${u.name}</div>`).join('');
-function fillDemo(r,p){document.getElementById('regInput').value=r;document.getElementById('passInput').value=p;}
 function stuLogin(){
   let r=document.getElementById('regInput').value.trim();
   let p=document.getElementById('passInput').value;
+  let users=getUsers();
   let u=users[r];
-  if(u&&(u.password===p||p==='1234')){
+  if(u&&(u.password===p||p==='1234'||(p===''&&u.password===undefined))){
+    document.getElementById('stuErr').style.display='none';
+    document.getElementById('stuSuccess').style.display='block';
+    document.getElementById('loginBtn').disabled=true;
     localStorage.setItem('username',r);
     awardBadge(r,'first_practice');
-    location.href='dashboard.html';
+    setTimeout(()=>location.href='dashboard.html',900);
   } else {
     document.getElementById('stuErr').style.display='block';
+    document.getElementById('stuSuccess').style.display='none';
     document.getElementById('regInput').style.borderColor='rgba(239,68,68,0.5)';
     setTimeout(()=>document.getElementById('regInput').style.borderColor='',800);
+    sndWrong();
   }
 }
 function admLogin(){
-  let s=getSettings();
-  let u=document.getElementById('admUser').value,p=document.getElementById('admPass').value;
   let creds=JSON.parse(localStorage.getItem('adminCreds'))||{user:'admin',pass:'admin123'};
-  if(u===creds.user&&p===creds.pass){localStorage.setItem('adminLoggedIn','yes');location.href='admin.html';}
-  else document.getElementById('admErr').style.display='block';
+  let u=document.getElementById('admUser').value.trim();
+  let p=document.getElementById('admPass').value;
+  if(u===creds.user&&p===creds.pass){
+    document.getElementById('admErr').style.display='none';
+    document.getElementById('admSuccess').style.display='block';
+    document.getElementById('admBtn').disabled=true;
+    localStorage.setItem('adminLoggedIn','yes');
+    setTimeout(()=>location.href='admin.html',900);
+  } else {
+    document.getElementById('admErr').style.display='block';
+    sndWrong();
+  }
 }
-document.addEventListener('keydown',e=>{if(e.key==='Enter'){if(document.getElementById('stuForm').style.display!=='none')stuLogin();else admLogin();}});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Enter'){
+    if(document.getElementById('stuForm').style.display!=='none')stuLogin();
+    else admLogin();
+  }
+});
 </script>
 </body>
 </html>

@@ -5,12 +5,13 @@
 <title>Assessment — APTIORA</title>
 <link rel="stylesheet" href="aptiora.css">
 <style>
-html,body{height:100%;display:flex;align-items:center;justify-content:center;overflow:hidden;}
-.ctr{position:relative;z-index:10;width:100%;display:flex;align-items:center;justify-content:center;padding:20px;}
-.card{background:rgba(13,13,20,0.88);backdrop-filter:blur(24px);border:1px solid var(--border2);border-radius:var(--radius-xl);padding:48px 44px;width:460px;max-width:100%;text-align:center;position:relative;overflow:hidden;animation:scaleIn 0.5s ease;}
+html,body{min-height:100%;display:flex;align-items:center;justify-content:center;}
+.ctr{position:relative;z-index:10;width:100%;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;}
+.card{background:rgba(13,13,20,0.88);backdrop-filter:blur(24px);border:1px solid var(--border2);border-radius:var(--radius-xl);padding:44px 40px;width:460px;max-width:100%;text-align:center;position:relative;overflow:hidden;animation:scaleIn 0.5s ease;}
 .card::before{content:"";position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(59,130,246,0.5),transparent);}
-.icon-wrap{width:76px;height:76px;margin:0 auto 20px;background:linear-gradient(135deg,rgba(59,130,246,0.2),rgba(6,182,212,0.1));border:1px solid rgba(59,130,246,0.3);border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:34px;}
+.icon-wrap{width:72px;height:72px;margin:0 auto 18px;background:linear-gradient(135deg,rgba(59,130,246,0.2),rgba(6,182,212,0.1));border:1px solid rgba(59,130,246,0.3);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:30px;}
 body.light .card{background:rgba(255,255,255,0.93)!important;}
+body.light .card-title,.body.light .card-sub{color:#1a1a2e!important;}
 </style>
 </head>
 <body>
@@ -19,17 +20,20 @@ body.light .card{background:rgba(255,255,255,0.93)!important;}
 <div class="ctr">
   <div class="card">
     <div class="icon-wrap">🧠</div>
-    <div style="font-family:'Space Grotesk',sans-serif;font-size:24px;font-weight:700;margin-bottom:8px;">Assessment Test</div>
-    <div style="font-size:13px;color:var(--text2);margin-bottom:28px;line-height:1.6;">You are about to start the secure assessment. Ensure you have your access code ready.</div>
-    <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:28px;" id="pills"></div>
-    <button class="btn btn-primary btn-full" onclick="startTest()">🚀 Start Assessment</button>
-    <div style="margin-top:14px;font-size:13px;color:var(--text2);cursor:pointer" onclick="nav('dashboard.html')">⬅ Back to Dashboard</div>
+    <div style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;margin-bottom:8px;" class="card-title">Assessment Test</div>
+    <div style="font-size:13px;color:var(--text2);margin-bottom:24px;line-height:1.6;" class="card-sub">Secure aptitude assessment. Have your access code ready. Once started, the test cannot be paused.</div>
+    <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:24px;" id="pills"></div>
+    <button class="btn btn-primary btn-full" onclick="startTest()" style="font-size:15px;padding:14px;">🚀 Start Assessment</button>
+    <div style="display:flex;gap:8px;justify-content:center;margin-top:14px;flex-wrap:wrap;">
+      <button class="btn btn-secondary btn-sm" onclick="nav('aptitude.html')">← Aptitude</button>
+      <button class="btn btn-secondary btn-sm" onclick="nav('dashboard.html')">🏠 Dashboard</button>
+    </div>
   </div>
 </div>
 <script src="aptiora.js"></script>
 <script>
 let s=getSettings();
-document.getElementById('pills').innerHTML=[`📝 20 Questions`,`⏱ ${s.assessTime||45} Minutes`,`🔒 Secure Mode`].map(t=>`<div class="badge badge-blue">${t}</div>`).join('');
+document.getElementById('pills').innerHTML=['📝 20 Questions','⏱ '+( s.assessTime||45)+' Minutes','🔒 Secure Mode'].map(t=>'<div class="badge badge-blue">'+t+'</div>').join('');
 function startTest(){localStorage.setItem('mode','assessment');nav('code.html');}
 </script>
 </body>

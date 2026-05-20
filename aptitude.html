@@ -5,24 +5,24 @@
 <title>Aptitude — APTIORA</title>
 <link rel="stylesheet" href="aptiora.css">
 <style>
-.course-banner{border-radius:var(--radius-xl);padding:24px 28px;margin-bottom:18px;background:linear-gradient(135deg,rgba(124,58,237,0.22),rgba(109,40,217,0.1));border:1px solid rgba(124,58,237,0.22);position:relative;overflow:hidden;text-align:center;}
+.course-banner{border-radius:var(--radius-xl);padding:22px 26px;margin-bottom:16px;background:linear-gradient(135deg,rgba(124,58,237,0.22),rgba(109,40,217,0.1));border:1px solid rgba(124,58,237,0.22);position:relative;overflow:hidden;text-align:center;}
 .course-banner::before{content:"";position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(124,58,237,0.5),transparent);}
-.course-icon{width:64px;height:64px;background:linear-gradient(135deg,var(--purple),#6d28d9);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 14px;box-shadow:0 6px 20px rgba(124,58,237,0.35);}
-.total-prog{font-family:'Space Grotesk',sans-serif;font-size:42px;font-weight:800;background:linear-gradient(135deg,var(--gold),#f97316);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.course-icon{width:60px;height:60px;background:linear-gradient(135deg,var(--purple),#6d28d9);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:26px;margin:0 auto 12px;box-shadow:0 6px 20px rgba(124,58,237,0.35);}
+.total-prog{font-family:'Space Grotesk',sans-serif;font-size:40px;font-weight:800;background:linear-gradient(135deg,var(--gold),#f97316);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
 .topic-table{background:rgba(13,13,20,0.85);backdrop-filter:blur(16px);border:1px solid var(--border);border-radius:var(--radius-xl);overflow:hidden;}
-.topic-thead{display:grid;grid-template-columns:2fr 1.5fr 2fr 1fr;padding:13px 22px;background:rgba(124,58,237,0.12);border-bottom:1px solid var(--border);}
+.topic-thead{display:grid;grid-template-columns:2fr 1.5fr 2fr 1fr;padding:12px 20px;background:rgba(124,58,237,0.12);border-bottom:1px solid var(--border);}
 .th{font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:1px;}
-.topic-row{display:grid;grid-template-columns:2fr 1.5fr 2fr 1fr;padding:18px 22px;border-bottom:1px solid var(--border);align-items:center;transition:background 0.2s;}
+.topic-row{display:grid;grid-template-columns:2fr 1.5fr 2fr 1fr;padding:16px 20px;border-bottom:1px solid var(--border);align-items:center;transition:background 0.2s;}
 .topic-row:last-child{border-bottom:none;}
 .topic-row:hover{background:rgba(255,255,255,0.02);}
-.topic-name{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:500;}
-.sched{font-size:12px;color:var(--text2);}
+.topic-name{display:flex;align-items:center;gap:9px;font-size:14px;font-weight:500;}
+.sched{font-size:11px;color:var(--text2);}
 .pct-lbl{font-size:11px;color:var(--text2);margin-top:3px;}
 @media(max-width:600px){.topic-thead,.topic-row{grid-template-columns:1fr 1fr;gap:6px;}.th:nth-child(2),.sched{display:none;}}
 body.light .topic-table{background:#ffffff!important;border-color:rgba(0,0,0,0.08)!important;}
-body.light .topic-thead{background:rgba(124,58,237,0.08)!important;border-bottom-color:rgba(0,0,0,0.08)!important;}
+body.light .topic-thead{background:rgba(124,58,237,0.08)!important;}
 body.light .topic-row{border-bottom-color:rgba(0,0,0,0.06)!important;color:#1a1a2e!important;}
-body.light .sched,.pct-lbl{color:rgba(26,26,46,0.55)!important;}
+body.light .course-banner{background:linear-gradient(135deg,rgba(124,58,237,0.1),rgba(109,40,217,0.06))!important;}
 </style>
 </head>
 <body>
@@ -37,46 +37,47 @@ body.light .sched,.pct-lbl{color:rgba(26,26,46,0.55)!important;}
     </div>
     <div class="topbar-right">
       <button class="tb-btn" id="themeBtn">🌙</button>
-      <button class="btn btn-secondary btn-sm" onclick="nav('dashboard.html')">⬅ Back</button>
+      <button class="btn btn-secondary btn-sm" onclick="nav('dashboard.html')">🏠 Home</button>
     </div>
   </div>
   <div class="app-page">
     <div class="course-banner anim-fadeUp">
       <div class="course-icon">📊</div>
-      <div style="font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:700;margin-bottom:6px;">APTITUDE COURSE</div>
-      <div style="font-size:13px;color:var(--text2);margin-bottom:12px;" id="courseDates">📅 25 Mar 2026 – 05 Apr 2026</div>
+      <div style="font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:700;margin-bottom:5px;">APTITUDE COURSE</div>
+      <div style="font-size:12px;color:var(--text2);margin-bottom:10px;" id="courseDates">📅 25 Mar 2026 – 05 Apr 2026</div>
       <div class="total-prog" id="totalProg">0%</div>
-      <div style="font-size:12px;color:var(--text2);margin-top:4px;">OVERALL PROGRESS</div>
+      <div style="font-size:11px;color:var(--text2);margin-top:3px;">OVERALL PROGRESS</div>
     </div>
     <div class="topic-table anim-fadeUp" style="animation-delay:0.1s">
       <div class="topic-thead">
         <div class="th">Topic</div><div class="th">Schedule</div><div class="th">Progress</div><div class="th">Action</div>
       </div>
-      <div class="topic-row" id="row1">
+      <div class="topic-row">
         <div class="topic-name"><span id="lock1">🔓</span>Verbal Ability</div>
         <div class="sched"><div style="font-size:11px" id="d1s">25 Mar 2026</div><div style="font-size:11px" id="d1e">05 Apr 2026</div></div>
         <div><div class="prog-bar"><div id="p1" class="prog-fill prog-purple" style="width:0%"></div></div><div class="pct-lbl" id="pct1">0%</div></div>
         <div><button id="b1" class="btn btn-primary btn-sm" onclick="startTopic(1,'Verbal Ability')">▶ Start</button></div>
       </div>
-      <div class="topic-row" id="row2">
+      <div class="topic-row">
         <div class="topic-name"><span id="lock2">🔒</span>Algebra</div>
-        <div class="sched"><div style="font-size:11px" id="d2s">25 Mar 2026</div><div style="font-size:11px" id="d2e">05 Apr 2026</div></div>
+        <div class="sched"><div style="font-size:11px">25 Mar 2026</div><div style="font-size:11px">05 Apr 2026</div></div>
         <div><div class="prog-bar"><div id="p2" class="prog-fill prog-blue" style="width:0%"></div></div><div class="pct-lbl" id="pct2">0%</div></div>
         <div><button id="b2" class="btn btn-secondary btn-sm" onclick="startTopic(2,'Algebra')" disabled>🔒 Locked</button></div>
       </div>
-      <div class="topic-row" id="row3">
+      <div class="topic-row">
         <div class="topic-name"><span id="lock3">🔒</span>Series &amp; Sequence</div>
-        <div class="sched"><div style="font-size:11px" id="d3s">25 Mar 2026</div><div style="font-size:11px" id="d3e">05 Apr 2026</div></div>
+        <div class="sched"><div style="font-size:11px">25 Mar 2026</div><div style="font-size:11px">05 Apr 2026</div></div>
         <div><div class="prog-bar"><div id="p3" class="prog-fill prog-gold" style="width:0%"></div></div><div class="pct-lbl" id="pct3">0%</div></div>
         <div><button id="b3" class="btn btn-secondary btn-sm" onclick="startTopic(3,'Series & Sequence')" disabled>🔒 Locked</button></div>
       </div>
     </div>
-    <div class="glass-card anim-fadeUp" style="animation-delay:0.15s;margin-top:16px;">
-      <div style="font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;margin-bottom:14px;">🎯 Ready for Assessment?</div>
-      <div style="font-size:13px;color:var(--text2);margin-bottom:16px;">Complete all topics to unlock the final assessment test.</div>
+    <div class="glass-card anim-fadeUp" style="animation-delay:0.15s;margin-top:14px;">
+      <div style="font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;margin-bottom:10px;">🎯 Assessment Test</div>
+      <div style="font-size:13px;color:var(--text2);margin-bottom:14px;">Complete practice topics then take the final assessment. Your result will appear in the leaderboard.</div>
       <div style="display:flex;gap:10px;flex-wrap:wrap;">
         <button class="btn btn-primary" onclick="nav('assessment.html')">📝 Go to Assessment</button>
         <button class="btn btn-secondary" onclick="nav('leaderboard.html')">🏆 Leaderboard</button>
+        <button class="btn btn-secondary" onclick="nav('dashboard.html')">🏠 Dashboard</button>
       </div>
     </div>
   </div>
@@ -95,13 +96,17 @@ let p3v=parseInt(localStorage.getItem('p3_done_'+reg))||0;
 let total=Math.floor((p1v+p2v+p3v)/3);
 document.getElementById('totalProg').innerText=total+'%';
 setTimeout(()=>{document.getElementById('p1').style.width=p1v+'%';document.getElementById('p2').style.width=p2v+'%';document.getElementById('p3').style.width=p3v+'%';},400);
-['1','2','3'].forEach(n=>{document.getElementById('pct'+n).innerText=[p1v,p2v,p3v][n-1]+'%';});
+document.getElementById('pct1').innerText=p1v+'%';
+document.getElementById('pct2').innerText=p2v+'%';
+document.getElementById('pct3').innerText=p3v+'%';
 if(p1v>=100){document.getElementById('lock2').innerText='🔓';let b=document.getElementById('b2');b.disabled=false;b.className='btn btn-primary btn-sm';b.innerText='▶ Start';document.getElementById('b1').innerText='🔄 Redo';}
 if(p2v>=100){document.getElementById('lock3').innerText='🔓';let b=document.getElementById('b3');b.disabled=false;b.className='btn btn-primary btn-sm';b.innerText='▶ Start';document.getElementById('b2').innerText='🔄 Redo';}
-if(p3v>=100)document.getElementById('b3').innerText='🔄 Redo';
+if(p3v>=100){document.getElementById('b3').innerText='🔄 Redo';}
 if(p1v>=100&&p2v>=100&&p3v>=100)awardBadge(reg,'all_topics');
 function startTopic(id,topic){
-  localStorage.setItem('topic',topic);localStorage.setItem('mode','practice');localStorage.setItem('currentTopic',id);
+  localStorage.setItem('topic',topic);
+  localStorage.setItem('mode','practice');
+  localStorage.setItem('currentTopic',id);
   nav('test.html');
 }
 </script>

@@ -1,3 +1,4 @@
+function nav(page){location.href=page;}
 /* APTIORA Global JS v3 */
 'use strict';
 
@@ -217,3 +218,29 @@ document.addEventListener('DOMContentLoaded',()=>{
   let tb=document.getElementById('themeBtn');
   if(tb)tb.onclick=toggleTheme;
 });
+
+// ── AI CONNECTION HELPER ──
+async function callClaude(messages, maxTokens=300, system=''){
+  try{
+    let body={model:'claude-sonnet-4-20250514',max_tokens:maxTokens,messages};
+    if(system)body.system=system;
+    let resp=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(body)
+    });
+    if(!resp.ok){
+      let err=await resp.json().catch(()=>({}));
+      if(resp.status===401)throw new Error('API key missing. AI features need Claude API access via claude.ai.');
+      if(resp.status===429)throw new Error('Rate limit reached. Please wait a moment and try again.');
+      throw new Error(err.error?.message||'API error '+resp.status);
+    }
+    let data=await resp.json();
+    return(data.content&&data.content[0]&&data.content[0].text)||'';
+  }catch(e){
+    if(e.message.includes('Failed to fetch')||e.message.includes('NetworkError')){
+      throw new Error('Network error. Check your internet connection.');
+    }
+    throw e;
+  }
+}

@@ -93,7 +93,7 @@ let problems=[
   {id:7,title:'Count Vowels',diff:'Easy',desc:'Count the number of vowels (a,e,i,o,u) in a string.',examples:[{in:'"Hello World"',out:'3'}],tc:[{i:'"hello"',o:'2'},{i:'"aeiou"',o:'5'},{i:'"xyz"',o:'0'}],templates:{python:'def count_vowels(s):\n    # Write your solution\n    pass\n\nprint(count_vowels("Hello World"))',c:'#include<stdio.h>\nint count_vowels(char* s) {\n    // Write your solution\n    return 0;\n}\nint main() {\n    printf("%d\\n", count_vowels("Hello World"));\n}',java:'public class Solution {\n    public static int countVowels(String s) {\n        // Write your solution\n        return 0;\n    }\n    public static void main(String[] args) {\n        System.out.println(countVowels("Hello World"));\n    }\n}'}},
   {id:8,title:'Binary Search',diff:'Hard',desc:'Implement binary search to find the index of a target in a sorted array. Return -1 if not found.',examples:[{in:'arr=[1,3,5,7,9], target=5',out:'2'}],tc:[{i:'[1,3,5,7,9], 5',o:'2'},{i:'[1,3,5,7,9], 1',o:'0'},{i:'[1,3,5,7,9], 6',o:'-1'}],templates:{python:'def binary_search(arr, target):\n    # Write your solution\n    pass\n\nprint(binary_search([1,3,5,7,9], 5))',c:'#include<stdio.h>\nint binary_search(int arr[], int n, int target) {\n    // Write your solution\n    return -1;\n}\nint main() {\n    int arr[] = {1,3,5,7,9};\n    printf("%d\\n", binary_search(arr, 5, 5));\n}',java:'public class Solution {\n    public static int binarySearch(int[] arr, int target) {\n        // Write your solution\n        return -1;\n    }\n    public static void main(String[] args) {\n        int[] arr = {1,3,5,7,9};\n        System.out.println(binarySearch(arr, 5));\n    }\n}'}}
 ];
-let curLang='python',curProb=null,filterDiff='all';
+let customProbs=JSON.parse(localStorage.getItem('customCodingProblems'))||[];let allProblems=[...problems,...customProbs];problems=allProblems;let curLang='python',curProb=null,filterDiff='all';
 function filterProbs(d,el){filterDiff=d;document.querySelectorAll('.lang-btn').forEach(b=>{if(['all','Easy','Medium','Hard'].some(x=>b.onclick&&b.onclick.toString().includes(x)))b.classList.remove('on');});el.classList.add('on');renderProbs();}
 function renderProbs(){
   let list=filterDiff==='all'?problems:problems.filter(p=>p.diff===filterDiff);
@@ -122,7 +122,7 @@ async function runCode(){
     out.innerText=review;
     let prog=parseInt(localStorage.getItem('codingProg_'+reg))||0;localStorage.setItem('codingProg_'+reg,Math.min(100,prog+Math.floor(100/problems.length)));
     awardBadge(reg,'coding_done');
-  }catch(e){out.className='output-box err';out.innerText='Connection error. Please try again.';}
+  }catch(e){out.className='output-box err';out.innerHTML='<strong>⚠️ AI Review Note:</strong><br><br>The AI code reviewer requires Claude API access. When running on a local server or hosting platform, AI features will work automatically.<br><br><strong>Your code is saved.</strong> Try submitting your solution to see if the logic is correct!';} 
   btn.disabled=false;btn.innerText='▶ Run & Review';
 }
 renderProbs();

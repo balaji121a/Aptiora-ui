@@ -2,171 +2,631 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Admin — APTIORA</title>
+<title>Admin Panel — APTIORA</title>
 <link rel="stylesheet" href="aptiora.css">
 <style>
-:root{--sidebar-w:220px;}
-.adm-sidebar{position:fixed;top:0;left:0;height:100vh;width:var(--sidebar-w);background:rgba(10,10,16,0.95);backdrop-filter:blur(24px);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:200;overflow:hidden;transition:transform var(--ease);}
-.adm-sidebar.mob-open{transform:translateX(0);}
-.adm-logo{padding:18px 16px;border-bottom:1px solid var(--border);font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:800;letter-spacing:2px;background:linear-gradient(135deg,#fff 30%,var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-.adm-nav{flex:1;overflow-y:auto;padding:10px 8px;display:flex;flex-direction:column;gap:2px;}
-.adm-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:var(--radius);cursor:pointer;color:var(--text2);font-size:13px;transition:all var(--ease);border:1px solid transparent;}
+:root{--sidebar-w:230px;}
+.adm-sidebar{position:fixed;top:0;left:0;height:100vh;width:var(--sidebar-w);background:rgba(8,8,14,0.97);backdrop-filter:blur(24px);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:200;overflow:hidden;transition:transform var(--ease);}
+.adm-logo{padding:16px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+.adm-logo-icon{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--purple),#6d28d9);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.adm-logo-text{font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:800;letter-spacing:1.5px;background:linear-gradient(135deg,#fff 30%,var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;white-space:nowrap;}
+.adm-nav{flex:1;overflow-y:auto;padding:8px 7px;display:flex;flex-direction:column;gap:1px;}
+.adm-nav::-webkit-scrollbar{width:3px;}.adm-nav::-webkit-scrollbar-thumb{background:rgba(124,58,237,0.25);border-radius:4px;}
+.adm-sec-lbl{font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1.5px;padding:8px 10px 3px;}
+.adm-item{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:var(--radius);cursor:pointer;color:var(--text2);font-size:13px;transition:all var(--ease);border:1px solid transparent;}
 .adm-item:hover{background:rgba(124,58,237,0.1);color:white;}
 .adm-item.on{background:rgba(124,58,237,0.18);color:white;border-color:rgba(124,58,237,0.3);font-weight:600;}
 .adm-main{margin-left:var(--sidebar-w);min-height:100vh;position:relative;z-index:10;transition:margin-left var(--ease);}
-.adm-topbar{height:64px;padding:0 22px;display:flex;align-items:center;justify-content:space-between;background:rgba(5,5,8,0.72);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;}
-.notif-badge{display:inline-block;background:#ef4444;color:white;font-size:10px;font-weight:700;padding:2px 6px;border-radius:20px;margin-left:auto;}
-.ham-btn{display:none;background:rgba(255,255,255,0.07);border:1px solid var(--border);color:white;width:34px;height:34px;border-radius:9px;cursor:pointer;font-size:16px;align-items:center;justify-content:center;}
-.stat-card-adm{background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:var(--radius-lg);padding:18px 20px;}
-.stat-val-adm{font-family:'Space Grotesk',sans-serif;font-size:32px;font-weight:800;}
-.stat-lbl-adm{font-size:12px;color:var(--text2);margin-top:3px;}
-table{width:100%;border-collapse:collapse;}
-th{background:rgba(124,58,237,0.1);padding:11px 16px;text-align:left;font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:1px;}
-td{padding:12px 16px;border-bottom:1px solid var(--border);font-size:13px;}
-tr:hover td{background:rgba(255,255,255,0.02);}
-tr:last-child td{border-bottom:none;}
-.notif-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9000;display:none;align-items:center;justify-content:center;padding:20px;}
-.notif-modal{background:rgba(13,13,20,0.98);backdrop-filter:blur(24px);border:1px solid var(--border2);border-radius:var(--radius-xl);padding:32px;width:480px;max-width:100%;}
-@media(max-width:768px){.ham-btn{display:flex;}.adm-sidebar{transform:translateX(-100%);}.adm-main{margin-left:0;}.stat-grid{grid-template-columns:1fr 1fr!important;}}
-body.light .adm-sidebar{background:rgba(255,255,255,0.95)!important;}
-body.light .adm-topbar{background:rgba(240,242,247,0.88)!important;}
-body.light td{color:#1a1a2e!important;}
+.adm-topbar{height:60px;padding:0 20px;display:flex;align-items:center;justify-content:space-between;background:rgba(5,5,8,0.8);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;}
+.ham-btn{display:none;background:rgba(255,255,255,0.07);border:1px solid var(--border);color:white;width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:16px;align-items:center;justify-content:center;}
+.adm-content{padding:20px;}
+/* STAT CARDS */
+.stat-grid-adm{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px;}
+@media(max-width:900px){.stat-grid-adm{grid-template-columns:1fr 1fr;}}
+.stat-box{background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px 18px;}
+.stat-big{font-family:'Space Grotesk',sans-serif;font-size:30px;font-weight:800;line-height:1;}
+.stat-lbl-s{font-size:11px;color:var(--text2);margin-top:4px;}
+/* TABLE */
+.adm-table{width:100%;border-collapse:collapse;}
+.adm-table th{background:rgba(124,58,237,0.1);padding:10px 14px;text-align:left;font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:1px;white-space:nowrap;}
+.adm-table td{padding:11px 14px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:middle;}
+.adm-table tr:last-child td{border-bottom:none;}
+.adm-table tr:hover td{background:rgba(255,255,255,0.02);}
+/* SECTION */
+.adm-section{display:none;}.adm-section.on{display:block;}
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:9000;display:none;align-items:center;justify-content:center;padding:20px;}
+.modal-overlay.on{display:flex;}
+.modal-box{background:rgba(13,13,20,0.98);backdrop-filter:blur(24px);border:1px solid var(--border2);border-radius:var(--radius-xl);padding:28px;width:500px;max-width:100%;max-height:85vh;overflow-y:auto;}
+/* NOTIF BAR */
+.adm-notif{position:fixed;bottom:20px;right:20px;padding:12px 20px;border-radius:var(--radius-lg);font-size:13px;font-weight:600;z-index:9999;animation:scaleIn 0.3s ease;pointer-events:none;}
+.adm-notif.success{background:rgba(16,185,129,0.92);color:white;}
+.adm-notif.error{background:rgba(239,68,68,0.9);color:white;}
+.adm-notif.info{background:rgba(59,130,246,0.9);color:white;}
+@media(max-width:768px){.ham-btn{display:flex!important;}.adm-sidebar{transform:translateX(-100%);}.adm-sidebar.mob-open{transform:translateX(0)!important;}.adm-main{margin-left:0!important;}.stat-grid-adm{grid-template-columns:1fr 1fr!important;}.adm-content{padding:14px;}}
+body.light .adm-sidebar{background:rgba(255,255,255,0.96)!important;}
+body.light .adm-topbar{background:rgba(240,242,247,0.9)!important;}
+body.light .adm-table td{color:#1a1a2e!important;}
+body.light .stat-box{background:rgba(0,0,0,0.03)!important;border-color:rgba(0,0,0,0.08)!important;color:#1a1a2e!important;}
 body.light .glass-card{color:#1a1a2e!important;}
+body.light .modal-box{background:rgba(255,255,255,0.97)!important;}
 </style>
 </head>
 <body>
 <div class="orb orb1"></div><div class="orb orb2"></div>
 <canvas class="bg-canvas" id="bgCanvas"></canvas>
-<div class="mobile-overlay" id="mobOvl" onclick="closeSidebar()"></div>
+<div class="mobile-overlay" id="mobOvl" onclick="closeSb()"></div>
 
-<div class="adm-sidebar" id="admSidebar">
-  <div class="adm-logo">⚙️ APTIORA ADMIN</div>
-  <div class="adm-nav">
-    <div class="adm-item on" onclick="showSec('dashboard',this)">📊 Dashboard</div>
-    <div class="adm-item" onclick="showSec('users',this)">👥 Users</div>
-    <div class="adm-item" onclick="showSec('questions',this)">❓ Questions</div>
-    <div class="adm-item" onclick="showSec('leaderboard',this)">🏆 Leaderboard</div>
-    <div class="adm-item" onclick="showSec('batches',this)">🏫 Batches</div>
-    <div class="adm-item" onclick="showSec('notifications',this)">🔔 Notifications</div>
-    <div class="adm-item" onclick="showSec('settings',this)">⚙️ Settings</div>
+<!-- SIDEBAR -->
+<div class="adm-sidebar" id="admSb">
+  <div class="adm-logo">
+    <div class="adm-logo-icon">⚙️</div>
+    <div class="adm-logo-text">APTIORA ADMIN</div>
   </div>
-  <div style="padding:10px 8px;border-top:1px solid var(--border);"><button class="btn btn-danger btn-full btn-sm" onclick="admLogout()">🚪 Logout</button></div>
+  <div class="adm-nav">
+    <div class="adm-sec-lbl">Overview</div>
+    <div class="adm-item on" onclick="showSec('dashboard',this)">📊 Dashboard</div>
+    <div class="adm-sec-lbl">Management</div>
+    <div class="adm-item" onclick="showSec('users',this)">👥 Users</div>
+    <div class="adm-item" onclick="showSec('batches',this)">🏫 Batches</div>
+    <div class="adm-sec-lbl">Content</div>
+    <div class="adm-item" onclick="showSec('questions',this)">❓ Aptitude Questions</div>
+    <div class="adm-item" onclick="showSec('coding_q',this)">💻 Coding Problems</div>
+    <div class="adm-item" onclick="showSec('technical_q',this)">🔬 Technical Questions</div>
+    <div class="adm-sec-lbl">Results</div>
+    <div class="adm-item" onclick="showSec('leaderboard',this)">🏆 Assessment Results</div>
+    <div class="adm-item" onclick="showSec('progress',this)">📈 Student Progress</div>
+    <div class="adm-sec-lbl">Communication</div>
+    <div class="adm-item" onclick="showSec('notifications',this)">🔔 Notifications</div>
+    <div class="adm-sec-lbl">System</div>
+    <div class="adm-item" onclick="showSec('settings',this)">⚙️ Settings</div>
+    <div class="adm-item" onclick="showSec('data',this)">🗄️ Data Management</div>
+  </div>
+  <div style="padding:8px 7px;border-top:1px solid var(--border);">
+    <div class="adm-item" onclick="admLogout()" style="color:#fca5a5;">🚪 Logout</div>
+  </div>
 </div>
 
+<!-- MAIN -->
 <div class="adm-main" id="admMain">
   <div class="adm-topbar">
     <div style="display:flex;align-items:center;gap:10px;">
-      <button class="ham-btn" id="hamBtn" onclick="toggleSidebar()">☰</button>
-      <div id="pageTitle" style="font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:700;">📊 Dashboard</div>
+      <button class="ham-btn" id="hamBtn" onclick="toggleSb()">☰</button>
+      <div id="pgTitle" style="font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:700;">📊 Dashboard</div>
     </div>
     <div style="display:flex;align-items:center;gap:8px;">
-      <span class="badge badge-purple">ADMIN</span>
+      <span class="badge badge-purple" style="font-size:11px;">ADMIN</span>
       <button class="tb-btn" id="themeBtn">🌙</button>
     </div>
   </div>
-  <div style="padding:24px;" id="secContent"></div>
+  <div class="adm-content" id="secContent"></div>
 </div>
 
-<div class="notif-overlay" id="notifModal">
-  <div class="notif-modal">
-    <div style="font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:700;margin-bottom:16px;">🔔 Send Notification</div>
-    <div class="form-group"><label class="form-label">Message</label><textarea class="form-input" id="notifMsg" placeholder="Type announcement..." rows="3"></textarea></div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;">
-      <button class="btn btn-primary" onclick="sendNotif()">📤 Send to All</button>
-      <button class="btn btn-secondary" onclick="document.getElementById('notifModal').style.display='none'">Cancel</button>
-    </div>
-  </div>
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOvl">
+  <div class="modal-box" id="modalBox"></div>
 </div>
 
 <script src="aptiora.js"></script>
 <script>
-// Admin auth
-(function(){let m=localStorage.getItem('darkMode')||(window.matchMedia&&window.matchMedia('(prefers-color-scheme:light)').matches?'light':'dark');if(m==='light')document.body.classList.add('light');let btn=document.getElementById('themeBtn');if(btn)btn.innerText=m==='light'?'☀️':'🌙';btn.onclick=()=>{let l=document.body.classList.toggle('light');localStorage.setItem('darkMode',l?'light':'dark');btn.innerText=l?'☀️':'🌙';};})();
+// Theme
+(function(){let m=localStorage.getItem('darkMode')||(window.matchMedia&&window.matchMedia('(prefers-color-scheme:light)').matches?'light':'dark');if(m==='light')document.body.classList.add('light');let btn=document.getElementById('themeBtn');if(btn){btn.innerText=m==='light'?'☀️':'🌙';btn.onclick=()=>{let l=document.body.classList.toggle('light');localStorage.setItem('darkMode',l?'light':'dark');btn.innerText=l?'☀️':'🌙';};}})();
 initParticles('bgCanvas');
-let creds=JSON.parse(localStorage.getItem('adminCreds'))||{user:'admin',pass:'admin123'};
-if(localStorage.getItem('adminLoggedIn')!=='yes'){
-  document.getElementById('secContent').innerHTML=`<div style="max-width:380px;margin:40px auto"><div class="glass-card"><div style="font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:700;text-align:center;margin-bottom:20px">Admin Login</div><div class="form-group"><label class="form-label">Username</label><input class="form-input" id="aUser" placeholder="admin"></div><div class="form-group"><label class="form-label">Password</label><input class="form-input" type="password" id="aPass" placeholder="Password"></div><button class="btn btn-primary btn-full" onclick="admLogin()">🔐 Login</button><div style="color:#fca5a5;font-size:13px;margin-top:10px;display:none" id="aErr">Wrong credentials</div></div></div>`;
-  document.addEventListener('keydown',e=>{if(e.key==='Enter')admLogin();});
-}else{renderDashboard();}
-function admLogin(){let u=document.getElementById('aUser')?.value,p=document.getElementById('aPass')?.value;if(u===creds.user&&p===creds.pass){localStorage.setItem('adminLoggedIn','yes');renderDashboard();}else{let e=document.getElementById('aErr');if(e)e.style.display='block';}}
-function admLogout(){localStorage.removeItem('adminLoggedIn');location.href='login.html';}
-function toggleSidebar(){let s=document.getElementById('admSidebar'),o=document.getElementById('mobOvl');s.classList.toggle('mob-open');o.classList.toggle('on');}
-function closeSidebar(){document.getElementById('admSidebar').classList.remove('mob-open');document.getElementById('mobOvl').classList.remove('on');}
-function showSec(sec,el){document.querySelectorAll('.adm-item').forEach(i=>i.classList.remove('on'));el.classList.add('on');closeSidebar();let titles={dashboard:'📊 Dashboard',users:'👥 Users',questions:'❓ Questions',leaderboard:'🏆 Leaderboard',batches:'🏫 Batches',notifications:'🔔 Notifications',settings:'⚙️ Settings'};document.getElementById('pageTitle').innerText=titles[sec]||sec;if(sec==='dashboard')renderDashboard();else if(sec==='users')renderUsers();else if(sec==='questions')renderQuestions();else if(sec==='leaderboard')renderLeaderboard();else if(sec==='batches')renderBatches();else if(sec==='notifications')renderNotifications();else if(sec==='settings')renderSettings();}
-function getUsers(){return JSON.parse(localStorage.getItem('users'))||{'714524205005':{name:'Balaji',dept:'IT',batch:'2024-2028',password:'1234'},'714524205053':{name:'Vicky',dept:'IT',batch:'2024-2028',password:'1234'},'714524205027':{name:'Ismail',dept:'IT',batch:'2024-2028',password:'1234'},'714524205041':{name:'Sakthivel',dept:'IT',batch:'2024-2028',password:'1234'}};}
-function getSettings(){return JSON.parse(localStorage.getItem('adminSettings'))||{assessTime:45,secureCode:'123456',antiCheat:true,forceFullscreen:true,shuffleQ:true,certDownload:true,courseStart:'25 Mar 2026',courseEnd:'05 Apr 2026'};}
-function getQBank(){return JSON.parse(localStorage.getItem('questionBank'))||{};}
-function showNotif(msg,t='success'){let n=document.createElement('div');n.style.cssText='position:fixed;bottom:20px;right:20px;background:'+(t==='success'?'rgba(16,185,129,0.9)':'rgba(239,68,68,0.9)')+';color:white;padding:12px 20px;border-radius:12px;font-size:13px;font-weight:600;z-index:9999;animation:scaleIn 0.3s ease';n.innerText=msg;document.body.appendChild(n);setTimeout(()=>n.remove(),2800);}
-function renderDashboard(){
-  let users=getUsers(),board=JSON.parse(localStorage.getItem('leaderboard'))||[],qb=getQBank();
-  let totalQ=Object.values(qb).reduce((s,arr)=>s+arr.length,0);
-  let assessed=Object.keys(users).filter(r=>localStorage.getItem('assessTaken_'+r)==='yes').length;
+
+// AUTH
+let adminCreds=JSON.parse(localStorage.getItem('adminCreds'))||{user:'admin',pass:'admin123'};
+if(localStorage.getItem('adminLoggedIn')!=='yes'){showLoginScreen();} else {renderDashboard();}
+
+function showLoginScreen(){
   document.getElementById('secContent').innerHTML=`
-  <div class="grid4 stat-grid" style="margin-bottom:20px;">
-    <div class="stat-card-adm"><div style="font-size:22px;margin-bottom:6px">👥</div><div class="stat-val-adm">${Object.keys(users).length}</div><div class="stat-lbl-adm">Total Students</div></div>
-    <div class="stat-card-adm"><div style="font-size:22px;margin-bottom:6px">📝</div><div class="stat-val-adm">${assessed}</div><div class="stat-lbl-adm">Assessed</div></div>
-    <div class="stat-card-adm"><div style="font-size:22px;margin-bottom:6px">❓</div><div class="stat-val-adm">${totalQ}</div><div class="stat-lbl-adm">Total Questions</div></div>
-    <div class="stat-card-adm"><div style="font-size:22px;margin-bottom:6px">🏆</div><div class="stat-val-adm">${board.length}</div><div class="stat-lbl-adm">In Leaderboard</div></div>
+  <div style="max-width:380px;margin:40px auto">
+    <div class="glass-card">
+      <div style="text-align:center;margin-bottom:20px">
+        <div style="font-size:40px;margin-bottom:8px">⚙️</div>
+        <div style="font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:700">Admin Login</div>
+        <div style="font-size:12px;color:var(--text2);margin-top:4px">APTIORA Admin Panel</div>
+      </div>
+      <div class="form-group"><label class="form-label">Username</label><input class="form-input" id="aU" placeholder="admin" autocomplete="username"></div>
+      <div class="form-group"><label class="form-label">Password</label><input class="form-input" type="password" id="aP" placeholder="Password" autocomplete="current-password"></div>
+      <button class="btn btn-primary btn-full" onclick="doLogin()">🔐 Login</button>
+      <div style="color:#fca5a5;font-size:12px;margin-top:8px;text-align:center;display:none" id="aErr">❌ Wrong credentials</div>
+    </div>
+  </div>`;
+  document.addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();},{once:true});
+}
+function doLogin(){
+  let u=document.getElementById('aU')?.value.trim(),p=document.getElementById('aP')?.value;
+  if(u===adminCreds.user&&p===adminCreds.pass){localStorage.setItem('adminLoggedIn','yes');renderDashboard();}
+  else{let e=document.getElementById('aErr');if(e)e.style.display='block';}
+}
+function admLogout(){localStorage.removeItem('adminLoggedIn');location.href='login.html';}
+
+// SIDEBAR
+function toggleSb(){let s=document.getElementById('admSb'),o=document.getElementById('mobOvl');s.classList.toggle('mob-open');o.classList.toggle('on');}
+function closeSb(){document.getElementById('admSb').classList.remove('mob-open');document.getElementById('mobOvl').classList.remove('on');}
+
+function showSec(sec,el){
+  if(localStorage.getItem('adminLoggedIn')!=='yes'){showLoginScreen();return;}
+  document.querySelectorAll('.adm-item').forEach(i=>i.classList.remove('on'));
+  if(el)el.classList.add('on');
+  closeSb();
+  let titles={dashboard:'📊 Dashboard',users:'👥 Users',batches:'🏫 Batches',questions:'❓ Aptitude Questions',coding_q:'💻 Coding Problems',technical_q:'🔬 Technical Questions',leaderboard:'🏆 Assessment Results',progress:'📈 Student Progress',notifications:'🔔 Notifications',settings:'⚙️ Settings',data:'🗄️ Data Management'};
+  document.getElementById('pgTitle').innerText=titles[sec]||sec;
+  let fns={dashboard:renderDashboard,users:renderUsers,batches:renderBatches,questions:renderQuestions,coding_q:renderCodingQ,technical_q:renderTechnicalQ,leaderboard:renderLeaderboard,progress:renderProgress,notifications:renderNotifications,settings:renderSettings,data:renderData};
+  if(fns[sec])fns[sec]();
+}
+
+// NOTIFICATION HELPER
+function showN(msg,t='success'){let n=document.createElement('div');n.className='adm-notif '+t;n.innerText=msg;document.body.appendChild(n);setTimeout(()=>n.remove(),2800);}
+
+// MODAL HELPERS
+function openModal(html){document.getElementById('modalBox').innerHTML=html;document.getElementById('modalOvl').classList.add('on');}
+function closeModal(){document.getElementById('modalOvl').classList.remove('on');}
+document.getElementById('modalOvl').onclick=e=>{if(e.target===document.getElementById('modalOvl'))closeModal();};
+
+// DATA HELPERS
+function getUs(){return JSON.parse(localStorage.getItem('users'))||{'714524205005':{name:'Balaji',dept:'IT',batch:'2024-2028',password:'1234'},'714524205053':{name:'Vicky',dept:'IT',batch:'2024-2028',password:'1234'},'714524205027':{name:'Ismail',dept:'IT',batch:'2024-2028',password:'1234'},'714524205041':{name:'Sakthivel',dept:'IT',batch:'2024-2028',password:'1234'}};}
+function saveUs(u){localStorage.setItem('users',JSON.stringify(u));}
+function getQBank(){return JSON.parse(localStorage.getItem('questionBank'))||{};}
+function saveQBank(q){localStorage.setItem('questionBank',JSON.stringify(q));}
+function getSet(){return JSON.parse(localStorage.getItem('adminSettings'))||{assessTime:45,secureCode:'123456',antiCheat:true,forceFullscreen:true,shuffleQ:true,certDownload:true,courseStart:'25 Mar 2026',courseEnd:'05 Apr 2026',allowRetake:false};}
+function getBatches(){return JSON.parse(localStorage.getItem('batches'))||[];}
+function getBoard(){return JSON.parse(localStorage.getItem('leaderboard'))||[];}
+
+// ═══════════════ DASHBOARD ═══════════════
+function renderDashboard(){
+  let users=getUs(),board=getBoard(),qb=getQBank();
+  let totalQ=Object.values(qb).reduce((s,a)=>s+a.length,0);
+  let assessed=Object.keys(users).filter(r=>localStorage.getItem('assessTaken_'+r)==='yes').length;
+  let board2=[...board].sort((a,b)=>b.score-a.score);
+  let avgScore=board2.length?Math.round(board2.reduce((s,u)=>s+u.score,0)/board2.length*10)/10:0;
+  document.getElementById('secContent').innerHTML=`
+  <div class="stat-grid-adm">
+    <div class="stat-box"><div style="font-size:20px;margin-bottom:5px">👥</div><div class="stat-big">${Object.keys(users).length}</div><div class="stat-lbl-s">Total Students</div></div>
+    <div class="stat-box"><div style="font-size:20px;margin-bottom:5px">📝</div><div class="stat-big">${assessed}</div><div class="stat-lbl-s">Assessed</div></div>
+    <div class="stat-box"><div style="font-size:20px;margin-bottom:5px">❓</div><div class="stat-big">${totalQ}</div><div class="stat-lbl-s">Total Questions</div></div>
+    <div class="stat-box"><div style="font-size:20px;margin-bottom:5px">⭐</div><div class="stat-big">${avgScore||'—'}</div><div class="stat-lbl-s">Avg Score /20</div></div>
   </div>
-  <div class="glass-card" style="margin-bottom:16px"><div style="font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;margin-bottom:14px">🏆 Top Performers</div>${board.sort((a,b)=>b.score-a.score).slice(0,5).map((u,i)=>`<div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border)"><div style="font-size:18px;width:26px">${['🥇','🥈','🥉'][i]||'#'+(i+1)}</div><div style="flex:1;font-size:13px;font-weight:500">${u.name}</div><div style="font-weight:700;color:#f5c842">${u.score}/20</div></div>`).join('') || '<div style="color:var(--text2);font-size:13px;text-align:center;padding:16px">No results yet</div>'}</div>
-  <div style="display:flex;gap:10px;flex-wrap:wrap;">
-    <button class="btn btn-primary" onclick="document.getElementById('notifModal').style.display='flex'">🔔 Send Notification</button>
-    <button class="btn btn-secondary" onclick="exportAllCSV()">📊 Export Results</button>
-    <button class="btn btn-secondary" onclick="clearLeaderboard()">🗑 Clear Leaderboard</button>
+  <div class="grid2">
+    <div class="glass-card">
+      <div style="font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:700;margin-bottom:12px">🏆 Top Performers</div>
+      ${board2.slice(0,5).map((u,i)=>`<div style="display:flex;align-items:center;gap:9px;padding:8px 0;border-bottom:1px solid var(--border);"><div style="font-size:17px;width:24px;text-align:center">${['🥇','🥈','🥉'][i]||'#'+(i+1)}</div><div style="flex:1;font-size:13px">${u.name}</div><div style="font-weight:700;color:${i===0?'#f5c842':i===1?'#94a3b8':'#cd7f32'}">${u.score}/20</div></div>`).join('')||'<div style="color:var(--text2);font-size:13px;text-align:center;padding:14px">No results yet</div>'}
+    </div>
+    <div class="glass-card">
+      <div style="font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:700;margin-bottom:12px">👥 Student Status</div>
+      ${Object.entries(users).map(([r,u])=>{let taken=localStorage.getItem('assessTaken_'+r)==='yes';let p1=parseInt(localStorage.getItem('p1_done_'+r))||0,p2=parseInt(localStorage.getItem('p2_done_'+r))||0,p3=parseInt(localStorage.getItem('p3_done_'+r))||0,ov=Math.floor((p1+p2+p3)/3);return`<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border);"><div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--purple),#6d28d9);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;color:white;flex-shrink:0">${u.name.charAt(0)}</div><div style="flex:1;font-size:12px;font-weight:500">${u.name}</div><div class="prog-bar" style="width:50px"><div class="prog-fill prog-purple" style="width:${ov}%"></div></div><div style="font-size:11px;color:var(--text2);width:28px;text-align:right">${ov}%</div><span class="badge ${taken?'badge-green':'badge-red'}" style="font-size:9px">${taken?'✅':'⏳'}</span></div>`;}).join('')}
+    </div>
+  </div>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;">
+    <button class="btn btn-primary" onclick="openNotifModal()">🔔 Send Notification</button>
+    <button class="btn btn-secondary" onclick="exportCSV()">📊 Export Results CSV</button>
+    <button class="btn btn-secondary" onclick="showSec('settings',document.querySelector('.adm-item:nth-child(14)'))">⚙️ Settings</button>
   </div>`;
 }
+
+// ═══════════════ USERS ═══════════════
 function renderUsers(){
-  let users=getUsers();
-  document.getElementById('secContent').innerHTML=`<div class="glass-card" style="margin-bottom:14px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px"><div style="font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700">👥 Student Accounts</div><button class="btn btn-primary btn-sm" onclick="addUser()">+ Add User</button></div><div style="overflow-x:auto"><table><thead><tr><th>Reg No</th><th>Name</th><th>Dept</th><th>Batch</th><th>Assessment</th><th>Progress</th><th>Action</th></tr></thead><tbody>${Object.entries(users).map(([r,u])=>{let p1=parseInt(localStorage.getItem('p1_done_'+r))||0,p2=parseInt(localStorage.getItem('p2_done_'+r))||0,p3=parseInt(localStorage.getItem('p3_done_'+r))||0,overall=Math.floor((p1+p2+p3)/3),taken=localStorage.getItem('assessTaken_'+r)==='yes';return`<tr><td style="font-family:'Courier New',monospace;font-size:12px">${r}</td><td><strong>${u.name}</strong></td><td>${u.dept||'IT'}</td><td>${u.batch||'2024-2028'}</td><td><span class="badge ${taken?'badge-green':'badge-red'}">${taken?'✅ Done':'⏳ Pending'}</span></td><td>${overall}%</td><td><button class="btn btn-danger btn-sm" onclick="delUser('${r}')">🗑</button></td></tr>`;}).join('')}</tbody></table></div></div>`;
+  let users=getUs();
+  document.getElementById('secContent').innerHTML=`
+  <div class="glass-card" style="margin-bottom:14px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+      <div style="font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:700">👥 Student Accounts (${Object.keys(users).length})</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-primary btn-sm" onclick="openAddUser()">+ Add Student</button>
+        <button class="btn btn-secondary btn-sm" onclick="exportStudents()">📤 Export</button>
+      </div>
+    </div>
+    <div style="overflow-x:auto">
+    <table class="adm-table">
+      <thead><tr><th>Reg No</th><th>Name</th><th>Dept</th><th>Batch</th><th>Password</th><th>Assessment</th><th>Progress</th><th>Actions</th></tr></thead>
+      <tbody>${Object.entries(users).map(([r,u])=>{
+        let taken=localStorage.getItem('assessTaken_'+r)==='yes';
+        let board=getBoard();let entry=board.find(b=>b.name===u.name);
+        let p1=parseInt(localStorage.getItem('p1_done_'+r))||0,p2=parseInt(localStorage.getItem('p2_done_'+r))||0,p3=parseInt(localStorage.getItem('p3_done_'+r))||0,ov=Math.floor((p1+p2+p3)/3);
+        return`<tr>
+          <td><code style="font-family:'Courier New',monospace;font-size:11px">${r}</code></td>
+          <td><strong>${u.name}</strong></td>
+          <td>${u.dept||'IT'}</td>
+          <td>${u.batch||'2024-2028'}</td>
+          <td><span style="font-family:'Courier New',monospace;font-size:11px">${u.password||'1234'}</span></td>
+          <td><span class="badge ${taken?'badge-green':'badge-red'}" style="font-size:10px">${taken?'✅ Done':'⏳ Pending'}</span></td>
+          <td>
+            <div class="prog-bar" style="width:60px;margin-bottom:2px"><div class="prog-fill prog-purple" style="width:${ov}%"></div></div>
+            <div style="font-size:10px;color:var(--text2)">${ov}%</div>
+          </td>
+          <td>
+            <div style="display:flex;gap:5px;flex-wrap:wrap">
+              <button class="btn btn-secondary btn-sm" onclick="editUser('${r}')" style="padding:4px 8px;font-size:11px">✏️</button>
+              <button class="btn btn-secondary btn-sm" onclick="clearUserData('${r}')" style="padding:4px 8px;font-size:11px;color:#fcd34d">🗑️ Clear</button>
+              <button class="btn btn-danger btn-sm" onclick="delUser('${r}')" style="padding:4px 8px;font-size:11px">✕</button>
+            </div>
+          </td>
+        </tr>`;}).join('')}
+      </tbody>
+    </table>
+    </div>
+  </div>`;
 }
-function addUser(){let r=prompt('Register Number:');if(!r)return;let n=prompt('Student Name:');if(!n)return;let users=getUsers();users[r]={name:n,dept:'IT',batch:'2024-2028',password:'1234'};localStorage.setItem('users',JSON.stringify(users));showNotif('✅ User added!');renderUsers();}
-function delUser(r){if(!confirm('Delete this user?'))return;let users=getUsers();delete users[r];localStorage.setItem('users',JSON.stringify(users));showNotif('🗑 Deleted','error');renderUsers();}
+
+function openAddUser(){
+  openModal(`
+  <div style="font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:700;margin-bottom:16px">➕ Add Student</div>
+  <div class="form-group"><label class="form-label">Register Number</label><input class="form-input" id="nu_reg" placeholder="714524205001"></div>
+  <div class="form-group"><label class="form-label">Full Name</label><input class="form-input" id="nu_name" placeholder="Student Name"></div>
+  <div class="form-group"><label class="form-label">Department</label>
+    <select class="form-input" id="nu_dept"><option>IT</option><option>CSE</option><option>ECE</option><option>EEE</option><option>MECH</option><option>CIVIL</option></select></div>
+  <div class="form-group"><label class="form-label">Batch</label>
+    <select class="form-input" id="nu_batch"><option>2024-2028</option><option>2023-2027</option><option>2025-2029</option><option>2022-2026</option></select></div>
+  <div class="form-group"><label class="form-label">Password</label><input class="form-input" id="nu_pass" placeholder="1234" value="1234"></div>
+  <div style="display:flex;gap:8px;margin-top:4px">
+    <button class="btn btn-primary" onclick="saveNewUser()">✅ Save</button>
+    <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+  </div>`);
+}
+function saveNewUser(){
+  let r=document.getElementById('nu_reg').value.trim(),n=document.getElementById('nu_name').value.trim();
+  if(!r||!n){alert('Register number and name required!');return;}
+  let users=getUs();users[r]={name:n,dept:document.getElementById('nu_dept').value,batch:document.getElementById('nu_batch').value,password:document.getElementById('nu_pass').value||'1234'};
+  saveUs(users);closeModal();showN('✅ Student added!');renderUsers();
+}
+function editUser(reg){
+  let users=getUs(),u=users[reg];if(!u)return;
+  openModal(`
+  <div style="font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:700;margin-bottom:16px">✏️ Edit Student</div>
+  <div class="form-group"><label class="form-label">Name</label><input class="form-input" id="eu_name" value="${u.name}"></div>
+  <div class="form-group"><label class="form-label">Department</label>
+    <select class="form-input" id="eu_dept"><option ${u.dept==='IT'?'selected':''}>IT</option><option ${u.dept==='CSE'?'selected':''}>CSE</option><option ${u.dept==='ECE'?'selected':''}>ECE</option><option ${u.dept==='EEE'?'selected':''}>EEE</option><option ${u.dept==='MECH'?'selected':''}>MECH</option></select></div>
+  <div class="form-group"><label class="form-label">Batch</label><input class="form-input" id="eu_batch" value="${u.batch||'2024-2028'}"></div>
+  <div class="form-group"><label class="form-label">Password</label><input class="form-input" id="eu_pass" value="${u.password||'1234'}"></div>
+  <div style="display:flex;gap:8px;margin-top:4px">
+    <button class="btn btn-primary" onclick="saveEditUser('${reg}')">💾 Save</button>
+    <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+  </div>`);
+}
+function saveEditUser(reg){
+  let users=getUs();users[reg].name=document.getElementById('eu_name').value;users[reg].dept=document.getElementById('eu_dept').value;users[reg].batch=document.getElementById('eu_batch').value;users[reg].password=document.getElementById('eu_pass').value;
+  saveUs(users);closeModal();showN('✅ Updated!');renderUsers();
+}
+function delUser(reg){if(!confirm('Delete this student? All their data will be lost.'))return;let users=getUs();delete users[reg];saveUs(users);showN('🗑 Deleted','error');renderUsers();}
+function clearUserData(reg){
+  if(!confirm('Clear all progress, scores and assessment data for this student?'))return;
+  ['p1_done_','p2_done_','p3_done_','assessTaken_','scoreHistory_','wrongAnswers_','mockInterviewHistory_','codingProg_','engProg_','techProg_','placeProg_','badges_','streak_','lastLogin_'].forEach(k=>localStorage.removeItem(k+reg));
+  let board=getBoard().filter(u=>{let users=getUs();return u.name!==(users[reg]||{}).name;});localStorage.setItem('leaderboard',JSON.stringify(board));
+  showN('🗑 Cleared all data','info');renderUsers();
+}
+function exportStudents(){
+  let users=getUs();let csv='Reg No,Name,Dept,Batch,Password\n'+Object.entries(users).map(([r,u])=>`${r},${u.name},${u.dept||'IT'},${u.batch||'2024-2028'},${u.password||'1234'}`).join('\n');
+  let a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);a.download='APTIORA_Students.csv';a.click();
+}
+
+// ═══════════════ BATCHES ═══════════════
+function renderBatches(){
+  let batches=getBatches();
+  document.getElementById('secContent').innerHTML=`
+  <div class="glass-card" style="margin-bottom:14px">
+    <div style="font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:700;margin-bottom:14px">➕ Create Batch</div>
+    <div class="grid2" style="margin-bottom:12px">
+      <div class="form-group" style="margin:0"><label class="form-label">Batch Name</label><input class="form-input" id="bN" placeholder="e.g. IT-A 2024-2028"></div>
+      <div class="form-group" style="margin:0"><label class="form-label">Department</label><select class="form-input" id="bD"><option>IT</option><option>CSE</option><option>ECE</option><option>EEE</option><option>MECH</option></select></div>
+      <div class="form-group" style="margin:0"><label class="form-label">Year</label><select class="form-input" id="bY"><option>2024-2028</option><option>2023-2027</option><option>2025-2029</option><option>2022-2026</option></select></div>
+      <div class="form-group" style="margin:0"><label class="form-label">Strength</label><input class="form-input" id="bSt" type="number" placeholder="60" value="60"></div>
+    </div>
+    <button class="btn btn-primary" onclick="addBatch()">+ Create Batch</button>
+    <div id="bMsg" style="color:#86efac;font-size:12px;margin-top:8px;display:none">✅ Batch created!</div>
+  </div>
+  <div class="glass-card">
+    <div style="font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:700;margin-bottom:12px">🏫 All Batches (${batches.length})</div>
+    ${batches.length?batches.map((b,i)=>{
+      let users=getUs();
+      let batchStudents=Object.values(users).filter(u=>u.batch===b.year&&u.dept===b.dept);
+      let assessed=batchStudents.filter(u=>{let regs=Object.keys(users).filter(r=>users[r]===u);return regs.some(r=>localStorage.getItem('assessTaken_'+r)==='yes');}).length;
+      return`<div style="background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px 16px;margin-bottom:10px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+          <div>
+            <div style="font-weight:600;font-size:14px">${b.name}</div>
+            <div style="font-size:11px;color:var(--text2);margin-top:3px">${b.dept} · ${b.year} · ${b.strength||60} students · Created ${new Date(b.created||Date.now()).toLocaleDateString('en-IN')}</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <div style="text-align:center"><div style="font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:700;color:#86efac">${assessed}</div><div style="font-size:10px;color:var(--text2)">Assessed</div></div>
+            <button class="btn btn-danger btn-sm" onclick="delBatch(${i})">🗑</button>
+          </div>
+        </div>
+        <div style="margin-top:10px">
+          <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text2);margin-bottom:4px"><span>Assessment Progress</span><span>${assessed}/${b.strength||60}</span></div>
+          <div class="prog-bar"><div class="prog-fill prog-green" style="width:${Math.round(assessed/(b.strength||60)*100)}%"></div></div>
+        </div>
+      </div>`;}).join(''):'<div style="text-align:center;color:var(--text2);font-size:13px;padding:20px">No batches created yet.</div>'}
+  </div>`;
+}
+function addBatch(){let n=document.getElementById('bN').value.trim();if(!n){alert('Name required!');return;}let batches=getBatches();batches.push({name:n,dept:document.getElementById('bD').value,year:document.getElementById('bY').value,strength:parseInt(document.getElementById('bSt').value)||60,created:Date.now()});localStorage.setItem('batches',JSON.stringify(batches));let msg=document.getElementById('bMsg');msg.style.display='block';setTimeout(()=>msg.style.display='none',2000);document.getElementById('bN').value='';showN('✅ Batch created!');renderBatches();}
+function delBatch(i){if(!confirm('Delete this batch?'))return;let b=getBatches();b.splice(i,1);localStorage.setItem('batches',JSON.stringify(b));showN('🗑 Deleted','error');renderBatches();}
+
+// ═══════════════ APTITUDE QUESTIONS ═══════════════
 function renderQuestions(){
   let qb=getQBank();let cats=['Verbal Ability','Algebra','Series & Sequence','Assessment'];
+  let totalQ=cats.reduce((s,c)=>s+(qb[c]||[]).length,0);
   document.getElementById('secContent').innerHTML=`
-  <div class="glass-card" style="margin-bottom:14px;border-color:rgba(124,58,237,0.25);background:rgba(124,58,237,0.06)">
-    <div style="font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;margin-bottom:14px">🤖 AI Question Generator</div>
+  <div class="glass-card" style="margin-bottom:14px;border-color:rgba(124,58,237,0.25);background:rgba(124,58,237,0.05)">
+    <div style="font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:700;margin-bottom:14px">🤖 AI Question Generator</div>
     <div class="grid2" style="margin-bottom:12px">
-      <div class="form-group" style="margin:0"><label class="form-label">Category</label><select class="form-input" id="aiQCat">${cats.map(c=>`<option>${c}</option>`).join('')}</select></div>
-      <div class="form-group" style="margin:0"><label class="form-label">Count</label><select class="form-input" id="aiQCount"><option value="5">5</option><option value="10" selected>10</option><option value="15">15</option></select></div>
-      <div class="form-group" style="margin:0"><label class="form-label">Difficulty</label><select class="form-input" id="aiQDiff"><option value="easy">Easy</option><option value="medium" selected>Medium</option><option value="hard">Hard</option></select></div>
+      <div class="form-group" style="margin:0"><label class="form-label">Category</label><select class="form-input" id="aiCat">${cats.map(c=>`<option>${c}</option>`).join('')}</select></div>
+      <div class="form-group" style="margin:0"><label class="form-label">Count</label><select class="form-input" id="aiCnt"><option value="5">5</option><option value="10" selected>10</option><option value="15">15</option><option value="20">20</option></select></div>
+      <div class="form-group" style="margin:0"><label class="form-label">Difficulty</label><select class="form-input" id="aiDiff"><option value="easy">Easy</option><option value="medium" selected>Medium</option><option value="hard">Hard</option></select></div>
     </div>
-    <button class="btn btn-primary" onclick="generateAIQ()" id="aiQBtn">✨ Generate Questions</button>
-    <div id="aiQStatus" style="margin-top:10px;font-size:13px;display:none"></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-primary" onclick="genAIQ()" id="aiQBtn">✨ Generate with AI</button>
+      <button class="btn btn-secondary" onclick="openAddQ()">+ Add Manually</button>
+    </div>
+    <div id="aiQSt" style="margin-top:10px;font-size:13px;display:none"></div>
   </div>
   <div class="glass-card">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px">
-      <div style="font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700">❓ Question Bank</div>
-      <select class="form-input" id="qFilter" onchange="renderQuestions()" style="width:180px;padding:8px 12px">${['all',...cats].map(c=>`<option value="${c}">${c==='all'?'All Categories':c}</option>`).join('')}</select>
+      <div style="font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:700">❓ Question Bank (${totalQ} total)</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <select class="form-input" id="qFilter" onchange="renderQTable()" style="padding:7px 10px;width:180px">${['all',...cats].map(c=>`<option value="${c}">${c==='all'?'All':c}</option>`).join('')}</select>
+        <button class="btn btn-danger btn-sm" onclick="clearAllQ()">🗑 Clear All</button>
+      </div>
     </div>
-    <div style="overflow-x:auto"><table><thead><tr><th>#</th><th>Question</th><th>Category</th><th>Answer</th><th>Action</th></tr></thead><tbody id="qTbody"></tbody></table></div>
+    <div style="overflow-x:auto"><table class="adm-table"><thead><tr><th>#</th><th>Question</th><th>Category</th><th>Correct Answer</th><th>Action</th></tr></thead><tbody id="qTbody"></tbody></table></div>
   </div>`;
   renderQTable();
 }
-function renderQTable(){let qb=getQBank();let filter=document.getElementById('qFilter')?.value||'all';let rows=[];Object.entries(qb).forEach(([cat,qs])=>{if(filter==='all'||filter===cat){qs.forEach((q,i)=>{rows.push({cat,q,i});});}});document.getElementById('qTbody').innerHTML=rows.slice(0,50).map((r,idx)=>`<tr><td style="color:var(--text2)">${idx+1}</td><td style="max-width:280px">${r.q.q.slice(0,60)}${r.q.q.length>60?'...':''}</td><td><span class="badge badge-purple" style="font-size:10px">${r.cat}</span></td><td style="color:#86efac">${r.q.o[r.q.a]}</td><td><button class="btn btn-danger btn-sm" onclick="delQ('${r.cat}',${r.i})">✕</button></td></tr>`).join('')||'<tr><td colspan="5" style="text-align:center;color:var(--text2);padding:20px">No questions. Use AI Generator above!</td></tr>';}
-function delQ(cat,i){let qb=getQBank();qb[cat].splice(i,1);localStorage.setItem('questionBank',JSON.stringify(qb));renderQTable();showNotif('🗑 Deleted','error');}
-async function generateAIQ(){
-  let cat=document.getElementById('aiQCat').value,count=document.getElementById('aiQCount').value,diff=document.getElementById('aiQDiff').value;
-  let btn=document.getElementById('aiQBtn'),status=document.getElementById('aiQStatus');
-  btn.disabled=true;btn.innerText='Generating...';status.style.display='block';status.style.color='rgba(255,255,255,0.6)';status.innerText='🤖 Creating '+count+' '+diff+' questions for '+cat+'...';
-  try{let resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1800,messages:[{role:'user',content:`Generate exactly ${count} MCQ aptitude questions for "${cat}" at ${diff} difficulty for B.Tech students.\nReturn ONLY JSON array, no other text:\n[{"q":"question","o":["A","B","C","D"],"a":0},...]`}]})});
-  let data=await resp.json();let raw=(data.content&&data.content[0]&&data.content[0].text)||'[]';let newQs=JSON.parse(raw.replace(/```json|```/g,'').trim());
-  let qb=getQBank();if(!qb[cat])qb[cat]=[];newQs.forEach(q=>qb[cat].push({q:q.q,o:q.o,a:q.a}));localStorage.setItem('questionBank',JSON.stringify(qb));
-  status.style.color='#86efac';status.innerText='✅ Added '+newQs.length+' questions to '+cat+'!';showNotif('✅ '+newQs.length+' questions added!');renderQTable();}
-  catch(e){status.style.color='#fca5a5';status.innerText='❌ Error: '+e.message;}
-  btn.disabled=false;btn.innerText='✨ Generate Questions';
+function renderQTable(){let qb=getQBank();let filter=document.getElementById('qFilter')?.value||'all';let rows=[];Object.entries(qb).forEach(([cat,qs])=>{if(filter==='all'||filter===cat)qs.forEach((q,i)=>rows.push({cat,q,i}));});document.getElementById('qTbody').innerHTML=rows.slice(0,60).map((r,idx)=>`<tr><td style="color:var(--text2);font-size:11px">${idx+1}</td><td style="max-width:260px;font-size:12px">${r.q.q.slice(0,65)}${r.q.q.length>65?'…':''}</td><td><span class="badge badge-purple" style="font-size:9px">${r.cat}</span></td><td style="color:#86efac;font-size:12px">${r.q.o[r.q.a]||'—'}</td><td><button class="btn btn-danger btn-sm" style="padding:3px 7px;font-size:10px" onclick="delQ('${r.cat}',${r.i})">✕</button></td></tr>`).join('')||'<tr><td colspan="5" style="text-align:center;color:var(--text2);padding:20px;font-size:13px">No questions. Generate with AI or add manually.</td></tr>';}
+function delQ(cat,i){let qb=getQBank();if(!qb[cat])return;qb[cat].splice(i,1);saveQBank(qb);renderQTable();showN('🗑 Question deleted','error');}
+function clearAllQ(){if(!confirm('Clear ALL questions from question bank?'))return;localStorage.removeItem('questionBank');showN('🗑 All questions cleared','error');renderQuestions();}
+function openAddQ(){
+  openModal(`
+  <div style="font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:700;margin-bottom:16px">➕ Add Question</div>
+  <div class="form-group"><label class="form-label">Category</label><select class="form-input" id="aq_cat"><option>Verbal Ability</option><option>Algebra</option><option>Series & Sequence</option><option>Assessment</option></select></div>
+  <div class="form-group"><label class="form-label">Question</label><textarea class="form-input" id="aq_q" placeholder="Enter question text..." rows="2"></textarea></div>
+  <div class="form-group"><label class="form-label">Option A</label><input class="form-input" id="aq_o0" placeholder="Option A"></div>
+  <div class="form-group"><label class="form-label">Option B</label><input class="form-input" id="aq_o1" placeholder="Option B"></div>
+  <div class="form-group"><label class="form-label">Option C</label><input class="form-input" id="aq_o2" placeholder="Option C"></div>
+  <div class="form-group"><label class="form-label">Option D</label><input class="form-input" id="aq_o3" placeholder="Option D"></div>
+  <div class="form-group"><label class="form-label">Correct Answer</label><select class="form-input" id="aq_ans"><option value="0">A</option><option value="1">B</option><option value="2">C</option><option value="3">D</option></select></div>
+  <div style="display:flex;gap:8px"><button class="btn btn-primary" onclick="saveAddQ()">✅ Add</button><button class="btn btn-secondary" onclick="closeModal()">Cancel</button></div>`);
 }
-function renderLeaderboard(){let board=JSON.parse(localStorage.getItem('leaderboard'))||[];board.sort((a,b)=>b.score-a.score);document.getElementById('secContent').innerHTML=`<div class="glass-card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px"><div style="font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700">🏆 Assessment Results</div><div style="display:flex;gap:8px"><button class="btn btn-secondary btn-sm" onclick="exportAllCSV()">📊 CSV</button><button class="btn btn-danger btn-sm" onclick="clearLeaderboard()">🗑 Clear</button></div></div><div style="overflow-x:auto"><table><thead><tr><th>Rank</th><th>Name</th><th>Score</th><th>Attempted</th></tr></thead><tbody>${board.length?board.map((u,i)=>`<tr><td>${['🥇','🥈','🥉'][i]||'#'+(i+1)}</td><td><strong>${u.name}</strong></td><td style="font-weight:700;color:#f5c842">${u.score}/20</td><td style="color:var(--text2)">${u.attempted||u.score}/20</td></tr>`).join(''):'<tr><td colspan="4" style="text-align:center;color:var(--text2);padding:20px">No results yet</td></tr>'}</tbody></table></div></div>`;}
-function renderBatches(){let batches=JSON.parse(localStorage.getItem('batches'))||[];document.getElementById('secContent').innerHTML=`<div class="glass-card" style="margin-bottom:14px"><div style="font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;margin-bottom:14px">➕ Create Batch</div><div class="grid2" style="margin-bottom:12px"><div class="form-group" style="margin:0"><label class="form-label">Batch Name</label><input class="form-input" id="bName" placeholder="e.g. IT 2024-2028"></div><div class="form-group" style="margin:0"><label class="form-label">Dept</label><select class="form-input" id="bDept"><option>IT</option><option>CSE</option><option>ECE</option><option>EEE</option><option>MECH</option></select></div><div class="form-group" style="margin:0"><label class="form-label">Year</label><select class="form-input" id="bYear"><option>2024-2028</option><option>2023-2027</option><option>2025-2029</option></select></div></div><button class="btn btn-primary" onclick="addBatch()">+ Create Batch</button></div><div class="glass-card"><div style="font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;margin-bottom:14px">🏫 Batches</div>${batches.length?batches.map((b,i)=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:8px"><div><div style="font-weight:600">${b.name}</div><div style="font-size:12px;color:var(--text2);margin-top:2px">${b.dept} · ${b.year} · ${new Date(b.created||Date.now()).toLocaleDateString('en-IN')}</div></div><button class="btn btn-danger btn-sm" onclick="delBatch(${i})">🗑</button></div>`).join(''):'<div style="text-align:center;color:var(--text2);font-size:13px;padding:16px">No batches yet</div>'}</div>`;}
-function addBatch(){let n=document.getElementById('bName').value.trim();if(!n){alert('Name required!');return;}let batches=JSON.parse(localStorage.getItem('batches'))||[];batches.push({name:n,dept:document.getElementById('bDept').value,year:document.getElementById('bYear').value,created:Date.now()});localStorage.setItem('batches',JSON.stringify(batches));showNotif('✅ Batch created!');renderBatches();}
-function delBatch(i){let b=JSON.parse(localStorage.getItem('batches'))||[];b.splice(i,1);localStorage.setItem('batches',JSON.stringify(b));showNotif('🗑 Deleted','error');renderBatches();}
-function renderNotifications(){document.getElementById('secContent').innerHTML=`<div class="glass-card"><div style="font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;margin-bottom:14px">🔔 Send Announcement</div><div class="form-group"><label class="form-label">Message</label><textarea class="form-input" id="notifMsgMain" placeholder="Type announcement..." rows="4"></textarea></div><button class="btn btn-primary" onclick="sendNotifMain()">📤 Send to All Students</button><div id="notifSuccess" style="color:#86efac;font-size:13px;margin-top:10px;display:none">✅ Sent!</div></div>`;}
-function sendNotif(){let msg=document.getElementById('notifMsg').value.trim();if(!msg)return;let notifs=JSON.parse(localStorage.getItem('userNotifs'))||[];notifs.unshift({msg,time:new Date().toLocaleTimeString(),read:false});notifs=notifs.slice(0,20);localStorage.setItem('userNotifs',JSON.stringify(notifs));document.getElementById('notifModal').style.display='none';showNotif('✅ Sent to all students!');}
-function sendNotifMain(){let msg=document.getElementById('notifMsgMain').value.trim();if(!msg)return;let notifs=JSON.parse(localStorage.getItem('userNotifs'))||[];notifs.unshift({msg,time:new Date().toLocaleTimeString(),read:false});notifs=notifs.slice(0,20);localStorage.setItem('userNotifs',JSON.stringify(notifs));document.getElementById('notifSuccess').style.display='block';showNotif('✅ Sent!');}
-function renderSettings(){let s=getSettings();document.getElementById('secContent').innerHTML=`<div class="glass-card"><div style="font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;margin-bottom:20px">⚙️ Admin Settings</div><div class="grid2"><div class="form-group"><label class="form-label">Assessment Duration (min)</label><input class="form-input" id="sTime" type="number" value="${s.assessTime||45}"></div><div class="form-group"><label class="form-label">Secure Code (6 digits)</label><input class="form-input" id="sCode" type="text" value="${s.secureCode||'123456'}" maxlength="6"></div><div class="form-group"><label class="form-label">Course Start Date</label><input class="form-input" id="sCStart" type="text" value="${s.courseStart||'25 Mar 2026'}"></div><div class="form-group"><label class="form-label">Course End Date</label><input class="form-input" id="sCEnd" type="text" value="${s.courseEnd||'05 Apr 2026'}"></div></div><div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px"><label style="display:flex;align-items:center;gap:10px;cursor:pointer"><input type="checkbox" id="sAnti" ${s.antiCheat!==false?'checked':''}><span style="font-size:13px">Enable Anti-cheat (tab switch detection)</span></label><label style="display:flex;align-items:center;gap:10px;cursor:pointer"><input type="checkbox" id="sFS" ${s.forceFullscreen!==false?'checked':''}><span style="font-size:13px">Force fullscreen during assessment</span></label><label style="display:flex;align-items:center;gap:10px;cursor:pointer"><input type="checkbox" id="sShuffle" ${s.shuffleQ!==false?'checked':''}><span style="font-size:13px">Shuffle questions (anti-copying)</span></label><label style="display:flex;align-items:center;gap:10px;cursor:pointer"><input type="checkbox" id="sCert" ${s.certDownload!==false?'checked':''}><span style="font-size:13px">Allow certificate download</span></label></div><button class="btn btn-primary" onclick="saveSettings()">💾 Save Settings</button><div id="settingsSaved" style="color:#86efac;font-size:13px;margin-top:10px;display:none">✅ Settings saved!</div></div>`;}
-function saveSettings(){let s={assessTime:parseInt(document.getElementById('sTime').value)||45,secureCode:document.getElementById('sCode').value||'123456',courseStart:document.getElementById('sCStart').value,courseEnd:document.getElementById('sCEnd').value,antiCheat:document.getElementById('sAnti').checked,forceFullscreen:document.getElementById('sFS').checked,shuffleQ:document.getElementById('sShuffle').checked,certDownload:document.getElementById('sCert').checked};localStorage.setItem('adminSettings',JSON.stringify(s));document.getElementById('settingsSaved').style.display='block';setTimeout(()=>document.getElementById('settingsSaved').style.display='none',2500);showNotif('✅ Settings saved!');}
-function exportAllCSV(){let board=JSON.parse(localStorage.getItem('leaderboard'))||[];if(!board.length){alert('No data');return;}board.sort((a,b)=>b.score-a.score);let csv='Rank,Name,Score,Attempted\n'+board.map((u,i)=>`${i+1},${u.name},${u.score}/20,${u.attempted||u.score}/20`).join('\n');let a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);a.download='APTIORA_Results_'+new Date().toLocaleDateString('en-IN').replace(/\//g,'-')+'.csv';a.click();}
-function clearLeaderboard(){if(!confirm('Clear all leaderboard data?'))return;localStorage.removeItem('leaderboard');showNotif('🗑 Cleared','error');renderDashboard();}
+function saveAddQ(){
+  let q=document.getElementById('aq_q').value.trim();if(!q){alert('Question required!');return;}
+  let cat=document.getElementById('aq_cat').value;let qb=getQBank();if(!qb[cat])qb[cat]=[];
+  qb[cat].push({q,o:[0,1,2,3].map(i=>document.getElementById('aq_o'+i).value||'Option '+(i+1)),a:parseInt(document.getElementById('aq_ans').value)});
+  saveQBank(qb);closeModal();showN('✅ Question added!');renderQuestions();
+}
+async function genAIQ(){
+  let cat=document.getElementById('aiCat').value,cnt=document.getElementById('aiCnt').value,diff=document.getElementById('aiDiff').value;
+  let btn=document.getElementById('aiQBtn'),st=document.getElementById('aiQSt');
+  btn.disabled=true;btn.innerText='Generating...';st.style.display='block';st.style.color='rgba(255,255,255,0.6)';st.innerText='🤖 Creating '+cnt+' '+diff+' questions for '+cat+'...';
+  try{
+    let resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:2000,messages:[{role:'user',content:`Generate exactly ${cnt} MCQ aptitude questions for "${cat}" at ${diff} difficulty for B.Tech placement prep.\nReturn ONLY valid JSON array, no other text:\n[{"q":"question text","o":["A","B","C","D"],"a":0},...]`}]})});
+    let data=await resp.json();let raw=(data.content&&data.content[0]&&data.content[0].text)||'[]';
+    let newQs=JSON.parse(raw.replace(/```json|```/g,'').trim());
+    let qb=getQBank();if(!qb[cat])qb[cat]=[];newQs.forEach(q=>qb[cat].push({q:q.q,o:q.o,a:q.a}));saveQBank(qb);
+    st.style.color='#86efac';st.innerText='✅ Added '+newQs.length+' questions to '+cat+'!';
+    showN('✅ '+newQs.length+' AI questions added!');renderQTable();
+  }catch(e){st.style.color='#fca5a5';st.innerText='❌ Error: '+e.message;}
+  btn.disabled=false;btn.innerText='✨ Generate with AI';
+}
+
+// ═══════════════ CODING PROBLEMS ═══════════════
+function renderCodingQ(){
+  let probs=JSON.parse(localStorage.getItem('customCodingProblems'))||[];
+  document.getElementById('secContent').innerHTML=`
+  <div class="glass-card" style="margin-bottom:14px">
+    <div style="font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:700;margin-bottom:14px">💻 Coding Problems Management</div>
+    <div style="font-size:13px;color:var(--text2);margin-bottom:14px">8 default problems are always available. Add custom problems here.</div>
+    <button class="btn btn-primary" onclick="openAddCoding()">+ Add Custom Problem</button>
+    <button class="btn btn-secondary" onclick="genAICoding()" style="margin-left:8px">🤖 AI Generate</button>
+    <div id="codingAISt" style="font-size:13px;margin-top:10px;display:none"></div>
+  </div>
+  <div class="glass-card">
+    <div style="font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:700;margin-bottom:12px">Custom Problems (${probs.length})</div>
+    ${probs.length?`<div style="overflow-x:auto"><table class="adm-table"><thead><tr><th>#</th><th>Title</th><th>Difficulty</th><th>Action</th></tr></thead><tbody>${probs.map((p,i)=>`<tr><td>${i+1}</td><td>${p.title}</td><td><span class="badge ${p.diff==='Easy'?'badge-green':p.diff==='Hard'?'badge-red':'badge-gold'}">${p.diff}</span></td><td><button class="btn btn-danger btn-sm" onclick="delCoding(${i})">✕</button></td></tr>`).join('')}</tbody></table></div>`:'<div style="text-align:center;color:var(--text2);font-size:13px;padding:20px">No custom problems. Default 8 problems are always shown.</div>'}
+  </div>`;
+}
+function openAddCoding(){openModal(`<div style="font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:700;margin-bottom:16px">💻 Add Coding Problem</div><div class="form-group"><label class="form-label">Title</label><input class="form-input" id="cp_t" placeholder="e.g. Sum of Array"></div><div class="form-group"><label class="form-label">Difficulty</label><select class="form-input" id="cp_d"><option>Easy</option><option>Medium</option><option>Hard</option></select></div><div class="form-group"><label class="form-label">Description</label><textarea class="form-input" id="cp_desc" placeholder="Problem description..." rows="3"></textarea></div><div style="display:flex;gap:8px"><button class="btn btn-primary" onclick="saveCoding()">✅ Add</button><button class="btn btn-secondary" onclick="closeModal()">Cancel</button></div>`);}
+function saveCoding(){let t=document.getElementById('cp_t').value.trim();if(!t)return;let p=JSON.parse(localStorage.getItem('customCodingProblems'))||[];p.push({title:t,diff:document.getElementById('cp_d').value,desc:document.getElementById('cp_desc').value,templates:{python:'# Write your solution here\n\n',c:'// Write your solution here\n\n',java:'// Write your solution here\n\n'}});localStorage.setItem('customCodingProblems',JSON.stringify(p));closeModal();showN('✅ Problem added!');renderCodingQ();}
+function delCoding(i){let p=JSON.parse(localStorage.getItem('customCodingProblems'))||[];p.splice(i,1);localStorage.setItem('customCodingProblems',JSON.stringify(p));showN('🗑 Deleted','error');renderCodingQ();}
+async function genAICoding(){let st=document.getElementById('codingAISt');st.style.display='block';st.innerText='🤖 Generating...';try{let resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:800,messages:[{role:'user',content:'Generate 3 coding problems for B.Tech placement prep. Return ONLY JSON: [{"title":"...","diff":"Easy|Medium|Hard","desc":"..."},...]'}]})});let data=await resp.json();let raw=(data.content&&data.content[0]&&data.content[0].text)||'[]';let probs=JSON.parse(raw.replace(/```json|```/g,'').trim());let existing=JSON.parse(localStorage.getItem('customCodingProblems'))||[];probs.forEach(p=>{existing.push({title:p.title,diff:p.diff,desc:p.desc,templates:{python:'# Write your solution here\n\n',c:'// Write your solution here\n\n',java:'// Write your solution here\n\n'}});});localStorage.setItem('customCodingProblems',JSON.stringify(existing));st.style.color='#86efac';st.innerText='✅ Added '+probs.length+' problems!';showN('✅ Done!');renderCodingQ();}catch(e){st.style.color='#fca5a5';st.innerText='❌ Error';}}
+
+// ═══════════════ TECHNICAL QUESTIONS ═══════════════
+function renderTechnicalQ(){
+  let cats=['DBMS','OS','CN','DSA'];let qb=JSON.parse(localStorage.getItem('techQBank'))||{};
+  let total=cats.reduce((s,c)=>s+(qb[c]||[]).length,0);
+  document.getElementById('secContent').innerHTML=`
+  <div class="glass-card" style="margin-bottom:14px;border-color:rgba(245,158,11,0.25);background:rgba(245,158,11,0.05)">
+    <div style="font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:700;margin-bottom:14px">🤖 AI Technical Q Generator</div>
+    <div class="grid2" style="margin-bottom:12px">
+      <div class="form-group" style="margin:0"><label class="form-label">Subject</label><select class="form-input" id="tqCat">${cats.map(c=>`<option>${c}</option>`).join('')}</select></div>
+      <div class="form-group" style="margin:0"><label class="form-label">Count</label><select class="form-input" id="tqCnt"><option value="5">5</option><option value="10" selected>10</option></select></div>
+    </div>
+    <button class="btn btn-primary" onclick="genTechQ()" id="tqBtn">✨ Generate</button>
+    <div id="tqSt" style="font-size:13px;margin-top:10px;display:none"></div>
+  </div>
+  <div class="glass-card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+      <div style="font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:700">🔬 Technical Questions (${total} custom)</div>
+      <select class="form-input" id="tqFilter" onchange="renderTechQTable()" style="padding:7px 10px;width:140px">${['all',...cats].map(c=>`<option value="${c}">${c==='all'?'All':c}</option>`).join('')}</select>
+    </div>
+    <div style="font-size:12px;color:var(--text2);margin-bottom:10px">Default questions (8 per subject) are always loaded. Custom questions below add to them.</div>
+    <div style="overflow-x:auto"><table class="adm-table"><thead><tr><th>#</th><th>Question</th><th>Subject</th><th>Action</th></tr></thead><tbody id="tqTbody"></tbody></table></div>
+  </div>`;
+  renderTechQTable();
+}
+function renderTechQTable(){let qb=JSON.parse(localStorage.getItem('techQBank'))||{};let filter=document.getElementById('tqFilter')?.value||'all';let rows=[];Object.entries(qb).forEach(([cat,qs])=>{if(filter==='all'||filter===cat)qs.forEach((q,i)=>rows.push({cat,q,i}));});document.getElementById('tqTbody').innerHTML=rows.slice(0,60).map((r,idx)=>`<tr><td style="font-size:11px;color:var(--text2)">${idx+1}</td><td style="font-size:12px;max-width:260px">${r.q.q.slice(0,60)}…</td><td><span class="badge badge-gold" style="font-size:9px">${r.cat}</span></td><td><button class="btn btn-danger btn-sm" style="padding:3px 7px;font-size:10px" onclick="delTechQ('${r.cat}',${r.i})">✕</button></td></tr>`).join('')||'<tr><td colspan="4" style="text-align:center;color:var(--text2);padding:16px;font-size:13px">No custom questions. Generate with AI above.</td></tr>';}
+function delTechQ(cat,i){let qb=JSON.parse(localStorage.getItem('techQBank'))||{};if(!qb[cat])return;qb[cat].splice(i,1);localStorage.setItem('techQBank',JSON.stringify(qb));renderTechQTable();showN('🗑 Deleted','error');}
+async function genTechQ(){let cat=document.getElementById('tqCat').value,cnt=document.getElementById('tqCnt').value;let btn=document.getElementById('tqBtn'),st=document.getElementById('tqSt');btn.disabled=true;btn.innerText='Generating...';st.style.display='block';st.innerText='🤖 Creating '+cnt+' '+cat+' questions...';try{let resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1500,messages:[{role:'user',content:`Generate ${cnt} MCQ questions for "${cat}" (B.Tech placement prep).\nReturn ONLY JSON: [{"q":"question","o":["A","B","C","D"],"a":0,"exp":"1 sentence explanation"},...]`}]})});let data=await resp.json();let raw=(data.content&&data.content[0]&&data.content[0].text)||'[]';let newQs=JSON.parse(raw.replace(/```json|```/g,'').trim());let qb=JSON.parse(localStorage.getItem('techQBank'))||{};if(!qb[cat])qb[cat]=[];newQs.forEach(q=>qb[cat].push(q));localStorage.setItem('techQBank',JSON.stringify(qb));st.style.color='#86efac';st.innerText='✅ Added '+newQs.length+' '+cat+' questions!';showN('✅ Done!');renderTechQTable();}catch(e){st.style.color='#fca5a5';st.innerText='❌ Error: '+e.message;}btn.disabled=false;btn.innerText='✨ Generate';}
+
+// ═══════════════ LEADERBOARD ═══════════════
+function renderLeaderboard(){
+  let board=[...getBoard()].sort((a,b)=>b.score-a.score);
+  document.getElementById('secContent').innerHTML=`
+  <div class="glass-card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+      <div style="font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:700">🏆 Assessment Leaderboard (${board.length} students)</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-secondary btn-sm" onclick="exportCSV()">📊 Export CSV</button>
+        <button class="btn btn-danger btn-sm" onclick="clearLeaderboard()">🗑 Clear All</button>
+      </div>
+    </div>
+    <div style="overflow-x:auto">
+    <table class="adm-table"><thead><tr><th>Rank</th><th>Name</th><th>Score</th><th>Attempted</th><th>Percentage</th></tr></thead>
+    <tbody>${board.length?board.map((u,i)=>`<tr style="${i===0?'background:rgba(245,200,66,0.06)':i===1?'background:rgba(148,163,184,0.04)':i===2?'background:rgba(205,127,50,0.06)':''}"><td>${['🥇','🥈','🥉'][i]||'#'+(i+1)}</td><td><strong>${u.name}</strong></td><td style="font-weight:700;color:${i===0?'#f5c842':i===1?'#94a3b8':i===2?'#cd7f32':'white'}">${u.score}/20</td><td style="color:var(--text2)">${u.attempted||u.score}/20</td><td><span class="badge ${u.score>=14?'badge-green':u.score>=10?'badge-gold':'badge-red'}">${Math.round(u.score/20*100)}%</span></td></tr>`).join(''):'<tr><td colspan="5" style="text-align:center;color:var(--text2);padding:20px">No results yet</td></tr>'}</tbody>
+    </table></div>
+  </div>`;
+}
+function exportCSV(){let board=[...getBoard()].sort((a,b)=>b.score-a.score);if(!board.length){alert('No data!');return;}let csv='Rank,Name,Score,Attempted,Percentage\n'+board.map((u,i)=>`${i+1},${u.name},${u.score}/20,${u.attempted||u.score}/20,${Math.round(u.score/20*100)}%`).join('\n');let a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);a.download='APTIORA_Results_'+new Date().toLocaleDateString('en-IN').replace(/\//g,'-')+'.csv';a.click();showN('📊 CSV downloaded!');}
+function clearLeaderboard(){if(!confirm('Clear all leaderboard data?'))return;localStorage.removeItem('leaderboard');showN('🗑 Cleared','error');renderLeaderboard();}
+
+// ═══════════════ STUDENT PROGRESS ═══════════════
+function renderProgress(){
+  let users=getUs();
+  document.getElementById('secContent').innerHTML=`
+  <div class="glass-card">
+    <div style="font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:700;margin-bottom:14px">📈 Student Progress Overview</div>
+    <div style="overflow-x:auto">
+    <table class="adm-table"><thead><tr><th>Student</th><th>Verbal</th><th>Algebra</th><th>Series</th><th>Aptitude</th><th>Coding</th><th>English</th><th>Technical</th><th>Overall</th><th>Assessment</th></tr></thead>
+    <tbody>${Object.entries(users).map(([r,u])=>{
+      let p1=parseInt(localStorage.getItem('p1_done_'+r))||0,p2=parseInt(localStorage.getItem('p2_done_'+r))||0,p3=parseInt(localStorage.getItem('p3_done_'+r))||0;
+      let apt=Math.floor((p1+p2+p3)/3),cod=parseInt(localStorage.getItem('codingProg_'+r))||0,eng=parseInt(localStorage.getItem('engProg_'+r))||0,tech=parseInt(localStorage.getItem('techProg_'+r))||0;
+      let overall=Math.floor((apt+cod+eng+tech)/4);
+      let taken=localStorage.getItem('assessTaken_'+r)==='yes';
+      let board=getBoard();let entry=board.find(b=>b.name===u.name);
+      return`<tr>
+        <td><strong>${u.name}</strong><div style="font-size:10px;color:var(--text2)">${r}</div></td>
+        <td><div class="prog-bar" style="width:50px"><div class="prog-fill prog-purple" style="width:${p1}%"></div></div><div style="font-size:10px;color:var(--text2)">${p1}%</div></td>
+        <td><div class="prog-bar" style="width:50px"><div class="prog-fill prog-blue" style="width:${p2}%"></div></div><div style="font-size:10px;color:var(--text2)">${p2}%</div></td>
+        <td><div class="prog-bar" style="width:50px"><div class="prog-fill prog-gold" style="width:${p3}%"></div></div><div style="font-size:10px;color:var(--text2)">${p3}%</div></td>
+        <td style="font-weight:600;color:${apt>=70?'#86efac':apt>=40?'#fcd34d':'#fca5a5'}">${apt}%</td>
+        <td style="font-weight:600;color:${cod>=70?'#86efac':cod>=40?'#fcd34d':'#fca5a5'}">${cod}%</td>
+        <td style="font-weight:600;color:${eng>=70?'#86efac':eng>=40?'#fcd34d':'#fca5a5'}">${eng}%</td>
+        <td style="font-weight:600;color:${tech>=70?'#86efac':tech>=40?'#fcd34d':'#fca5a5'}">${tech}%</td>
+        <td><span class="badge ${overall>=70?'badge-green':overall>=40?'badge-gold':'badge-red'}">${overall}%</span></td>
+        <td>${taken?`<span class="badge badge-green">✅ ${entry?entry.score+'/20':'Done'}</span>`:'<span class="badge badge-red">⏳ No</span>'}</td>
+      </tr>`;}).join('')}
+    </tbody></table></div>
+  </div>`;
+}
+
+// ═══════════════ NOTIFICATIONS ═══════════════
+function renderNotifications(){
+  let notifs=JSON.parse(localStorage.getItem('userNotifs'))||[];
+  document.getElementById('secContent').innerHTML=`
+  <div class="glass-card" style="margin-bottom:14px">
+    <div style="font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:700;margin-bottom:14px">📤 Send Notification to All Students</div>
+    <div class="form-group"><label class="form-label">Message</label><textarea class="form-input" id="nMsg" placeholder="Type announcement for all students..." rows="3"></textarea></div>
+    <div class="form-group"><label class="form-label">Type</label><select class="form-input" id="nType" style="width:auto"><option value="info">ℹ️ Info</option><option value="warning">⚠️ Warning</option><option value="success">✅ Important</option></select></div>
+    <button class="btn btn-primary" onclick="sendNotifAll()">📤 Send to All Students</button>
+    <div id="nSent" style="color:#86efac;font-size:12px;margin-top:8px;display:none">✅ Sent!</div>
+  </div>
+  <div class="glass-card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <div style="font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:700">📋 Sent Notifications (${notifs.length})</div>
+      <button class="btn btn-danger btn-sm" onclick="clearNotifs()">🗑 Clear All</button>
+    </div>
+    ${notifs.length?notifs.map(n=>`<div style="padding:10px 0;border-bottom:1px solid var(--border);"><div style="font-size:13px">${n.msg}</div><div style="font-size:10px;color:var(--text2);margin-top:3px">${n.time||''}</div></div>`).join(''):'<div style="text-align:center;color:var(--text2);font-size:13px;padding:16px">No notifications sent yet.</div>'}
+  </div>`;
+}
+function openNotifModal(){openModal(`
+  <div style="font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:700;margin-bottom:16px">🔔 Send Notification</div>
+  <div class="form-group"><label class="form-label">Message</label><textarea class="form-input" id="qnMsg" placeholder="Type your announcement..." rows="3"></textarea></div>
+  <div style="display:flex;gap:8px"><button class="btn btn-primary" onclick="quickSendNotif()">📤 Send</button><button class="btn btn-secondary" onclick="closeModal()">Cancel</button></div>`);}
+function quickSendNotif(){let msg=document.getElementById('qnMsg').value.trim();if(!msg)return;let n=JSON.parse(localStorage.getItem('userNotifs'))||[];n.unshift({msg,time:new Date().toLocaleTimeString(),read:false});n=n.slice(0,25);localStorage.setItem('userNotifs',JSON.stringify(n));closeModal();showN('✅ Notification sent!');}
+function sendNotifAll(){let msg=document.getElementById('nMsg').value.trim();if(!msg){alert('Enter a message!');return;}let n=JSON.parse(localStorage.getItem('userNotifs'))||[];n.unshift({msg,time:new Date().toLocaleTimeString(),read:false});n=n.slice(0,25);localStorage.setItem('userNotifs',JSON.stringify(n));document.getElementById('nSent').style.display='block';setTimeout(()=>document.getElementById('nSent').style.display='none',2500);document.getElementById('nMsg').value='';showN('✅ Sent to all students!');}
+function clearNotifs(){localStorage.removeItem('userNotifs');showN('🗑 Cleared','error');renderNotifications();}
+
+// ═══════════════ SETTINGS ═══════════════
+function renderSettings(){
+  let s=getSet();let creds=adminCreds;
+  document.getElementById('secContent').innerHTML=`
+  <div class="grid2">
+    <div class="glass-card">
+      <div style="font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:700;margin-bottom:16px">🎓 Assessment Settings</div>
+      <div class="form-group"><label class="form-label">Duration (minutes)</label><input class="form-input" id="sT" type="number" value="${s.assessTime||45}" min="10" max="180"></div>
+      <div class="form-group"><label class="form-label">Secure Code (6 digits)</label><input class="form-input" id="sC" type="text" value="${s.secureCode||'123456'}" maxlength="6"></div>
+      <div class="form-group"><label class="form-label">Course Start Date</label><input class="form-input" id="sCS" value="${s.courseStart||'25 Mar 2026'}"></div>
+      <div class="form-group"><label class="form-label">Course End Date</label><input class="form-input" id="sCE" value="${s.courseEnd||'05 Apr 2026'}"></div>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px">
+        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13px"><input type="checkbox" id="sAC" ${s.antiCheat!==false?'checked':''}> Anti-cheat (tab switch detection)</label>
+        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13px"><input type="checkbox" id="sFS" ${s.forceFullscreen!==false?'checked':''}> Force fullscreen during assessment</label>
+        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13px"><input type="checkbox" id="sSH" ${s.shuffleQ!==false?'checked':''}> Shuffle questions (anti-copying)</label>
+        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13px"><input type="checkbox" id="sCD" ${s.certDownload!==false?'checked':''}> Allow certificate download</label>
+        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13px"><input type="checkbox" id="sAR" ${s.allowRetake?'checked':''}> Allow assessment retake</label>
+      </div>
+      <button class="btn btn-primary" onclick="saveSettings()">💾 Save Settings</button>
+      <div id="sSaved" style="color:#86efac;font-size:12px;margin-top:8px;display:none">✅ Saved!</div>
+    </div>
+    <div class="glass-card">
+      <div style="font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:700;margin-bottom:16px">🔐 Admin Credentials</div>
+      <div class="form-group"><label class="form-label">Current Password</label><input class="form-input" type="password" id="cpOld" placeholder="Current password"></div>
+      <div class="form-group"><label class="form-label">New Username</label><input class="form-input" id="cpUser" value="${creds.user}"></div>
+      <div class="form-group"><label class="form-label">New Password</label><input class="form-input" type="password" id="cpNew" placeholder="New password"></div>
+      <div class="form-group"><label class="form-label">Confirm Password</label><input class="form-input" type="password" id="cpConf" placeholder="Confirm password"></div>
+      <button class="btn btn-primary" onclick="changePass()">🔑 Update Credentials</button>
+      <div id="cpMsg" style="font-size:12px;margin-top:8px;display:none"></div>
+    </div>
+  </div>`;
+}
+function saveSettings(){let s={assessTime:parseInt(document.getElementById('sT').value)||45,secureCode:document.getElementById('sC').value||'123456',courseStart:document.getElementById('sCS').value,courseEnd:document.getElementById('sCE').value,antiCheat:document.getElementById('sAC').checked,forceFullscreen:document.getElementById('sFS').checked,shuffleQ:document.getElementById('sSH').checked,certDownload:document.getElementById('sCD').checked,allowRetake:document.getElementById('sAR').checked};localStorage.setItem('adminSettings',JSON.stringify(s));document.getElementById('sSaved').style.display='block';setTimeout(()=>document.getElementById('sSaved').style.display='none',2500);showN('✅ Settings saved!');}
+function changePass(){
+  let old=document.getElementById('cpOld').value,nu=document.getElementById('cpUser').value.trim(),np=document.getElementById('cpNew').value,nc=document.getElementById('cpConf').value;
+  let msg=document.getElementById('cpMsg');
+  if(old!==adminCreds.pass){msg.style.display='block';msg.style.color='#fca5a5';msg.innerText='❌ Wrong current password';return;}
+  if(np&&np!==nc){msg.style.display='block';msg.style.color='#fca5a5';msg.innerText='❌ Passwords do not match';return;}
+  adminCreds={user:nu||adminCreds.user,pass:np||adminCreds.pass};
+  localStorage.setItem('adminCreds',JSON.stringify(adminCreds));
+  msg.style.display='block';msg.style.color='#86efac';msg.innerText='✅ Updated!';showN('✅ Credentials updated!');
+}
+
+// ═══════════════ DATA MANAGEMENT ═══════════════
+function renderData(){
+  let users=getUs();
+  document.getElementById('secContent').innerHTML=`
+  <div class="glass-card" style="margin-bottom:14px">
+    <div style="font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:700;margin-bottom:6px">🗄️ Data Management</div>
+    <div style="font-size:13px;color:var(--text2);margin-bottom:16px">Clear specific data for students or reset the system.</div>
+    <div class="grid2">
+      <div>
+        <div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px">Per-Student Clear</div>
+        <div class="form-group"><label class="form-label">Select Student</label><select class="form-input" id="clrStu">${Object.entries(users).map(([r,u])=>`<option value="${r}">${u.name} (${r})</option>`).join('')}</select></div>
+        <div style="display:flex;flex-direction:column;gap:7px">
+          <button class="btn btn-secondary btn-sm" onclick="clr('answers')">🗑 Clear Answers Only</button>
+          <button class="btn btn-secondary btn-sm" onclick="clr('progress')">🗑 Clear Aptitude Progress</button>
+          <button class="btn btn-secondary btn-sm" onclick="clr('assessment')">🗑 Clear Assessment Status</button>
+          <button class="btn btn-danger btn-sm" onclick="clr('all')">🗑 Clear ALL Data for Student</button>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px">Global Actions</div>
+        <div style="display:flex;flex-direction:column;gap:7px">
+          <button class="btn btn-secondary btn-sm" onclick="clearLeaderboard2()">🗑 Clear Leaderboard</button>
+          <button class="btn btn-secondary btn-sm" onclick="clearQBank()">🗑 Clear Question Bank</button>
+          <button class="btn btn-secondary btn-sm" onclick="clearNotifs()">🗑 Clear Notifications</button>
+          <button class="btn btn-secondary btn-sm" onclick="exportAllData()">📤 Export All Data (JSON)</button>
+          <button class="btn btn-danger btn-sm" onclick="fullReset()">⚠️ Full System Reset</button>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+function clr(type){
+  let reg=document.getElementById('clrStu').value;let users=getUs();let name=(users[reg]||{}).name||'Student';
+  if(!confirm(`Clear ${type} data for ${name}?`))return;
+  if(type==='answers'){['p1_done_','p2_done_','p3_done_','answers_'+reg].forEach(k=>{Object.keys(localStorage).filter(lk=>lk.startsWith(k+reg)||lk===k).forEach(lk=>localStorage.removeItem(lk));});localStorage.removeItem('allowTest');}
+  else if(type==='progress'){['p1_done_','p2_done_','p3_done_','codingProg_','engProg_','techProg_','placeProg_','scoreHistory_'].forEach(k=>localStorage.removeItem(k+reg));}
+  else if(type==='assessment'){localStorage.removeItem('assessTaken_'+reg);let board=getBoard().filter(u=>u.name!==name);localStorage.setItem('leaderboard',JSON.stringify(board));}
+  else{['p1_done_','p2_done_','p3_done_','assessTaken_','scoreHistory_','wrongAnswers_','mockInterviewHistory_','codingProg_','engProg_','techProg_','placeProg_','badges_','streak_','lastLogin_','flagged_'].forEach(k=>localStorage.removeItem(k+reg));let board=getBoard().filter(u=>u.name!==name);localStorage.setItem('leaderboard',JSON.stringify(board));}
+  showN('✅ Cleared!');
+}
+function clearLeaderboard2(){if(!confirm('Clear leaderboard?'))return;localStorage.removeItem('leaderboard');showN('🗑 Done','error');}
+function clearQBank(){if(!confirm('Clear all questions?'))return;localStorage.removeItem('questionBank');localStorage.removeItem('techQBank');showN('🗑 Done','error');}
+function exportAllData(){
+  let data={users:getUs(),leaderboard:getBoard(),questionBank:getQBank(),settings:getSet(),batches:getBatches(),exported:new Date().toISOString()};
+  let a=document.createElement('a');a.href='data:application/json;charset=utf-8,'+encodeURIComponent(JSON.stringify(data,null,2));a.download='APTIORA_Backup_'+Date.now()+'.json';a.click();showN('📤 Data exported!');}
+function fullReset(){
+  if(!confirm('⚠️ Full reset will delete ALL data including users, questions, and results. Are you sure?'))return;
+  if(!confirm('Last warning! This cannot be undone. Confirm full reset?'))return;
+  let keep=['adminLoggedIn','adminCreds','darkMode'];let toRemove=Object.keys(localStorage).filter(k=>!keep.includes(k));toRemove.forEach(k=>localStorage.removeItem(k));showN('⚠️ System reset complete','error');setTimeout(()=>renderDashboard(),1000);
+}
 </script>
 </body>
 </html>
