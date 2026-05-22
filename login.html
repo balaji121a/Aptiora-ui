@@ -60,6 +60,9 @@ body.light .tab-btn{color:rgba(26,26,46,0.6)!important;}
 </div>
 <script src="aptiora.js"></script>
 <script>
+// Clear stale admin session
+localStorage.removeItem('adminLoggedIn');
+// Redirect student if already logged in
 if(localStorage.getItem('username')) location.href='dashboard.html';
 function setTab(t){
   document.getElementById('stuTab').classList.toggle('on',t==='student');
