@@ -59,8 +59,7 @@ body.light .college-badge{background:rgba(124,58,237,0.08)!important;}
   <div class="footer-note">AI-POWERED · SECURE ASSESSMENT · PWA ENABLED</div>
 </div>
 <script src="aptiora.js"></script>
-<script>// Auto redirect
-if(localStorage.getItem('username')) nav('dashboard.html');
-else if(localStorage.getItem('adminLoggedIn')==='yes') nav('admin.html');</script>
+<script>// Auto redirect - only student session
+if(localStorage.getItem('username')) nav('dashboard.html');</script>
 </body>
 </html>

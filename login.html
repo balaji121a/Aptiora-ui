@@ -61,7 +61,6 @@ body.light .tab-btn{color:rgba(26,26,46,0.6)!important;}
 <script src="aptiora.js"></script>
 <script>
 if(localStorage.getItem('username')) location.href='dashboard.html';
-else if(localStorage.getItem('adminLoggedIn')==='yes') location.href='admin.html';
 function setTab(t){
   document.getElementById('stuTab').classList.toggle('on',t==='student');
   document.getElementById('admTab').classList.toggle('on',t==='admin');
