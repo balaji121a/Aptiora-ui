@@ -18,9 +18,19 @@ html,body{min-height:100%;display:flex;align-items:center;justify-content:center
 .login-btn:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(124,58,237,0.45);}
 .err-msg{color:#fca5a5;font-size:13px;text-align:center;padding:9px;background:rgba(239,68,68,0.1);border-radius:var(--radius);margin-top:10px;display:none;}
 .success-msg{color:#86efac;font-size:14px;text-align:center;padding:10px;background:rgba(134,239,172,0.1);border-radius:var(--radius);margin-top:10px;display:none;font-weight:600;}
+.input-wrap{position:relative;display:flex;align-items:center;}
+.input-wrap .form-input{width:100%;padding-right:44px;}
+.eye-btn{position:absolute;right:12px;background:none;border:none;cursor:pointer;color:var(--text2);font-size:18px;line-height:1;padding:0;display:flex;align-items:center;transition:color 0.2s;}
+.eye-btn:hover{color:#a78bfa;}
+.login-btn .btn-loader{display:none;width:18px;height:18px;border:2.5px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.7s linear infinite;margin:0 auto;}
+.login-btn.loading .btn-text{display:none;}
+.login-btn.loading .btn-loader{display:block;}
+.login-btn.loading{pointer-events:none;opacity:0.85;}
+@keyframes spin{to{transform:rotate(360deg);}}
 body.light .login-card{background:rgba(255,255,255,0.93)!important;}
 body.light .tab-row{background:rgba(0,0,0,0.04)!important;border-color:rgba(0,0,0,0.1)!important;}
 body.light .tab-btn{color:rgba(26,26,46,0.6)!important;}
+body.light .eye-btn{color:rgba(26,26,46,0.4)!important;}
 </style>
 </head>
 <body>
@@ -39,9 +49,12 @@ body.light .tab-btn{color:rgba(26,26,46,0.6)!important;}
         <input class="form-input" id="regInput" placeholder="Enter your Register Number" type="text" inputmode="numeric" maxlength="15" autocomplete="username">
       </div>
       <div class="form-group"><label class="form-label">Password</label>
-        <input class="form-input" id="passInput" placeholder="Enter your password" type="password" autocomplete="current-password">
+        <div class="input-wrap">
+          <input class="form-input" id="passInput" placeholder="Enter your password" type="password" autocomplete="current-password">
+          <button class="eye-btn" type="button" onclick="toggleEye('passInput','eyeStu')" id="eyeStu" title="Show/Hide Password">👁</button>
+        </div>
       </div>
-      <button class="login-btn" onclick="stuLogin()" id="loginBtn">🚀 Login</button>
+      <button class="login-btn" onclick="stuLogin()" id="loginBtn"><span class="btn-text">🚀 Login</span><div class="btn-loader"></div></button>
       <div class="success-msg" id="stuSuccess">✅ Login Successful! Redirecting...</div>
       <div class="err-msg" id="stuErr">❌ Invalid credentials. Please try again.</div>
     </div>
@@ -50,9 +63,12 @@ body.light .tab-btn{color:rgba(26,26,46,0.6)!important;}
         <input class="form-input" id="admUser" placeholder="Enter admin username" autocomplete="username">
       </div>
       <div class="form-group"><label class="form-label">Admin Password</label>
-        <input class="form-input" id="admPass" placeholder="Enter admin password" type="password" autocomplete="current-password">
+        <div class="input-wrap">
+          <input class="form-input" id="admPass" placeholder="Enter admin password" type="password" autocomplete="current-password">
+          <button class="eye-btn" type="button" onclick="toggleEye('admPass','eyeAdm')" id="eyeAdm" title="Show/Hide Password">👁</button>
+        </div>
       </div>
-      <button class="login-btn" onclick="admLogin()" id="admBtn">🔐 Admin Login</button>
+      <button class="login-btn" onclick="admLogin()" id="admBtn"><span class="btn-text">🔐 Admin Login</span><div class="btn-loader"></div></button>
       <div class="success-msg" id="admSuccess">✅ Admin Login Successful!</div>
       <div class="err-msg" id="admErr">❌ Wrong credentials.</div>
     </div>
@@ -70,18 +86,27 @@ function setTab(t){
   document.getElementById('stuForm').style.display=t==='student'?'block':'none';
   document.getElementById('admForm').style.display=t==='admin'?'block':'none';
 }
+function toggleEye(inputId, btnId){
+  let inp=document.getElementById(inputId);
+  let btn=document.getElementById(btnId);
+  if(inp.type==='password'){inp.type='text';btn.textContent='🙈';}
+  else{inp.type='password';btn.textContent='👁';}
+}
 function stuLogin(){
   let r=document.getElementById('regInput').value.trim();
   let p=document.getElementById('passInput').value;
   let users=getUsers();
   let u=users[r];
+  let btn=document.getElementById('loginBtn');
   if(u&&(u.password===p||p==='1234'||(p===''&&u.password===undefined))){
     document.getElementById('stuErr').style.display='none';
-    document.getElementById('stuSuccess').style.display='block';
-    document.getElementById('loginBtn').disabled=true;
-    localStorage.setItem('username',r);
-    awardBadge(r,'first_practice');
-    setTimeout(()=>location.href='dashboard.html',900);
+    btn.classList.add('loading');
+    setTimeout(()=>{
+      document.getElementById('stuSuccess').style.display='block';
+      localStorage.setItem('username',r);
+      awardBadge(r,'first_practice');
+      setTimeout(()=>location.href='dashboard.html',900);
+    },900);
   } else {
     document.getElementById('stuErr').style.display='block';
     document.getElementById('stuSuccess').style.display='none';
@@ -94,12 +119,15 @@ function admLogin(){
   let creds=JSON.parse(localStorage.getItem('adminCreds'))||{user:'admin',pass:'admin123'};
   let u=document.getElementById('admUser').value.trim();
   let p=document.getElementById('admPass').value;
+  let btn=document.getElementById('admBtn');
   if(u===creds.user&&p===creds.pass){
     document.getElementById('admErr').style.display='none';
-    document.getElementById('admSuccess').style.display='block';
-    document.getElementById('admBtn').disabled=true;
-    localStorage.setItem('adminLoggedIn','yes');
-    setTimeout(()=>location.href='admin.html',900);
+    btn.classList.add('loading');
+    setTimeout(()=>{
+      document.getElementById('admSuccess').style.display='block';
+      localStorage.setItem('adminLoggedIn','yes');
+      setTimeout(()=>location.href='admin.html',900);
+    },900);
   } else {
     document.getElementById('admErr').style.display='block';
     sndWrong();
