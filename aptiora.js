@@ -51,22 +51,23 @@ function _clearSession(){
 }
 
 function getCurrentUser(){
-  // Must have BOTH: username in localStorage AND active session flag
   let reg = localStorage.getItem('username');
-  if(!reg || !_isSessionActive()){
-    _clearSession();
-    location.href = 'login.html';
-    return null;
-  }
+  let sessionOk = sessionStorage.getItem('aptSession') === '1';
+  // If no username at all → definitely not logged in
+  if(!reg){ location.href = 'login.html'; return null; }
+  // If username exists but no session → tab was closed/reopened → force login
+  if(!sessionOk){ localStorage.removeItem('username'); location.href = 'login.html'; return null; }
   return { reg, ...( getUsers()[reg] || { name: 'Student' }) };
 }
 function requireLogin(){
   let reg = localStorage.getItem('username');
-  if(!reg || !_isSessionActive()){ _clearSession(); location.href = 'login.html'; return null; }
+  let sessionOk = sessionStorage.getItem('aptSession') === '1';
+  if(!reg || !sessionOk){ localStorage.removeItem('username'); location.href = 'login.html'; return null; }
   return reg;
 }
 function logout(){
-  _clearSession();
+  localStorage.removeItem('username');
+  sessionStorage.removeItem('aptSession');
   location.href = 'login.html';
 }
 
