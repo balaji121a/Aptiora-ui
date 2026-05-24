@@ -18,7 +18,7 @@
 .adm-item.on{background:rgba(124,58,237,0.18);color:white;border-color:rgba(124,58,237,0.3);font-weight:600;}
 .adm-main{margin-left:var(--sidebar-w);min-height:100vh;position:relative;z-index:10;transition:margin-left var(--ease);}
 .adm-topbar{height:60px;padding:0 20px;display:flex;align-items:center;justify-content:space-between;background:rgba(5,5,8,0.8);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;}
-.ham-btn{display:none;background:rgba(255,255,255,0.07);border:1px solid var(--border);color:white;width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:16px;align-items:center;justify-content:center;}
+.ham-btn{display:none;background:rgba(255,255,255,0.07);border:1px solid var(--border);color:var(--tx);width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:16px;align-items:center;justify-content:center;}
 .adm-content{padding:20px;}
 /* STAT CARDS */
 .stat-grid-adm{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px;}
@@ -44,12 +44,12 @@
 .adm-notif.error{background:rgba(239,68,68,0.9);color:white;}
 .adm-notif.info{background:rgba(59,130,246,0.9);color:white;}
 @media(max-width:768px){.ham-btn{display:flex!important;}.adm-sidebar{transform:translateX(-100%);}.adm-sidebar.mob-open{transform:translateX(0)!important;}.adm-main{margin-left:0!important;}.stat-grid-adm{grid-template-columns:1fr 1fr!important;}.adm-content{padding:14px;}}
-body.light .adm-sidebar{background:rgba(255,255,255,0.96)!important;}
-body.light .adm-topbar{background:rgba(240,242,247,0.9)!important;}
-body.light .adm-table td{color:#1a1a2e!important;}
-body.light .stat-box{background:rgba(0,0,0,0.03)!important;border-color:rgba(0,0,0,0.08)!important;color:#1a1a2e!important;}
-body.light .glass-card{color:#1a1a2e!important;}
-body.light .modal-box{background:rgba(255,255,255,0.97)!important;}
+body.light .adm-sidebar{background:var(--surface);}
+body.light .adm-topbar{background:var(--surface-topbar);}
+body.light .adm-table td{color:var(--tx);}
+body.light .stat-box{background:var(--stat-bg);border-color:var(--bdr);color:var(--tx);}
+body.light .glass-card{color:var(--tx);}
+body.light .modal-box{background:var(--surface);}
 </style>
 </head>
 <body>
@@ -111,7 +111,7 @@ body.light .modal-box{background:rgba(255,255,255,0.97)!important;}
 <script src="aptiora.js"></script>
 <script>
 // Theme
-(function(){let m=localStorage.getItem('darkMode')||(window.matchMedia&&window.matchMedia('(prefers-color-scheme:light)').matches?'light':'dark');if(m==='light')document.body.classList.add('light');let btn=document.getElementById('themeBtn');if(btn){btn.innerText=m==='light'?'☀️':'🌙';btn.onclick=()=>{let l=document.body.classList.toggle('light');localStorage.setItem('darkMode',l?'light':'dark');btn.innerText=l?'☀️':'🌙';};}})();
+(function(){let m=localStorage.getItem('theme')||(window.matchMedia&&window.matchMedia('(prefers-color-scheme:light)').matches?'light':'dark');if(m==='light')document.body.classList.add('light');let btn=document.getElementById('themeBtn');if(btn){btn.innerText=m==='light'?'☀️':'🌙';btn.onclick=()=>{let l=document.body.classList.toggle('light');localStorage.setItem('theme',l?'light':'dark');btn.innerText=l?'☀️':'🌙';};}})();
 initParticles('bgCanvas');
 
 // AUTH
@@ -195,7 +195,7 @@ function renderDashboard(){
     </div>
     <div class="glass-card">
       <div style="font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:700;margin-bottom:12px">👥 Student Status</div>
-      ${Object.entries(users).map(([r,u])=>{let taken=localStorage.getItem('assessTaken_'+r)==='yes';let p1=parseInt(localStorage.getItem('p1_done_'+r))||0,p2=parseInt(localStorage.getItem('p2_done_'+r))||0,p3=parseInt(localStorage.getItem('p3_done_'+r))||0,ov=Math.floor((p1+p2+p3)/3);return`<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border);"><div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--purple),#6d28d9);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;color:white;flex-shrink:0">${u.name.charAt(0)}</div><div style="flex:1;font-size:12px;font-weight:500">${u.name}</div><div class="prog-bar" style="width:50px"><div class="prog-fill prog-purple" style="width:${ov}%"></div></div><div style="font-size:11px;color:var(--text2);width:28px;text-align:right">${ov}%</div><span class="badge ${taken?'badge-green':'badge-red'}" style="font-size:9px">${taken?'✅':'⏳'}</span></div>`;}).join('')}
+      ${Object.entries(users).map(([r,u])=>{let taken=localStorage.getItem('assessTaken_'+r)==='yes';let p1=parseInt(localStorage.getItem('p1_done_'+r))||0,p2=parseInt(localStorage.getItem('p2_done_'+r))||0,p3=parseInt(localStorage.getItem('p3_done_'+r))||0,ov=Math.floor((p1+p2+p3)/3);return`<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border);"><div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--purple),#6d28d9);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;color:var(--tx);flex-shrink:0">${u.name.charAt(0)}</div><div style="flex:1;font-size:12px;font-weight:500">${u.name}</div><div class="prog-bar" style="width:50px"><div class="prog-fill prog-purple" style="width:${ov}%"></div></div><div style="font-size:11px;color:var(--text2);width:28px;text-align:right">${ov}%</div><span class="badge ${taken?'badge-green':'badge-red'}" style="font-size:9px">${taken?'✅':'⏳'}</span></div>`;}).join('')}
     </div>
   </div>
   <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;">

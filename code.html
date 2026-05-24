@@ -10,12 +10,12 @@ html,body{height:100%;display:flex;align-items:center;justify-content:center;ove
 .card{background:rgba(13,13,20,0.88);backdrop-filter:blur(24px);border:1px solid var(--border2);border-radius:var(--radius-xl);padding:46px 42px;width:420px;max-width:100%;text-align:center;position:relative;overflow:hidden;animation:scaleIn 0.5s ease;}
 .card::before{content:"";position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(124,58,237,0.5),transparent);}
 .otp{display:flex;gap:min(10px,2vw);justify-content:center;margin:20px 0;}
-.otp input{width:min(46px,13vw);height:min(56px,15vw);text-align:center;font-size:clamp(16px,5vw,22px);font-weight:700;border:1.5px solid var(--border);border-radius:var(--radius);background:rgba(255,255,255,0.06);color:white;outline:none;font-family:'Space Grotesk',sans-serif;transition:all 0.2s;}
+.otp input{width:min(46px,13vw);height:min(56px,15vw);text-align:center;font-size:clamp(16px,5vw,22px);font-weight:700;border:1.5px solid var(--border);border-radius:var(--radius);background:rgba(255,255,255,0.06);color:var(--tx);outline:none;font-family:'Space Grotesk',sans-serif;transition:all 0.2s;}
 .otp input:focus{border-color:rgba(124,58,237,0.6);background:rgba(124,58,237,0.08);box-shadow:0 0 0 3px rgba(124,58,237,0.1);}
 #err{color:#fca5a5;font-size:13px;margin-top:10px;display:none;padding:8px;background:rgba(239,68,68,0.1);border-radius:var(--radius);}
 #succ{display:none;color:#86efac;font-size:14px;font-weight:600;margin-top:12px;padding:10px;background:rgba(134,239,172,0.1);border-radius:var(--radius);}
-body.light .card{background:rgba(255,255,255,0.93)!important;}
-body.light .otp input{background:rgba(0,0,0,0.05)!important;border-color:rgba(0,0,0,0.12)!important;color:#1a1a2e!important;}
+body.light .card{background:var(--surface);}
+body.light .otp input{background:var(--input-bg);border-color:var(--bdr2);color:var(--tx);}
 </style>
 </head>
 <body>

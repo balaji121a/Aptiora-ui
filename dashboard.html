@@ -61,7 +61,7 @@
 .chat-sug{background:rgba(255,255,255,0.05);border:1px solid var(--border);color:var(--text2);padding:3px 8px;border-radius:20px;font-size:11px;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.2s;}
 .chat-sug:hover{background:rgba(124,58,237,0.12);color:#a78bfa;}
 .chat-input-row{padding:7px 9px;border-top:1px solid var(--border);display:flex;gap:6px;}
-.chat-input{flex:1;background:rgba(255,255,255,0.06);border:1px solid var(--border);color:white;padding:7px 11px;border-radius:8px;font-size:13px;font-family:'Inter',sans-serif;outline:none;}
+.chat-input{flex:1;background:rgba(255,255,255,0.06);border:1px solid var(--border);color:var(--tx);padding:7px 11px;border-radius:8px;font-size:13px;font-family:'Inter',sans-serif;outline:none;}
 .chat-input::placeholder{color:var(--text3);}
 .chat-send{background:linear-gradient(135deg,var(--purple),#6d28d9);border:none;color:white;width:30px;height:30px;border-radius:8px;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .notif-panel{position:fixed;top:68px;right:14px;width:280px;background:rgba(13,13,20,0.97);backdrop-filter:blur(20px);border:1px solid var(--border2);border-radius:var(--radius-xl);box-shadow:0 16px 48px rgba(0,0,0,0.5);z-index:400;display:none;overflow:hidden;}
@@ -69,15 +69,15 @@
 .notif-head{padding:12px 16px;font-weight:700;font-size:13px;border-bottom:1px solid var(--border);}
 .notif-item{padding:10px 16px;border-bottom:1px solid var(--border);font-size:12px;color:var(--text2);}
 .notif-time{font-size:10px;color:var(--text3);margin-top:2px;}
-body.light .daily-card{background:linear-gradient(135deg,rgba(245,200,66,0.08),rgba(249,115,22,0.04))!important;}
-body.light .daily-opt{background:rgba(0,0,0,0.03)!important;border-color:rgba(0,0,0,0.1)!important;color:#1a1a2e!important;}
-body.light .prog-card{background:rgba(0,0,0,0.03)!important;border-color:rgba(0,0,0,0.08)!important;}
-body.light .welcome-banner{background:linear-gradient(135deg,rgba(124,58,237,0.1),rgba(59,130,246,0.06))!important;}
-body.light .welcome-name{color:#1a1a2e!important;}
-body.light .chat-win,.body.light .notif-panel{background:rgba(255,255,255,0.97)!important;}
-body.light .msg-ai{background:rgba(0,0,0,0.04)!important;color:#1a1a2e!important;}
-body.light .chat-input{background:rgba(0,0,0,0.04)!important;color:#1a1a2e!important;}
-body.light .test-mode-card{color:#1a1a2e!important;}
+body.light .daily-card{background:linear-gradient(135deg,rgba(245,200,66,0.08),rgba(249,115,22,0.04));}
+body.light .daily-opt{background:var(--stat-bg);border-color:var(--bdr2);color:var(--tx);}
+body.light .prog-card{background:var(--stat-bg);border-color:var(--bdr);}
+body.light .welcome-banner{background:linear-gradient(135deg,rgba(124,58,237,0.1),rgba(59,130,246,0.06));}
+body.light .welcome-name{color:var(--tx);}
+body.light .chat-win,.body.light .notif-panel{background:var(--surface);}
+body.light .msg-ai{background:var(--stat-bg);color:var(--tx);}
+body.light .chat-input{background:var(--stat-bg);color:var(--tx);}
+body.light .test-mode-card{color:var(--tx);}
 </style>
 </head>
 <body>
@@ -242,15 +242,15 @@ function showPerf(type,el){
   if(type==='assess'){
     let board=JSON.parse(localStorage.getItem('leaderboard'))||[];board.sort((a,b)=>b.score-a.score);
     if(!board.length){body.innerHTML='<div style="text-align:center;padding:20px;color:var(--text2);font-size:13px">No assessment results yet.</div>';return;}
-    body.innerHTML=board.slice(0,5).map((u,i)=>'<div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);"><div style="font-size:18px;width:26px;text-align:center">'+(['🥇','🥈','🥉'][i]||'#'+(i+1))+'</div><div style="width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--purple),#6d28d9);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;color:white">'+u.name.charAt(0)+'</div><div style="flex:1;font-size:13px;font-weight:500">'+u.name+'</div><div style="font-weight:700;color:'+([' #f5c842','#94a3b8','#cd7f32'][i]||'white')+'">'+u.score+'/20</div></div>').join('');
+    body.innerHTML=board.slice(0,5).map((u,i)=>'<div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);"><div style="font-size:18px;width:26px;text-align:center">'+(['🥇','🥈','🥉'][i]||'#'+(i+1))+'</div><div style="width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--purple),#6d28d9);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;color:var(--tx)">'+u.name.charAt(0)+'</div><div style="flex:1;font-size:13px;font-weight:500">'+u.name+'</div><div style="font-weight:700;color:'+([' #f5c842','#94a3b8','#cd7f32'][i]||'white')+'">'+u.score+'/20</div></div>').join('');
   } else if(type==='coding'){
     let users=getUsers();let coded=Object.keys(users).map(r=>({name:users[r].name,prog:parseInt(localStorage.getItem('codingProg_'+r))||0})).filter(u=>u.prog>0).sort((a,b)=>b.prog-a.prog);
     if(!coded.length){body.innerHTML='<div style="text-align:center;padding:20px;color:var(--text2);font-size:13px">No coding progress yet.</div>';return;}
-    body.innerHTML=coded.slice(0,5).map((u,i)=>'<div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);"><div style="font-size:18px;width:26px;text-align:center">'+(['🥇','🥈','🥉'][i]||'#'+(i+1))+'</div><div style="width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#06b6d4);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;color:white">'+u.name.charAt(0)+'</div><div style="flex:1;font-size:13px;font-weight:500">'+u.name+'</div><div class="prog-bar" style="width:60px"><div class="prog-fill prog-blue" style="width:'+u.prog+'%"></div></div><div style="font-size:12px;color:var(--blue);margin-left:6px">'+u.prog+'%</div></div>').join('');
+    body.innerHTML=coded.slice(0,5).map((u,i)=>'<div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);"><div style="font-size:18px;width:26px;text-align:center">'+(['🥇','🥈','🥉'][i]||'#'+(i+1))+'</div><div style="width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#06b6d4);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;color:var(--tx)">'+u.name.charAt(0)+'</div><div style="flex:1;font-size:13px;font-weight:500">'+u.name+'</div><div class="prog-bar" style="width:60px"><div class="prog-fill prog-blue" style="width:'+u.prog+'%"></div></div><div style="font-size:12px;color:var(--blue);margin-left:6px">'+u.prog+'%</div></div>').join('');
   } else {
     let users=getUsers();let allPerf=Object.keys(users).map(r=>{let pp1=parseInt(localStorage.getItem('p1_done_'+r))||0,pp2=parseInt(localStorage.getItem('p2_done_'+r))||0,pp3=parseInt(localStorage.getItem('p3_done_'+r))||0,cp=parseInt(localStorage.getItem('codingProg_'+r))||0,ep=parseInt(localStorage.getItem('engProg_'+r))||0,tp=parseInt(localStorage.getItem('techProg_'+r))||0;let avg=Math.floor((pp1+pp2+pp3+cp+ep+tp)/6);return{name:users[r].name,avg};}).filter(u=>u.avg>0).sort((a,b)=>b.avg-a.avg);
     if(!allPerf.length){body.innerHTML='<div style="text-align:center;padding:20px;color:var(--text2);font-size:13px">No progress yet.</div>';return;}
-    body.innerHTML=allPerf.slice(0,5).map((u,i)=>'<div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);"><div style="font-size:18px;width:26px;text-align:center">'+(['🥇','🥈','🥉'][i]||'#'+(i+1))+'</div><div style="width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--purple),#6d28d9);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;color:white">'+u.name.charAt(0)+'</div><div style="flex:1;font-size:13px;font-weight:500">'+u.name+'</div><div style="font-weight:700;color:var(--gold)">'+u.avg+'%</div></div>').join('');
+    body.innerHTML=allPerf.slice(0,5).map((u,i)=>'<div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);"><div style="font-size:18px;width:26px;text-align:center">'+(['🥇','🥈','🥉'][i]||'#'+(i+1))+'</div><div style="width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--purple),#6d28d9);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;color:var(--tx)">'+u.name.charAt(0)+'</div><div style="flex:1;font-size:13px;font-weight:500">'+u.name+'</div><div style="font-weight:700;color:var(--gold)">'+u.avg+'%</div></div>').join('');
   }
 }
 showPerf('assess',document.getElementById('pt_assess'));
