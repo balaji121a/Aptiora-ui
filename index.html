@@ -6,36 +6,202 @@
 <title>APTIORA — Aptitude Online Examination</title>
 <link rel="stylesheet" href="aptiora.css">
 <style>
-html,body{height:100%;overflow:hidden;}
-.hero{position:relative;z-index:10;width:100%;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;}
+html,body{height:100%;overflow:hidden;background:#0a0014;}
+
+/* ── 3D canvas sits behind everything ── */
+#threeCanvas{
+  position:fixed;top:0;left:0;
+  width:100%;height:100%;
+  z-index:0;
+  display:block;
+}
+
+/* ── Glow pulse ring ── */
+.glow-ring{
+  position:fixed;top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  width:600px;height:600px;
+  border-radius:50%;
+  background:radial-gradient(ellipse,rgba(124,58,237,0.1) 0%,transparent 70%);
+  pointer-events:none;z-index:1;
+  animation:pulseRing 4s ease-in-out infinite;
+}
+@keyframes pulseRing{
+  0%,100%{transform:translate(-50%,-50%) scale(1);opacity:0.7;}
+  50%{transform:translate(-50%,-50%) scale(1.2);opacity:1;}
+}
+
+/* ── Hero ── */
+.hero{
+  position:relative;z-index:10;
+  width:100%;min-height:100vh;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  text-align:center;padding:24px;
+}
+
+/* ── Logo ── */
 .logo-wrap{margin-bottom:10px;animation:scaleIn 0.7s ease;}
-.logo-icon{font-size:70px;display:block;margin-bottom:12px;}
-.logo-text{font-family:'Space Grotesk',sans-serif;font-size:clamp(42px,9vw,80px);font-weight:900;letter-spacing:5px;background:linear-gradient(135deg,#fff 20%,var(--gold) 60%,#f97316);-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1;}
-.tagline{font-family:'Space Grotesk',sans-serif;font-size:clamp(15px,3vw,20px);color:var(--text2);margin:14px 0 8px;animation:fadeUp 0.7s ease 0.15s both;letter-spacing:0.5px;}
-.sub-tagline{font-size:clamp(12px,2vw,14px);color:var(--text3);margin-bottom:36px;animation:fadeUp 0.7s ease 0.2s both;}
-.feature-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:500px;margin:0 auto 36px;animation:fadeUp 0.7s ease 0.25s both;}
+.logo-icon{
+  font-size:70px;display:block;margin-bottom:12px;
+  filter:drop-shadow(0 0 28px #7c3aed) drop-shadow(0 0 60px rgba(124,58,237,0.4));
+  animation:iconFloat 3s ease-in-out infinite;
+}
+@keyframes iconFloat{
+  0%,100%{transform:translateY(0);}
+  50%{transform:translateY(-10px);}
+}
+.logo-text{
+  font-family:'Space Grotesk',sans-serif;
+  font-size:clamp(42px,9vw,80px);
+  font-weight:900;letter-spacing:5px;
+  background:linear-gradient(135deg,#fff 20%,#c4b5fd 45%,#f59e0b 70%,#f97316 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;line-height:1;
+  text-shadow:none;
+  animation:scaleIn 0.7s ease;
+}
+
+/* ── Text ── */
+.tagline{
+  font-family:'Space Grotesk',sans-serif;
+  font-size:clamp(15px,3vw,20px);
+  color:rgba(196,181,253,0.9);
+  margin:14px 0 8px;
+  animation:fadeUp 0.7s ease 0.15s both;
+  letter-spacing:1px;
+}
+.sub-tagline{
+  font-size:clamp(12px,2vw,14px);
+  color:rgba(255,255,255,0.35);
+  margin-bottom:36px;
+  animation:fadeUp 0.7s ease 0.2s both;
+  letter-spacing:2px;
+}
+
+/* ── Feature grid ── */
+.feature-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:10px;max-width:500px;margin:0 auto 36px;
+  animation:fadeUp 0.7s ease 0.25s both;
+}
 @media(max-width:480px){.feature-grid{grid-template-columns:repeat(2,1fr);}}
-.feat-item{background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:var(--radius-lg);padding:12px 10px;text-align:center;transition:all 0.2s;}
-.feat-item:hover{background:rgba(124,58,237,0.1);border-color:rgba(124,58,237,0.3);transform:translateY(-2px);}
-.feat-icon{font-size:22px;display:block;margin-bottom:5px;}
-.feat-name{font-size:11px;font-weight:600;color:var(--text2);}
-.cta-row{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;animation:fadeUp 0.7s ease 0.35s both;}
-.cta-primary{padding:15px 42px;font-size:16px;font-weight:700;border:none;border-radius:var(--radius-lg);background:linear-gradient(135deg,var(--purple),#6d28d9);color:white;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.3s;box-shadow:0 8px 28px rgba(124,58,237,0.4);}
-.cta-primary:hover{transform:translateY(-3px);box-shadow:0 14px 36px rgba(124,58,237,0.5);}
-.cta-secondary{padding:15px 28px;font-size:15px;font-weight:700;border:1px solid var(--border2);border-radius:var(--radius-lg);background:rgba(255,255,255,0.07);color:white;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.3s;}
+.feat-item{
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(139,92,246,0.2);
+  border-radius:14px;padding:13px 10px;
+  text-align:center;
+  transition:all 0.3s;
+  position:relative;overflow:hidden;
+  cursor:pointer;
+  backdrop-filter:blur(6px);
+}
+.feat-item::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(124,58,237,0.18),transparent);
+  opacity:0;transition:opacity 0.3s;
+}
+.feat-item:hover{
+  background:rgba(124,58,237,0.12);
+  border-color:rgba(124,58,237,0.55);
+  transform:translateY(-6px) scale(1.06);
+  box-shadow:0 0 22px rgba(124,58,237,0.45),0 0 50px rgba(124,58,237,0.1);
+}
+.feat-item:hover::before{opacity:1;}
+.feat-icon{font-size:24px;display:block;margin-bottom:5px;}
+.feat-name{font-size:11px;font-weight:700;color:rgba(196,181,253,0.85);letter-spacing:1px;text-transform:uppercase;}
+
+/* ── CTA ── */
+.cta-row{
+  display:flex;gap:12px;flex-wrap:wrap;
+  justify-content:center;
+  animation:fadeUp 0.7s ease 0.35s both;
+}
+.cta-primary{
+  padding:16px 52px;font-size:16px;font-weight:800;
+  border:none;border-radius:16px;
+  background:linear-gradient(135deg,#7c3aed,#5b21b6);
+  color:white;cursor:pointer;
+  font-family:'Inter',sans-serif;
+  letter-spacing:1px;
+  transition:all 0.3s;
+  box-shadow:0 8px 32px rgba(124,58,237,0.5),inset 0 1px 0 rgba(255,255,255,0.15);
+  position:relative;overflow:hidden;
+}
+.cta-primary::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,0.1),transparent);
+  pointer-events:none;
+}
+.cta-primary:hover{
+  transform:translateY(-4px) scale(1.04);
+  box-shadow:0 16px 48px rgba(124,58,237,0.7),0 0 80px rgba(124,58,237,0.3);
+}
+.cta-secondary{
+  padding:15px 28px;font-size:15px;font-weight:700;
+  border:1px solid rgba(139,92,246,0.35);
+  border-radius:16px;
+  background:rgba(255,255,255,0.06);
+  color:white;cursor:pointer;
+  font-family:'Inter',sans-serif;
+  backdrop-filter:blur(8px);
+  transition:all 0.3s;
+}
 .cta-secondary:hover{background:rgba(255,255,255,0.12);}
-.footer-note{margin-top:28px;font-size:11px;color:var(--text3);animation:fadeUp 0.7s ease 0.45s both;letter-spacing:0.5px;}
-.college-badge{display:inline-flex;align-items:center;gap:7px;background:rgba(124,58,237,0.12);border:1px solid rgba(124,58,237,0.25);border-radius:20px;padding:6px 16px;font-size:12px;color:#a78bfa;font-weight:600;margin-bottom:24px;animation:fadeUp 0.7s ease 0.1s both;}
+
+/* ── Badge ── */
+.college-badge{
+  display:inline-flex;align-items:center;gap:7px;
+  background:rgba(124,58,237,0.12);
+  border:1px solid rgba(124,58,237,0.3);
+  border-radius:20px;padding:6px 16px;
+  font-size:12px;color:#a78bfa;font-weight:600;
+  margin-bottom:24px;
+  animation:fadeUp 0.7s ease 0.1s both;
+  backdrop-filter:blur(8px);
+  letter-spacing:0.5px;
+}
+
+/* ── Footer ── */
+.footer-note{
+  margin-top:28px;font-size:10px;
+  color:rgba(255,255,255,0.2);
+  animation:fadeUp 0.7s ease 0.45s both;
+  letter-spacing:3px;
+}
+
+/* ── Keyframes ── */
+@keyframes scaleIn{
+  from{opacity:0;transform:scale(0.8);}
+  to{opacity:1;transform:scale(1);}
+}
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(28px);}
+  to{opacity:1;transform:translateY(0);}
+}
+
+/* ── Light mode overrides ── */
+body.light{background:#f0ecff;}
 body.light .feat-item{background:rgba(0,0,0,0.04)!important;border-color:rgba(0,0,0,0.08)!important;}
 body.light .feat-name{color:rgba(26,26,46,0.6)!important;}
 body.light .cta-secondary{background:rgba(0,0,0,0.05)!important;border-color:rgba(0,0,0,0.12)!important;color:#1a1a2e!important;}
-body.light .footer-note{color:rgba(26,26,46,0.35)!important;}
+body.light .footer-note{color:rgba(26,26,46,0.3)!important;}
 body.light .college-badge{background:rgba(124,58,237,0.08)!important;}
+body.light .tagline{color:rgba(80,40,160,0.85)!important;}
+body.light .sub-tagline{color:rgba(80,40,160,0.45)!important;}
 </style>
 </head>
 <body>
-<div class="orb orb1"></div><div class="orb orb2"></div><div class="orb orb3"></div>
-<canvas class="bg-canvas" id="bgCanvas"></canvas>
+
+<!-- 3D Background Canvas -->
+<canvas id="threeCanvas"></canvas>
+<div class="glow-ring"></div>
+
+<!-- Original orb divs kept for aptiora.css compatibility -->
+<div class="orb orb1" style="display:none"></div>
+<div class="orb orb2" style="display:none"></div>
+<div class="orb orb3" style="display:none"></div>
+
 <div class="hero">
   <div class="logo-wrap">
     <span class="logo-icon">📘</span>
@@ -53,13 +219,214 @@ body.light .college-badge{background:rgba(124,58,237,0.08)!important;}
     <div class="feat-item"><span class="feat-icon">🏢</span><div class="feat-name">Placement</div></div>
   </div>
   <div class="cta-row">
-    <button class="cta-primary" onclick="nav('login.html')">🚀 Login to Portal</button>
-    <button class="cta-secondary" onclick="nav('admin.html')">⚙️ Admin</button>
+    <button class="cta-primary" onclick="nav('login.html')">🚀 Start</button>
   </div>
   <div class="footer-note">AI-POWERED · SECURE ASSESSMENT · PWA ENABLED</div>
 </div>
+
+<!-- Three.js CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+<!-- 3D Scene Script -->
+<script>
+(function(){
+  const canvas = document.getElementById('threeCanvas');
+  const renderer = new THREE.WebGLRenderer({canvas, antialias:true, alpha:false});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setClearColor(0x0a0014, 1);
+
+  const scene = new THREE.Scene();
+  scene.fog = new THREE.FogExp2(0x0a0014, 0.007);
+
+  const camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 2000);
+  camera.position.set(0, 0, 80);
+
+  // Lights
+  scene.add(new THREE.AmbientLight(0x7c3aed, 0.5));
+  const dirLight = new THREE.DirectionalLight(0xffffff, 0.7);
+  dirLight.position.set(1,1,1);
+  scene.add(dirLight);
+
+  const purpleLight = new THREE.PointLight(0x7c3aed, 2.5, 130);
+  purpleLight.position.set(0,0,30);
+  scene.add(purpleLight);
+
+  const goldLight = new THREE.PointLight(0xf59e0b, 1.8, 120);
+  goldLight.position.set(30,-20,10);
+  scene.add(goldLight);
+
+  const blueLight = new THREE.PointLight(0x3b82f6, 1.2, 100);
+  blueLight.position.set(-30,20,0);
+  scene.add(blueLight);
+
+  // ── Floating geometric shapes ──
+  const shapes = [];
+  const geoTypes = [
+    new THREE.IcosahedronGeometry(5,0),
+    new THREE.OctahedronGeometry(4,0),
+    new THREE.TetrahedronGeometry(4,0),
+    new THREE.IcosahedronGeometry(3,0),
+    new THREE.OctahedronGeometry(6,0),
+    new THREE.TetrahedronGeometry(5,0),
+  ];
+  const colors = [0x7c3aed,0x5b21b6,0xf59e0b,0xc4b5fd,0x6d28d9,0xf97316,0x3b82f6,0xa78bfa];
+
+  for(let i=0;i<20;i++){
+    const geo = geoTypes[i % geoTypes.length];
+    const mat = new THREE.MeshStandardMaterial({
+      color: colors[i % colors.length],
+      wireframe: i % 3 !== 0,
+      metalness: 0.7,
+      roughness: 0.25,
+      transparent: true,
+      opacity: 0.45 + Math.random()*0.4
+    });
+    const mesh = new THREE.Mesh(geo, mat);
+    mesh.position.set(
+      (Math.random()-0.5)*200,
+      (Math.random()-0.5)*110,
+      (Math.random()-0.5)*90 - 20
+    );
+    mesh.rotation.set(Math.random()*Math.PI*2, Math.random()*Math.PI*2, 0);
+    const s = 0.4 + Math.random()*0.9;
+    mesh.scale.set(s,s,s);
+    mesh.userData = {
+      rx: (Math.random()-0.5)*0.009,
+      ry: (Math.random()-0.5)*0.013,
+      rz: (Math.random()-0.5)*0.007,
+      floatSpeed: 0.3 + Math.random()*0.7,
+      floatAmp:   1.5 + Math.random()*2,
+      floatOffset:Math.random()*Math.PI*2
+    };
+    scene.add(mesh);
+    shapes.push(mesh);
+  }
+
+  // ── Particle field ──
+  const pCount = 3500;
+  const pos = new Float32Array(pCount*3);
+  const col = new Float32Array(pCount*3);
+  const pColors = [
+    new THREE.Color(0x7c3aed),
+    new THREE.Color(0xf59e0b),
+    new THREE.Color(0xc4b5fd),
+    new THREE.Color(0xffffff),
+    new THREE.Color(0x3b82f6),
+  ];
+  for(let i=0;i<pCount;i++){
+    pos[i*3]   = (Math.random()-0.5)*450;
+    pos[i*3+1] = (Math.random()-0.5)*280;
+    pos[i*3+2] = (Math.random()-0.5)*220 - 40;
+    const c = pColors[Math.floor(Math.random()*pColors.length)];
+    col[i*3]=c.r; col[i*3+1]=c.g; col[i*3+2]=c.b;
+  }
+  const pGeo = new THREE.BufferGeometry();
+  pGeo.setAttribute('position', new THREE.BufferAttribute(pos,3));
+  pGeo.setAttribute('color',    new THREE.BufferAttribute(col,3));
+  const pMat = new THREE.PointsMaterial({size:0.55, vertexColors:true, transparent:true, opacity:0.75, sizeAttenuation:true});
+  const particles = new THREE.Points(pGeo, pMat);
+  scene.add(particles);
+
+  // ── Grid floor ──
+  const grid = new THREE.GridHelper(320, 42, 0x7c3aed, 0x3b0764);
+  grid.position.y = -46;
+  grid.material.transparent = true;
+  grid.material.opacity = 0.22;
+  scene.add(grid);
+
+  // ── Torus rings ──
+  const ring1 = new THREE.Mesh(
+    new THREE.TorusGeometry(24, 0.4, 8, 90),
+    new THREE.MeshStandardMaterial({color:0x7c3aed, metalness:0.95, roughness:0.05, transparent:true, opacity:0.5})
+  );
+  ring1.rotation.x = Math.PI/2.5;
+  ring1.position.z = -10;
+  scene.add(ring1);
+
+  const ring2 = new THREE.Mesh(
+    new THREE.TorusGeometry(38, 0.3, 8, 90),
+    new THREE.MeshStandardMaterial({color:0xf59e0b, metalness:0.95, roughness:0.05, transparent:true, opacity:0.3})
+  );
+  ring2.rotation.x = Math.PI/2.2;
+  ring2.rotation.y = 0.4;
+  ring2.position.z = -18;
+  scene.add(ring2);
+
+  const ring3 = new THREE.Mesh(
+    new THREE.TorusGeometry(50, 0.2, 8, 90),
+    new THREE.MeshStandardMaterial({color:0x3b82f6, metalness:0.95, roughness:0.05, transparent:true, opacity:0.2})
+  );
+  ring3.rotation.x = Math.PI/2.8;
+  ring3.rotation.z = 0.5;
+  ring3.position.z = -25;
+  scene.add(ring3);
+
+  // ── Mouse parallax ──
+  let mx=0, my=0;
+  document.addEventListener('mousemove',e=>{
+    mx = (e.clientX/window.innerWidth - 0.5)*2;
+    my = (e.clientY/window.innerHeight - 0.5)*2;
+  });
+
+  // ── Resize ──
+  window.addEventListener('resize',()=>{
+    camera.aspect = window.innerWidth/window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  });
+
+  // ── Animate ──
+  let t=0;
+  function animate(){
+    requestAnimationFrame(animate);
+    t += 0.006;
+
+    // Camera parallax
+    camera.position.x += (mx*9 - camera.position.x)*0.04;
+    camera.position.y += (-my*6 - camera.position.y)*0.04;
+    camera.lookAt(0,0,0);
+
+    // Float shapes
+    shapes.forEach(m=>{
+      m.rotation.x += m.userData.rx;
+      m.rotation.y += m.userData.ry;
+      m.rotation.z += m.userData.rz;
+      m.position.y += Math.sin(t*m.userData.floatSpeed + m.userData.floatOffset)*0.018*m.userData.floatAmp;
+    });
+
+    // Spin rings
+    ring1.rotation.z += 0.004;
+    ring2.rotation.z -= 0.003;
+    ring3.rotation.z += 0.002;
+
+    // Drift particles
+    particles.rotation.y += 0.0004;
+    particles.rotation.x += 0.0002;
+
+    // Pulse grid
+    grid.position.y = -46 + Math.sin(t*0.5)*1.5;
+
+    // Dynamic lights
+    purpleLight.intensity = 1.8 + Math.sin(t*1.5)*1.0;
+    purpleLight.position.x = Math.sin(t*0.5)*22;
+    purpleLight.position.y = Math.cos(t*0.4)*15;
+    goldLight.position.x   = Math.cos(t*0.4)*25;
+    goldLight.position.y   = Math.sin(t*0.6)*15;
+
+    renderer.render(scene, camera);
+  }
+  animate();
+})();
+</script>
+
+<!-- Original app scripts -->
 <script src="aptiora.js"></script>
-<script>// Auto redirect - only student session
-if(localStorage.getItem('username')) nav('dashboard.html');</script>
+<script>
+// Clear any stale admin session on landing
+localStorage.removeItem('adminLoggedIn');
+// Auto redirect only if student is logged in
+if(localStorage.getItem('username')) nav('dashboard.html');
+</script>
 </body>
 </html>
