@@ -27,10 +27,10 @@ html,body{min-height:100%;display:flex;align-items:center;justify-content:center
 .login-btn.loading .btn-loader{display:block;}
 .login-btn.loading{pointer-events:none;opacity:0.85;}
 @keyframes spin{to{transform:rotate(360deg);}}
-body.light .login-card{background:var(--surface);}
-body.light .tab-row{background:var(--stat-bg);border-color:var(--bdr2);}
-body.light .tab-btn{color:var(--tx-2);}
-body.light .eye-btn{color:var(--tx-2);}
+body.light .login-card{background:rgba(255,255,255,0.93)!important;}
+body.light .tab-row{background:rgba(0,0,0,0.04)!important;border-color:rgba(0,0,0,0.1)!important;}
+body.light .tab-btn{color:rgba(26,26,46,0.6)!important;}
+body.light .eye-btn{color:rgba(26,26,46,0.4)!important;}
 </style>
 </head>
 <body>
@@ -77,9 +77,9 @@ body.light .eye-btn{color:var(--tx-2);}
 <script src="aptiora.js"></script>
 <script>
 // Clear stale admin session
-localStorage.removeItem('adminLoggedIn');
+sessionStorage.removeItem('adminLoggedIn');
 // Redirect student if already logged in
-if(localStorage.getItem('username')) location.href='dashboard.html';
+// Session-based: no auto-redirect on login page
 function setTab(t){
   document.getElementById('stuTab').classList.toggle('on',t==='student');
   document.getElementById('admTab').classList.toggle('on',t==='admin');
@@ -103,7 +103,7 @@ function stuLogin(){
     btn.classList.add('loading');
     setTimeout(()=>{
       document.getElementById('stuSuccess').style.display='block';
-      localStorage.setItem('username',r);
+      sessionStorage.setItem('username',r);
       awardBadge(r,'first_practice');
       setTimeout(()=>location.href='dashboard.html',900);
     },900);
@@ -125,7 +125,7 @@ function admLogin(){
     btn.classList.add('loading');
     setTimeout(()=>{
       document.getElementById('admSuccess').style.display='block';
-      localStorage.setItem('adminLoggedIn','yes');
+      sessionStorage.setItem('adminLoggedIn','yes');
       setTimeout(()=>location.href='admin.html',900);
     },900);
   } else {

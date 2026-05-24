@@ -45,7 +45,7 @@ body.light .score-ring::before{background:var(--bg);}
 <script src="aptiora.js"></script>
 <script>
 let score=Number(localStorage.getItem('pscore'))||0,time=Number(localStorage.getItem('ptime'))||0;
-let reg=localStorage.getItem('username')||'Guest';
+let reg=sessionStorage.getItem('username')||'Guest';
 let total=20,pct=Math.round((score/total)*100);
 document.getElementById('scoreNum').innerText=score;
 document.getElementById('scoreTotal').innerText='/ '+total;

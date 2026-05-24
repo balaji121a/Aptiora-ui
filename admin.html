@@ -116,7 +116,7 @@ initParticles('bgCanvas');
 
 // AUTH
 let adminCreds=JSON.parse(localStorage.getItem('adminCreds'))||{user:'admin',pass:'admin123'};
-if(localStorage.getItem('adminLoggedIn')!=='yes'){showLoginScreen();} else {renderDashboard();}
+if(sessionStorage.getItem('adminLoggedIn')!=='yes'){showLoginScreen();} else {renderDashboard();}
 
 function showLoginScreen(){
   document.getElementById('secContent').innerHTML=`
@@ -137,17 +137,17 @@ function showLoginScreen(){
 }
 function doLogin(){
   let u=document.getElementById('aU')?.value.trim(),p=document.getElementById('aP')?.value;
-  if(u===adminCreds.user&&p===adminCreds.pass){localStorage.setItem('adminLoggedIn','yes');renderDashboard();}
+  if(u===adminCreds.user&&p===adminCreds.pass){sessionStorage.setItem('adminLoggedIn','yes');renderDashboard();}
   else{let e=document.getElementById('aErr');if(e)e.style.display='block';}
 }
-function admLogout(){localStorage.removeItem('adminLoggedIn');location.href='login.html';}
+function admLogout(){sessionStorage.removeItem('adminLoggedIn');location.href='login.html';}
 
 // SIDEBAR
 function toggleSb(){let s=document.getElementById('admSb'),o=document.getElementById('mobOvl');s.classList.toggle('mob-open');o.classList.toggle('on');}
 function closeSb(){document.getElementById('admSb').classList.remove('mob-open');document.getElementById('mobOvl').classList.remove('on');}
 
 function showSec(sec,el){
-  if(localStorage.getItem('adminLoggedIn')!=='yes'){showLoginScreen();return;}
+  if(sessionStorage.getItem('adminLoggedIn')!=='yes'){showLoginScreen();return;}
   document.querySelectorAll('.adm-item').forEach(i=>i.classList.remove('on'));
   if(el)el.classList.add('on');
   closeSb();
