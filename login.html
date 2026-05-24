@@ -7,26 +7,31 @@
 <style>
 html,body{min-height:100%;display:flex;align-items:center;justify-content:center;}
 .login-page{position:relative;z-index:10;width:100%;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;}
-.login-card{background:var(--surface2);backdrop-filter:blur(24px);border:1px solid var(--bdr2);border-radius:var(--radius-xl);padding:44px 40px;width:420px;max-width:100%;position:relative;overflow:hidden;animation:scaleIn 0.5s ease;}
+.login-card{background:var(--surface2,rgba(13,13,20,0.88));backdrop-filter:blur(24px);border:1px solid var(--bdr2,rgba(255,255,255,0.14));border-radius:var(--radius-xl,28px);padding:44px 40px;width:420px;max-width:100%;position:relative;overflow:hidden;animation:scaleIn 0.5s ease;}
 .login-card::before{content:"";position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(124,58,237,0.5),transparent);}
-.login-logo{font-family:'Space Grotesk',sans-serif;font-size:26px;font-weight:800;letter-spacing:3px;background:linear-gradient(135deg,var(--logo-grad-start,#fff) 30%,var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-align:center;margin-bottom:4px;}
-.login-tagline{text-align:center;font-size:13px;color:var(--tx-2);margin-bottom:28px;}
-.tab-row{display:flex;gap:0;background:var(--hover-surface);border:1px solid var(--bdr);border-radius:var(--radius);padding:3px;margin-bottom:22px;}
-.tab-btn{flex:1;padding:9px;border:none;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.2s;color:var(--tx-2);background:none;}
-.tab-btn.on{background:linear-gradient(135deg,var(--purple),#6d28d9);color:#fff;box-shadow:0 4px 12px rgba(124,58,237,0.3);}
-.login-btn{width:100%;padding:14px;border:none;border-radius:var(--radius);background:linear-gradient(135deg,var(--purple),#6d28d9);color:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.3s;box-shadow:0 6px 20px rgba(124,58,237,0.35);margin-top:4px;position:relative;overflow:hidden;}
+.login-logo{font-family:'Space Grotesk',sans-serif;font-size:26px;font-weight:800;letter-spacing:3px;background:linear-gradient(135deg,#fff 30%,#f5c842);-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-align:center;margin-bottom:4px;}
+.login-tagline{text-align:center;font-size:13px;color:var(--tx-2,rgba(255,255,255,0.55));margin-bottom:28px;}
+.tab-row{display:flex;background:rgba(255,255,255,0.05);border:1px solid var(--bdr,rgba(255,255,255,0.08));border-radius:14px;padding:3px;margin-bottom:22px;}
+.tab-btn{flex:1;padding:9px;border:none;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.2s;color:var(--tx-2,rgba(255,255,255,0.55));background:none;}
+.tab-btn.on{background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#fff;box-shadow:0 4px 12px rgba(124,58,237,0.3);}
+.login-btn{width:100%;padding:14px;border:none;border-radius:14px;background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.3s;box-shadow:0 6px 20px rgba(124,58,237,0.35);margin-top:4px;position:relative;overflow:hidden;}
 .login-btn:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(124,58,237,0.45);}
-.err-msg{color:#fca5a5;font-size:13px;text-align:center;padding:9px;background:rgba(239,68,68,0.1);border-radius:var(--radius);margin-top:10px;display:none;}
-.success-msg{color:#86efac;font-size:14px;text-align:center;padding:10px;background:rgba(134,239,172,0.1);border-radius:var(--radius);margin-top:10px;display:none;font-weight:600;}
+.err-msg{color:#fca5a5;font-size:13px;text-align:center;padding:9px;background:rgba(239,68,68,0.1);border-radius:12px;margin-top:10px;display:none;}
+.success-msg{color:#86efac;font-size:14px;text-align:center;padding:10px;background:rgba(134,239,172,0.1);border-radius:12px;margin-top:10px;display:none;font-weight:600;}
 .input-wrap{position:relative;display:flex;align-items:center;}
 .input-wrap .form-input{width:100%;padding-right:44px;}
-.eye-btn{position:absolute;right:12px;background:none;border:none;cursor:pointer;color:var(--tx-2);font-size:18px;line-height:1;padding:0;display:flex;align-items:center;transition:color 0.2s;}
+.eye-btn{position:absolute;right:12px;background:none;border:none;cursor:pointer;color:var(--tx-2,rgba(255,255,255,0.55));font-size:18px;line-height:1;padding:0;display:flex;align-items:center;transition:color 0.2s;}
 .eye-btn:hover{color:#a78bfa;}
-.login-btn .btn-loader{display:none;width:18px;height:18px;border:2.5px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.7s linear infinite;margin:0 auto;}
+.spin{display:none;width:18px;height:18px;border:2.5px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:sp 0.7s linear infinite;margin:0 auto;}
 .login-btn.loading .btn-text{display:none;}
-.login-btn.loading .btn-loader{display:block;}
+.login-btn.loading .spin{display:block;}
 .login-btn.loading{pointer-events:none;opacity:0.85;}
-@keyframes spin{to{transform:rotate(360deg);}}
+@keyframes sp{to{transform:rotate(360deg);}}
+body.light .login-card{background:rgba(255,255,255,0.93);}
+body.light .login-logo{background:linear-gradient(135deg,#1a1a2e 30%,#7c3aed);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+body.light .tab-row{background:rgba(0,0,0,0.04);border-color:rgba(0,0,0,0.1);}
+body.light .tab-btn{color:rgba(26,26,46,0.6);}
+body.light .eye-btn{color:rgba(26,26,46,0.4);}
 </style>
 </head>
 <body>
@@ -40,99 +45,170 @@ html,body{min-height:100%;display:flex;align-items:center;justify-content:center
       <button class="tab-btn on" id="stuTab" onclick="setTab('student')">🎓 Student</button>
       <button class="tab-btn" id="admTab" onclick="setTab('admin')">⚙️ Admin</button>
     </div>
+
+    <!-- Student Form -->
     <div id="stuForm">
-      <div class="form-group"><label class="form-label">Register Number</label>
-        <input class="form-input" id="regInput" placeholder="Enter your Register Number" type="text" inputmode="numeric" maxlength="15" autocomplete="username">
+      <div class="form-group">
+        <label class="form-label">Register Number</label>
+        <input class="form-input" id="regInput" placeholder="e.g. 714524205005" type="text" inputmode="numeric" maxlength="15" autocomplete="username">
       </div>
-      <div class="form-group"><label class="form-label">Password</label>
+      <div class="form-group">
+        <label class="form-label">Password</label>
         <div class="input-wrap">
           <input class="form-input" id="passInput" placeholder="Enter your password" type="password" autocomplete="current-password">
           <button class="eye-btn" type="button" onclick="toggleEye('passInput','eyeStu')" id="eyeStu">👁</button>
         </div>
       </div>
-      <button class="login-btn" onclick="stuLogin()" id="loginBtn"><span class="btn-text">🚀 Login</span><div class="btn-loader"></div></button>
-      <div class="success-msg" id="stuSuccess">✅ Login Successful! Redirecting...</div>
-      <div class="err-msg" id="stuErr">❌ Invalid credentials. Please try again.</div>
+      <button class="login-btn" onclick="stuLogin()" id="loginBtn">
+        <span class="btn-text">🚀 Login</span>
+        <div class="spin"></div>
+      </button>
+      <div class="success-msg" id="stuSuccess">✅ Login Successful! Entering...</div>
+      <div class="err-msg" id="stuErr"></div>
     </div>
+
+    <!-- Admin Form -->
     <div id="admForm" style="display:none">
-      <div class="form-group"><label class="form-label">Admin Username</label>
+      <div class="form-group">
+        <label class="form-label">Admin Username</label>
         <input class="form-input" id="admUser" placeholder="Enter admin username" autocomplete="username">
       </div>
-      <div class="form-group"><label class="form-label">Admin Password</label>
+      <div class="form-group">
+        <label class="form-label">Admin Password</label>
         <div class="input-wrap">
           <input class="form-input" id="admPass" placeholder="Enter admin password" type="password" autocomplete="current-password">
           <button class="eye-btn" type="button" onclick="toggleEye('admPass','eyeAdm')" id="eyeAdm">👁</button>
         </div>
       </div>
-      <button class="login-btn" onclick="admLogin()" id="admBtn"><span class="btn-text">🔐 Admin Login</span><div class="btn-loader"></div></button>
+      <button class="login-btn" onclick="admLogin()" id="admBtn">
+        <span class="btn-text">🔐 Admin Login</span>
+        <div class="spin"></div>
+      </button>
       <div class="success-msg" id="admSuccess">✅ Admin Login Successful!</div>
-      <div class="err-msg" id="admErr">❌ Wrong credentials.</div>
+      <div class="err-msg" id="admErr"></div>
     </div>
   </div>
 </div>
+
 <script src="aptiora.js"></script>
 <script>
-// Login page — do NOT clear session here (index.html handles that)
-// If already has a valid session, go straight to dashboard
-if(localStorage.getItem('username') && sessionStorage.getItem('aptSession')==='1'){
-  location.replace('dashboard.html');
+/* ── SESSION HELPERS — defined inline so they work regardless of aptiora.js version ── */
+function doStartSession(reg){
+  localStorage.setItem('username', reg);
+  sessionStorage.setItem('aptSession', '1');
+}
+function doStartAdminSession(){
+  sessionStorage.setItem('adminSession', '1');
+}
+function hasActiveSession(){
+  return localStorage.getItem('username') &&
+         sessionStorage.getItem('aptSession') === '1';
 }
 
+/* If already logged in this tab → skip login page */
+if(hasActiveSession()) location.replace('dashboard.html');
+
+/* ── UI ── */
 function setTab(t){
-  document.getElementById('stuTab').classList.toggle('on',t==='student');
-  document.getElementById('admTab').classList.toggle('on',t==='admin');
-  document.getElementById('stuForm').style.display=t==='student'?'block':'none';
-  document.getElementById('admForm').style.display=t==='admin'?'block':'none';
+  document.getElementById('stuTab').classList.toggle('on', t==='student');
+  document.getElementById('admTab').classList.toggle('on', t==='admin');
+  document.getElementById('stuForm').style.display = t==='student' ? 'block' : 'none';
+  document.getElementById('admForm').style.display = t==='admin'   ? 'block' : 'none';
 }
-function toggleEye(inputId,btnId){
-  let inp=document.getElementById(inputId),btn=document.getElementById(btnId);
-  if(inp.type==='password'){inp.type='text';btn.textContent='🙈';}
-  else{inp.type='password';btn.textContent='👁';}
+function toggleEye(inputId, btnId){
+  let inp = document.getElementById(inputId);
+  let btn = document.getElementById(btnId);
+  inp.type = inp.type==='password' ? 'text' : 'password';
+  btn.textContent = inp.type==='text' ? '🙈' : '👁';
 }
+
+/* ── STUDENT LOGIN ── */
 function stuLogin(){
-  let r=document.getElementById('regInput').value.trim();
-  let p=document.getElementById('passInput').value;
-  let users=getUsers(), u=users[r];
-  let btn=document.getElementById('loginBtn');
-  if(u && (u.password===p || p==='1234')){
-    document.getElementById('stuErr').style.display='none';
-    btn.classList.add('loading');
-    // Set session IMMEDIATELY — before any timeout
-    _startSession(r);
-    awardBadge(r,'first_practice');
-    setTimeout(()=>{
-      document.getElementById('stuSuccess').style.display='block';
-      setTimeout(()=>location.replace('dashboard.html'), 700);
-    }, 400);
-  } else {
-    document.getElementById('stuErr').style.display='block';
-    document.getElementById('stuSuccess').style.display='none';
-    document.getElementById('regInput').style.borderColor='rgba(239,68,68,0.5)';
-    setTimeout(()=>document.getElementById('regInput').style.borderColor='',800);
-    sndWrong();
+  let reg = document.getElementById('regInput').value.trim();
+  let pass = document.getElementById('passInput').value;
+  let errEl = document.getElementById('stuErr');
+  let succEl = document.getElementById('stuSuccess');
+  let btn = document.getElementById('loginBtn');
+
+  errEl.style.display = 'none';
+  succEl.style.display = 'none';
+
+  if(!reg){ showErr(errEl, '❌ Enter your Register Number'); return; }
+  if(!pass){ showErr(errEl, '❌ Enter your password'); return; }
+
+  // Get users — try aptiora.js getUsers() if available, else fallback
+  let users = {};
+  try { users = getUsers(); } catch(e){
+    users = JSON.parse(localStorage.getItem('users')) || {
+      '714524205005':{name:'Balaji',  password:'1234'},
+      '714524205053':{name:'Vicky',   password:'1234'},
+      '714524205027':{name:'Ismail',  password:'1234'},
+      '714524205041':{name:'Sakthivel',password:'1234'}
+    };
   }
+
+  let u = users[reg];
+  if(!u){
+    showErr(errEl, '❌ Register number not found');
+    shake(document.getElementById('regInput'));
+    return;
+  }
+  if(u.password !== pass){
+    showErr(errEl, '❌ Wrong password. Try again.');
+    shake(document.getElementById('passInput'));
+    try{ sndWrong(); }catch(e){}
+    return;
+  }
+
+  /* Valid — start session and redirect */
+  btn.classList.add('loading');
+  doStartSession(reg);
+  try{ awardBadge(reg,'first_practice'); }catch(e){}
+
+  setTimeout(()=>{
+    succEl.style.display = 'block';
+    setTimeout(()=> location.replace('dashboard.html'), 600);
+  }, 350);
 }
+
+/* ── ADMIN LOGIN ── */
 function admLogin(){
-  let creds=JSON.parse(localStorage.getItem('adminCreds'))||{user:'admin',pass:'admin123'};
-  let u=document.getElementById('admUser').value.trim();
-  let p=document.getElementById('admPass').value;
-  let btn=document.getElementById('admBtn');
-  if(u===creds.user && p===creds.pass){
-    document.getElementById('admErr').style.display='none';
+  let uVal = document.getElementById('admUser').value.trim();
+  let pVal = document.getElementById('admPass').value;
+  let errEl = document.getElementById('admErr');
+  let succEl = document.getElementById('admSuccess');
+  let btn = document.getElementById('admBtn');
+
+  errEl.style.display = 'none';
+  succEl.style.display = 'none';
+
+  if(!uVal || !pVal){ showErr(errEl, '❌ Enter username and password'); return; }
+
+  let creds = JSON.parse(localStorage.getItem('adminCreds')) || {user:'admin', pass:'admin123'};
+  if(uVal === creds.user && pVal === creds.pass){
     btn.classList.add('loading');
-    sessionStorage.setItem('adminSession','1');
+    doStartAdminSession();
     setTimeout(()=>{
-      document.getElementById('admSuccess').style.display='block';
-      setTimeout(()=>location.replace('admin.html'), 700);
-    }, 400);
+      succEl.style.display = 'block';
+      setTimeout(()=> location.replace('admin.html'), 600);
+    }, 350);
   } else {
-    document.getElementById('admErr').style.display='block';
-    sndWrong();
+    showErr(errEl, '❌ Wrong admin credentials');
+    try{ sndWrong(); }catch(e){}
   }
 }
-document.addEventListener('keydown',e=>{
+
+/* ── HELPERS ── */
+function showErr(el, msg){ el.innerText = msg; el.style.display = 'block'; }
+function shake(el){
+  el.style.borderColor = 'rgba(239,68,68,0.6)';
+  el.animate([{transform:'translateX(0)'},{transform:'translateX(-7px)'},{transform:'translateX(7px)'},{transform:'translateX(-4px)'},{transform:'translateX(4px)'},{transform:'translateX(0)'}],{duration:350});
+  setTimeout(()=> el.style.borderColor = '', 800);
+}
+
+document.addEventListener('keydown', e=>{
   if(e.key==='Enter'){
-    if(document.getElementById('stuForm').style.display!=='none') stuLogin();
+    if(document.getElementById('stuForm').style.display !== 'none') stuLogin();
     else admLogin();
   }
 });
