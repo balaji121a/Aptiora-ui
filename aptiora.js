@@ -1,174 +1,261 @@
-function nav(page){location.href=page;}
-/* APTIORA Global JS v3 */
+/* APTIORA Global JS v4 — session-aware auth */
 'use strict';
 
 // ── THEME ──
+(function applyThemeEarly(){
+  let old = localStorage.getItem('darkMode');
+  if(old && !localStorage.getItem('theme')){
+    localStorage.setItem('theme', old === 'light' ? 'light' : 'dark');
+    localStorage.removeItem('darkMode');
+  }
+  let m = localStorage.getItem('theme') ||
+    (window.matchMedia && window.matchMedia('(prefers-color-scheme:light)').matches ? 'light' : 'dark');
+  if(m === 'light') document.documentElement.classList.add('light-early');
+})();
+
 function applyTheme(){
-  let m=localStorage.getItem('darkMode')||(window.matchMedia&&window.matchMedia('(prefers-color-scheme:light)').matches?'light':'dark');
-  document.body.classList.toggle('light',m==='light');
-  let btn=document.getElementById('themeBtn');
-  if(btn)btn.innerText=m==='light'?'☀️':'🌙';
+  let m = localStorage.getItem('theme') || 'dark';
+  document.body.classList.toggle('light', m === 'light');
+  document.documentElement.classList.remove('light-early');
+  _syncThemeBtn(m);
 }
 function toggleTheme(){
-  let isLight=document.body.classList.toggle('light');
-  localStorage.setItem('darkMode',isLight?'light':'dark');
-  let btn=document.getElementById('themeBtn');
-  if(btn)btn.innerText=isLight?'☀️':'🌙';
+  let next = localStorage.getItem('theme') === 'light' ? 'dark' : 'light';
+  localStorage.setItem('theme', next);
+  document.body.classList.toggle('light', next === 'light');
+  _syncThemeBtn(next);
+}
+function _syncThemeBtn(mode){
+  let btn = document.getElementById('themeBtn');
+  if(btn) btn.innerText = mode === 'light' ? '☀️' : '🌙';
+}
+
+// ── SESSION AUTH ──
+// Strategy: username stored in localStorage but guarded by a sessionStorage flag.
+// sessionStorage flag is set on login and cleared on tab/browser close automatically.
+// This means: same data, but access gated by session — no cross-tab bleed,
+// auto-logout on tab close, and all existing score/badge localStorage data is preserved.
+
+const SESSION_FLAG = 'aptSession'; // sessionStorage key — clears on tab close
+
+function _isSessionActive(){
+  return sessionStorage.getItem(SESSION_FLAG) === '1';
+}
+function _startSession(reg){
+  localStorage.setItem('username', reg);      // persist data key
+  sessionStorage.setItem(SESSION_FLAG, '1');  // session gate — auto-clears on tab close
+}
+function _clearSession(){
+  sessionStorage.removeItem(SESSION_FLAG);
+  localStorage.removeItem('username');
+}
+
+function getCurrentUser(){
+  // Must have BOTH: username in localStorage AND active session flag
+  let reg = localStorage.getItem('username');
+  if(!reg || !_isSessionActive()){
+    _clearSession();
+    location.href = 'login.html';
+    return null;
+  }
+  return { reg, ...( getUsers()[reg] || { name: 'Student' }) };
+}
+function requireLogin(){
+  let reg = localStorage.getItem('username');
+  if(!reg || !_isSessionActive()){ _clearSession(); location.href = 'login.html'; return null; }
+  return reg;
+}
+function logout(){
+  _clearSession();
+  location.href = 'login.html';
 }
 
 // ── SIDEBAR ──
 function initSidebar(){
-  let sidebar=document.getElementById('appSidebar');
-  let main=document.getElementById('appMain');
-  let overlay=document.getElementById('mobileOverlay');
-  let colBtn=document.getElementById('collapseBtn');
-  if(!sidebar)return;
-  let collapsed=localStorage.getItem('sidebarCollapsed')==='1';
-  if(collapsed&&window.innerWidth>768){sidebar.classList.add('collapsed');if(main)main.classList.add('collapsed');}
-  if(colBtn)colBtn.onclick=()=>{
-    if(window.innerWidth<=768){sidebar.classList.toggle('mobile-open');if(overlay)overlay.classList.toggle('on');}
-    else{collapsed=!collapsed;sidebar.classList.toggle('collapsed',collapsed);if(main)main.classList.toggle('collapsed',collapsed);localStorage.setItem('sidebarCollapsed',collapsed?'1':'0');}
+  let sidebar  = document.getElementById('appSidebar');
+  let main     = document.getElementById('appMain');
+  let overlay  = document.getElementById('mobileOverlay');
+  let colBtn   = document.getElementById('collapseBtn');
+  if(!sidebar) return;
+
+  let collapsed = localStorage.getItem('sidebarCollapsed') === '1';
+  if(collapsed && window.innerWidth > 768){
+    sidebar.classList.add('collapsed');
+    if(main) main.classList.add('collapsed');
+  }
+
+  if(colBtn) colBtn.onclick = () => {
+    if(window.innerWidth <= 768){
+      sidebar.classList.toggle('mobile-open');
+      if(overlay) overlay.classList.toggle('on');
+    } else {
+      collapsed = !collapsed;
+      sidebar.classList.toggle('collapsed', collapsed);
+      if(main) main.classList.toggle('collapsed', collapsed);
+      localStorage.setItem('sidebarCollapsed', collapsed ? '1' : '0');
+    }
   };
-  if(overlay)overlay.onclick=()=>{sidebar.classList.remove('mobile-open');overlay.classList.remove('on');};
-  // Mark active nav item
-  let path=location.pathname.split('/').pop();
-  document.querySelectorAll('.s-item[data-page]').forEach(el=>{if(el.dataset.page===path)el.classList.add('active');});
-  document.querySelectorAll('.bn-item[data-page]').forEach(el=>{if(el.dataset.page===path)el.classList.add('active');});
+  if(overlay) overlay.onclick = () => {
+    sidebar.classList.remove('mobile-open');
+    overlay.classList.remove('on');
+  };
+
+  let path = location.pathname.split('/').pop();
+  document.querySelectorAll('.s-item[data-page]').forEach(el => {
+    if(el.dataset.page === path) el.classList.add('active');
+  });
+  document.querySelectorAll('.bn-item[data-page]').forEach(el => {
+    if(el.dataset.page === path) el.classList.add('active');
+  });
 }
 
 // ── PARTICLES ──
-function initParticles(canvasId='bgCanvas'){
-  let cv=document.getElementById(canvasId);if(!cv)return;
-  let ctx=cv.getContext('2d');
-  let W=cv.width=innerWidth,H=cv.height=innerHeight;
-  class P{constructor(){this.reset();}
-    reset(){this.x=Math.random()*W;this.y=Math.random()*H;this.r=Math.random()*1.4+0.3;this.dx=(Math.random()-.5)*.32;this.dy=(Math.random()-.5)*.32;this.a=Math.random()*.45+0.08;}
-    draw(){ctx.beginPath();ctx.arc(this.x,this.y,this.r,0,Math.PI*2);ctx.fillStyle=`rgba(255,255,255,${this.a})`;ctx.fill();}
-    update(){this.x+=this.dx;this.y+=this.dy;if(this.x<0||this.x>W||this.y<0||this.y>H)this.reset();this.draw();}
+function initParticles(canvasId = 'bgCanvas'){
+  let cv = document.getElementById(canvasId); if(!cv) return;
+  let ctx = cv.getContext('2d');
+  let W = cv.width = innerWidth, H = cv.height = innerHeight;
+  class P {
+    constructor(){ this.reset(); }
+    reset(){ this.x=Math.random()*W; this.y=Math.random()*H; this.r=Math.random()*1.4+0.3; this.dx=(Math.random()-.5)*.32; this.dy=(Math.random()-.5)*.32; this.a=Math.random()*.45+0.08; }
+    draw(){ ctx.beginPath(); ctx.arc(this.x,this.y,this.r,0,Math.PI*2); ctx.fillStyle=`rgba(124,58,237,${this.a})`; ctx.fill(); }
+    update(){ this.x+=this.dx; this.y+=this.dy; if(this.x<0||this.x>W||this.y<0||this.y>H) this.reset(); this.draw(); }
   }
-  const pts=Array.from({length:70},()=>new P()),maxD=120;
+  const pts = Array.from({length:70}, () => new P()), maxD = 120;
   function loop(){
-    ctx.clearRect(0,0,W,H);pts.forEach(p=>p.update());
-    for(let i=0;i<pts.length;i++)for(let j=i+1;j<pts.length;j++){
-      let d=Math.hypot(pts[i].x-pts[j].x,pts[i].y-pts[j].y);
-      if(d<maxD){ctx.beginPath();ctx.strokeStyle=`rgba(124,58,237,${(1-d/maxD)*0.11})`;ctx.lineWidth=0.7;ctx.moveTo(pts[i].x,pts[i].y);ctx.lineTo(pts[j].x,pts[j].y);ctx.stroke();}
+    ctx.clearRect(0,0,W,H); pts.forEach(p => p.update());
+    for(let i=0;i<pts.length;i++) for(let j=i+1;j<pts.length;j++){
+      let d = Math.hypot(pts[i].x-pts[j].x, pts[i].y-pts[j].y);
+      if(d < maxD){ ctx.beginPath(); ctx.strokeStyle=`rgba(124,58,237,${(1-d/maxD)*0.11})`; ctx.lineWidth=0.7; ctx.moveTo(pts[i].x,pts[i].y); ctx.lineTo(pts[j].x,pts[j].y); ctx.stroke(); }
     }
     requestAnimationFrame(loop);
   }
   loop();
-  addEventListener('resize',()=>{W=cv.width=innerWidth;H=cv.height=innerHeight;});
+  addEventListener('resize', () => { W=cv.width=innerWidth; H=cv.height=innerHeight; });
 }
 
 // ── SOUND ──
-let _actx=null,soundOn=localStorage.getItem('soundEnabled')!=='off';
-function _getCtx(){if(!_actx)_actx=new(window.AudioContext||window.webkitAudioContext)();return _actx;}
+let _actx = null, soundOn = localStorage.getItem('soundEnabled') !== 'off';
+function _getCtx(){ if(!_actx) _actx = new(window.AudioContext||window.webkitAudioContext)(); return _actx; }
 function playTone(f,d,t='sine',v=0.22){
-  if(!soundOn)return;
-  try{let a=_getCtx(),o=a.createOscillator(),g=a.createGain();o.connect(g);g.connect(a.destination);o.type=t;o.frequency.value=f;g.gain.setValueAtTime(v,a.currentTime);g.gain.exponentialRampToValueAtTime(0.001,a.currentTime+d);o.start();o.stop(a.currentTime+d);}catch(e){}
+  if(!soundOn) return;
+  try{ let a=_getCtx(),o=a.createOscillator(),g=a.createGain(); o.connect(g); g.connect(a.destination); o.type=t; o.frequency.value=f; g.gain.setValueAtTime(v,a.currentTime); g.gain.exponentialRampToValueAtTime(0.001,a.currentTime+d); o.start(); o.stop(a.currentTime+d); }catch(e){}
 }
-function sndClick(){playTone(440,0.045);}
-function sndCorrect(){playTone(523,0.08);setTimeout(()=>playTone(659,0.08),90);setTimeout(()=>playTone(784,0.18),180);}
-function sndWrong(){playTone(220,0.28,'sawtooth',0.18);}
-function sndWarn(){[0,180,360].forEach(d=>setTimeout(()=>playTone(880,0.09),d));}
-function toggleSound(){soundOn=!soundOn;localStorage.setItem('soundEnabled',soundOn?'on':'off');let b=document.getElementById('soundBtn');if(b)b.innerText=soundOn?'🔊':'🔇';}
+function sndClick(){ playTone(440,0.045); }
+function sndCorrect(){ playTone(523,0.08); setTimeout(()=>playTone(659,0.08),90); setTimeout(()=>playTone(784,0.18),180); }
+function sndWrong(){ playTone(220,0.28,'sawtooth',0.18); }
+function sndWarn(){ [0,180,360].forEach(d=>setTimeout(()=>playTone(880,0.09),d)); }
+function toggleSound(){
+  soundOn = !soundOn;
+  localStorage.setItem('soundEnabled', soundOn ? 'on' : 'off');
+  let b = document.getElementById('soundBtn');
+  if(b) b.innerText = soundOn ? '🔊' : '🔇';
+}
 
 // ── RIPPLE ──
-function addRipple(el,e){
-  let r=el.getBoundingClientRect(),d=document.createElement('span');
-  d.className='ripple-el';let s=Math.max(r.width,r.height);
+function addRipple(el, e){
+  let r=el.getBoundingClientRect(), d=document.createElement('span');
+  d.className='ripple-el';
+  let s=Math.max(r.width,r.height);
   d.style.cssText=`width:${s}px;height:${s}px;left:${(e?e.clientX:r.left+r.width/2)-r.left-s/2}px;top:${(e?e.clientY:r.top+r.height/2)-r.top-s/2}px;`;
-  el.style.position='relative';el.style.overflow='hidden';el.appendChild(d);
-  setTimeout(()=>d.remove(),520);
+  el.style.position='relative'; el.style.overflow='hidden'; el.appendChild(d);
+  setTimeout(()=>d.remove(), 520);
 }
 
 // ── ANIMATED COUNTER ──
-function animateCounter(el,to,duration=1200,suffix=''){
-  let start=0,step=to/60,frame=duration/60;
-  let iv=setInterval(()=>{start+=step;if(start>=to){start=to;clearInterval(iv);}el.innerText=Math.floor(start)+suffix;},frame);
+function animateCounter(el, to, duration=1200, suffix=''){
+  let start=0, step=to/60, frame=duration/60;
+  let iv=setInterval(()=>{ start+=step; if(start>=to){start=to;clearInterval(iv);} el.innerText=Math.floor(start)+suffix; }, frame);
 }
 
 // ── USERS ──
-function getUsers(){return JSON.parse(localStorage.getItem('users'))||{'714524205005':{name:'Balaji',dept:'IT',batch:'2024-2028',password:'1234'},'714524205053':{name:'Vicky',dept:'IT',batch:'2024-2028',password:'1234'},'714524205027':{name:'Ismail',dept:'IT',batch:'2024-2028',password:'1234'},'714524205041':{name:'Sakthivel',dept:'IT',batch:'2024-2028',password:'1234'}};}
-function getCurrentUser(){let reg=sessionStorage.getItem('username');if(!reg){location.href='login.html';return null;}return{reg,...(getUsers()[reg]||{name:'Student'})};}
-function requireLogin(){let r=sessionStorage.getItem('username');if(!r)location.href='login.html';return r;}
-function logout(){sessionStorage.removeItem('username');location.href='login.html';}
+function getUsers(){
+  return JSON.parse(localStorage.getItem('users')) || {
+    '714524205005': {name:'Balaji',  dept:'IT', batch:'2024-2028', password:'1234'},
+    '714524205053': {name:'Vicky',   dept:'IT', batch:'2024-2028', password:'1234'},
+    '714524205027': {name:'Ismail',  dept:'IT', batch:'2024-2028', password:'1234'},
+    '714524205041': {name:'Sakthivel',dept:'IT',batch:'2024-2028', password:'1234'}
+  };
+}
+function getSettings(){
+  return JSON.parse(localStorage.getItem('adminSettings')) || {
+    assessTime:45, secureCode:'123456', antiCheat:true, forceFullscreen:true,
+    shuffleQ:true, certDownload:true, courseStart:'25 Mar 2026', courseEnd:'05 Apr 2026'
+  };
+}
 
-// ── SETTINGS ──
-function getSettings(){return JSON.parse(localStorage.getItem('adminSettings'))||{assessTime:45,secureCode:'123456',antiCheat:true,forceFullscreen:true,shuffleQ:true,certDownload:true,courseStart:'25 Mar 2026',courseEnd:'05 Apr 2026'};}
-
-// ── NOTIFICATIONS (push to user) ──
-function pushNotif(msg,type='info'){
-  let notifs=JSON.parse(localStorage.getItem('userNotifs'))||[];
-  notifs.unshift({msg,type,time:new Date().toLocaleTimeString(),read:false});
-  notifs=notifs.slice(0,20);
-  localStorage.setItem('userNotifs',JSON.stringify(notifs));
-  let dot=document.getElementById('notifDot');if(dot)dot.classList.add('on');
+// ── NOTIFICATIONS ──
+function pushNotif(msg, type='info'){
+  let notifs = JSON.parse(localStorage.getItem('userNotifs')) || [];
+  notifs.unshift({msg, type, time:new Date().toLocaleTimeString(), read:false});
+  notifs = notifs.slice(0,20);
+  localStorage.setItem('userNotifs', JSON.stringify(notifs));
+  let dot = document.getElementById('notifDot'); if(dot) dot.classList.add('on');
 }
 
 // ── SCORE HISTORY ──
-function saveScoreHistory(reg,topic,score,total,extra={}){
-  let hist=JSON.parse(localStorage.getItem('scoreHistory_'+reg))||[];
-  hist.push({topic,score,total,date:new Date().toLocaleDateString('en-IN'),time:new Date().toLocaleTimeString(),...extra});
-  localStorage.setItem('scoreHistory_'+reg,JSON.stringify(hist));
+function saveScoreHistory(reg, topic, score, total, extra={}){
+  let hist = JSON.parse(localStorage.getItem('scoreHistory_'+reg)) || [];
+  hist.push({topic, score, total, date:new Date().toLocaleDateString('en-IN'), time:new Date().toLocaleTimeString(), ...extra});
+  localStorage.setItem('scoreHistory_'+reg, JSON.stringify(hist));
 }
 
 // ── BADGES ──
-const BADGE_DEFS=[
-  {id:'first_practice',icon:'🎯',name:'First Step',desc:'Completed first practice session'},
-  {id:'streak_3',icon:'🔥',name:'On Fire',desc:'3-day streak'},
-  {id:'streak_7',icon:'⚡',name:'Week Warrior',desc:'7-day streak'},
-  {id:'perfect_score',icon:'💯',name:'Perfect Score',desc:'100% in a practice session'},
-  {id:'top_3',icon:'🏆',name:'Podium',desc:'Top 3 in leaderboard'},
-  {id:'assessment_done',icon:'📝',name:'Assessed',desc:'Completed first assessment'},
-  {id:'interview_done',icon:'🎤',name:'Speaker',desc:'Completed mock interview'},
-  {id:'coding_done',icon:'💻',name:'Coder',desc:'Solved first coding problem'},
-  {id:'all_topics',icon:'📚',name:'All-Rounder',desc:'Completed all aptitude topics'},
+const BADGE_DEFS = [
+  {id:'first_practice', icon:'🎯', name:'First Step',    desc:'Completed first practice session'},
+  {id:'streak_3',       icon:'🔥', name:'On Fire',       desc:'3-day streak'},
+  {id:'streak_7',       icon:'⚡', name:'Week Warrior',  desc:'7-day streak'},
+  {id:'perfect_score',  icon:'💯', name:'Perfect Score', desc:'100% in a practice session'},
+  {id:'top_3',          icon:'🏆', name:'Podium',        desc:'Top 3 in leaderboard'},
+  {id:'assessment_done',icon:'📝', name:'Assessed',      desc:'Completed first assessment'},
+  {id:'interview_done', icon:'🎤', name:'Speaker',       desc:'Completed mock interview'},
+  {id:'coding_done',    icon:'💻', name:'Coder',         desc:'Solved first coding problem'},
+  {id:'all_topics',     icon:'📚', name:'All-Rounder',   desc:'Completed all aptitude topics'},
 ];
-function getBadges(reg){return JSON.parse(localStorage.getItem('badges_'+reg))||[];}
-function awardBadge(reg,id){
-  let badges=getBadges(reg);
-  if(badges.includes(id))return false;
-  badges.push(id);localStorage.setItem('badges_'+reg,JSON.stringify(badges));
-  let def=BADGE_DEFS.find(b=>b.id===id);
-  if(def)showBadgeToast(def);
+function getBadges(reg){ return JSON.parse(localStorage.getItem('badges_'+reg)) || []; }
+function awardBadge(reg, id){
+  let badges = getBadges(reg);
+  if(badges.includes(id)) return false;
+  badges.push(id); localStorage.setItem('badges_'+reg, JSON.stringify(badges));
+  let def = BADGE_DEFS.find(b => b.id === id);
+  if(def) showBadgeToast(def);
   return true;
 }
 function showBadgeToast(def){
-  let t=document.createElement('div');
-  t.style.cssText='position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:linear-gradient(135deg,rgba(124,58,237,0.95),rgba(109,40,217,0.9));color:white;padding:12px 22px;border-radius:16px;font-family:Inter,sans-serif;font-size:14px;font-weight:700;z-index:9999;opacity:0;transition:all 0.4s;box-shadow:0 8px 28px rgba(124,58,237,0.45);display:flex;align-items:center;gap:10px;';
-  t.innerHTML=`<span style="font-size:24px">${def.icon}</span><div><div>Badge Unlocked!</div><div style="font-size:12px;opacity:0.8;font-weight:500">${def.name}</div></div>`;
+  let t = document.createElement('div');
+  t.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:linear-gradient(135deg,rgba(124,58,237,0.95),rgba(109,40,217,0.9));color:#fff;padding:12px 22px;border-radius:16px;font-family:Inter,sans-serif;font-size:14px;font-weight:700;z-index:9999;opacity:0;transition:all 0.4s;box-shadow:0 8px 28px rgba(124,58,237,0.45);display:flex;align-items:center;gap:10px;';
+  t.innerHTML = `<span style="font-size:24px">${def.icon}</span><div><div>Badge Unlocked!</div><div style="font-size:12px;opacity:0.8;font-weight:500">${def.name}</div></div>`;
   document.body.appendChild(t);
-  setTimeout(()=>{t.style.opacity='1';t.style.transform='translateX(-50%) translateY(0)';},50);
-  setTimeout(()=>{t.style.opacity='0';t.style.transform='translateX(-50%) translateY(20px)';setTimeout(()=>t.remove(),400);},3200);
+  setTimeout(() => { t.style.opacity='1'; t.style.transform='translateX(-50%) translateY(0)'; }, 50);
+  setTimeout(() => { t.style.opacity='0'; t.style.transform='translateX(-50%) translateY(20px)'; setTimeout(()=>t.remove(),400); }, 3200);
 }
 
 // ── CONFETTI ──
 function launchConfetti(count=60){
   for(let i=0;i<count;i++){
-    let c=document.createElement('div');
-    c.style.cssText=`position:fixed;left:${Math.random()*100}%;top:-10px;width:8px;height:8px;background:hsl(${Math.random()*360},90%,60%);z-index:9999;border-radius:2px;pointer-events:none;`;
+    let c = document.createElement('div');
+    c.style.cssText = `position:fixed;left:${Math.random()*100}%;top:-10px;width:8px;height:8px;background:hsl(${Math.random()*360},90%,60%);z-index:9999;border-radius:2px;pointer-events:none;`;
     document.body.appendChild(c);
     c.animate([{transform:'translateY(0) rotate(0)'},{transform:`translateY(${innerHeight+20}px) rotate(720deg)`}],{duration:2800+Math.random()*1800});
-    setTimeout(()=>c.remove(),5000);
+    setTimeout(()=>c.remove(), 5000);
   }
 }
 
 // ── KEYBOARD SHORTCUTS (test page) ──
-function initTestKeyboard(selectAns,prevQ,nextQ,toggleFlag){
-  document.addEventListener('keydown',e=>{
-    if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')return;
-    if(e.key==='1'||e.key==='a'||e.key==='A')selectAns(0);
-    else if(e.key==='2'||e.key==='b'||e.key==='B')selectAns(1);
-    else if(e.key==='3'||e.key==='c'||e.key==='C')selectAns(2);
-    else if(e.key==='4'||e.key==='d'||e.key==='D')selectAns(3);
-    else if(e.key==='ArrowRight'||e.key===' ')nextQ();
-    else if(e.key==='ArrowLeft')prevQ();
-    else if(e.key==='f'||e.key==='F')toggleFlag();
+function initTestKeyboard(selectAns, prevQ, nextQ, toggleFlag){
+  document.addEventListener('keydown', e => {
+    if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA') return;
+    if(e.key==='1'||e.key==='a'||e.key==='A') selectAns(0);
+    else if(e.key==='2'||e.key==='b'||e.key==='B') selectAns(1);
+    else if(e.key==='3'||e.key==='c'||e.key==='C') selectAns(2);
+    else if(e.key==='4'||e.key==='d'||e.key==='D') selectAns(3);
+    else if(e.key==='ArrowRight'||e.key===' ') nextQ();
+    else if(e.key==='ArrowLeft') prevQ();
+    else if(e.key==='f'||e.key==='F') toggleFlag();
   });
 }
 
-// ── SIDEBAR NAV HTML GENERATOR ──
-function buildSidebar(activePage,userName,userReg){
+// ── SIDEBAR HTML BUILDER ──
+function buildSidebar(activePage, userName, userReg){
   return `
   <div class="app-sidebar" id="appSidebar">
     <div class="s-logo">
@@ -177,22 +264,25 @@ function buildSidebar(activePage,userName,userReg){
     </div>
     <div class="s-nav">
       <div class="s-sec-title">Main</div>
-      <div class="s-item${activePage==='dashboard'?' active':''}" data-page="dashboard.html" onclick="nav('dashboard.html')"><div class="s-icon">🏠</div><div class="s-text">Dashboard</div></div>
-      <div class="s-item${activePage==='aptitude'?' active':''}" data-page="aptitude.html" onclick="nav('aptitude.html')"><div class="s-icon">📖</div><div class="s-text">Aptitude</div></div>
-      <div class="s-item${activePage==='coding'?' active':''}" data-page="coding.html" onclick="nav('coding.html')"><div class="s-icon">💻</div><div class="s-text">Coding</div></div>
-      <div class="s-item${activePage==='english'?' active':''}" data-page="english.html" onclick="nav('english.html')"><div class="s-icon">🗣</div><div class="s-text">English</div></div>
-      <div class="s-item${activePage==='technical'?' active':''}" data-page="technical.html" onclick="nav('technical.html')"><div class="s-icon">🔬</div><div class="s-text">Technical</div></div>
+      <a class="s-item${activePage==='dashboard'?' active':''}" data-page="dashboard.html" onclick="nav('dashboard.html')"><div class="s-icon">🏠</div><div class="s-text">Dashboard</div></a>
+      <a class="s-item${activePage==='aptitude'?' active':''}" data-page="aptitude.html" onclick="nav('aptitude.html')"><div class="s-icon">📖</div><div class="s-text">Aptitude</div></a>
+      <a class="s-item${activePage==='coding'?' active':''}" data-page="coding.html" onclick="nav('coding.html')"><div class="s-icon">💻</div><div class="s-text">Coding</div></a>
+      <a class="s-item${activePage==='english'?' active':''}" data-page="english.html" onclick="nav('english.html')"><div class="s-icon">🗣</div><div class="s-text">English</div></a>
+      <a class="s-item${activePage==='technical'?' active':''}" data-page="technical.html" onclick="nav('technical.html')"><div class="s-icon">🔬</div><div class="s-text">Technical</div></a>
       <div class="s-sec-title">Practice</div>
-      <div class="s-item${activePage==='interview'?' active':''}" data-page="interview.html" onclick="nav('interview.html')"><div class="s-icon">🎤</div><div class="s-text">Mock Interview</div></div>
-      <div class="s-item${activePage==='placement'?' active':''}" data-page="placement.html" onclick="nav('placement.html')"><div class="s-icon">🏢</div><div class="s-text">Placement</div></div>
+      <a class="s-item${activePage==='interview'?' active':''}" data-page="interview.html" onclick="nav('interview.html')"><div class="s-icon">🎤</div><div class="s-text">Mock Interview</div></a>
+      <a class="s-item${activePage==='placement'?' active':''}" data-page="placement.html" onclick="nav('placement.html')"><div class="s-icon">🏢</div><div class="s-text">Placement</div></a>
       <div class="s-sec-title">Results</div>
-      <div class="s-item${activePage==='leaderboard'?' active':''}" data-page="leaderboard.html" onclick="nav('leaderboard.html')"><div class="s-icon">🏆</div><div class="s-text">Leaderboard</div></div>
-      <div class="s-item${activePage==='profile'?' active':''}" data-page="profile.html" onclick="nav('profile.html')"><div class="s-icon">👤</div><div class="s-text">Profile</div></div>
+      <a class="s-item${activePage==='leaderboard'?' active':''}" data-page="leaderboard.html" onclick="nav('leaderboard.html')"><div class="s-icon">🏆</div><div class="s-text">Leaderboard</div></a>
+      <a class="s-item${activePage==='profile'?' active':''}" data-page="profile.html" onclick="nav('profile.html')"><div class="s-icon">👤</div><div class="s-text">Profile</div></a>
     </div>
     <div class="s-footer">
       <div class="s-user" onclick="nav('profile.html')">
         <div class="s-avatar">${(userName||'U').charAt(0).toUpperCase()}</div>
-        <div class="s-user-info"><div class="s-user-name">${userName||'Student'}</div><div class="s-user-role">${userReg||''}</div></div>
+        <div class="s-user-info">
+          <div class="s-user-name">${userName||'Student'}</div>
+          <div class="s-user-role">${userReg||''}</div>
+        </div>
       </div>
     </div>
   </div>
@@ -206,41 +296,38 @@ function buildSidebar(activePage,userName,userReg){
   </div>`;
 }
 
-function nav(page){location.href=page;}
+function nav(page){ location.href = page; }
 
-// ── INIT ON LOAD ──
-document.addEventListener('DOMContentLoaded',()=>{
+// ── INIT ──
+document.addEventListener('DOMContentLoaded', () => {
   applyTheme();
   initSidebar();
   initParticles('bgCanvas');
-  let sb=document.getElementById('soundBtn');
-  if(sb){sb.innerText=soundOn?'🔊':'🔇';sb.onclick=toggleSound;}
-  let tb=document.getElementById('themeBtn');
-  if(tb)tb.onclick=toggleTheme;
+  let sb = document.getElementById('soundBtn');
+  if(sb){ sb.innerText = soundOn ? '🔊' : '🔇'; sb.onclick = toggleSound; }
+  let tb = document.getElementById('themeBtn');
+  if(tb) tb.onclick = toggleTheme;
 });
 
-// ── AI CONNECTION HELPER ──
+// ── AI HELPER ──
 async function callClaude(messages, maxTokens=300, system=''){
   try{
-    let body={model:'claude-sonnet-4-20250514',max_tokens:maxTokens,messages};
-    if(system)body.system=system;
-    let resp=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify(body)
+    let body = {model:'claude-sonnet-4-20250514', max_tokens:maxTokens, messages};
+    if(system) body.system = system;
+    let resp = await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body)
     });
     if(!resp.ok){
-      let err=await resp.json().catch(()=>({}));
-      if(resp.status===401)throw new Error('API key missing. AI features need Claude API access via claude.ai.');
-      if(resp.status===429)throw new Error('Rate limit reached. Please wait a moment and try again.');
-      throw new Error(err.error?.message||'API error '+resp.status);
+      let err = await resp.json().catch(()=>({}));
+      if(resp.status===401) throw new Error('API key missing. AI features need Claude API access via claude.ai.');
+      if(resp.status===429) throw new Error('Rate limit reached. Please wait a moment and try again.');
+      throw new Error(err.error?.message || 'API error '+resp.status);
     }
-    let data=await resp.json();
-    return(data.content&&data.content[0]&&data.content[0].text)||'';
+    let data = await resp.json();
+    return (data.content && data.content[0] && data.content[0].text) || '';
   }catch(e){
-    if(e.message.includes('Failed to fetch')||e.message.includes('NetworkError')){
+    if(e.message.includes('Failed to fetch')||e.message.includes('NetworkError'))
       throw new Error('Network error. Check your internet connection.');
-    }
     throw e;
   }
 }

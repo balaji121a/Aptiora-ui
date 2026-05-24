@@ -7,30 +7,26 @@
 <style>
 html,body{min-height:100%;display:flex;align-items:center;justify-content:center;}
 .login-page{position:relative;z-index:10;width:100%;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;}
-.login-card{background:rgba(13,13,20,0.88);backdrop-filter:blur(24px);border:1px solid var(--border2);border-radius:var(--radius-xl);padding:44px 40px;width:420px;max-width:100%;position:relative;overflow:hidden;animation:scaleIn 0.5s ease;}
+.login-card{background:var(--surface2);backdrop-filter:blur(24px);border:1px solid var(--bdr2);border-radius:var(--radius-xl);padding:44px 40px;width:420px;max-width:100%;position:relative;overflow:hidden;animation:scaleIn 0.5s ease;}
 .login-card::before{content:"";position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(124,58,237,0.5),transparent);}
-.login-logo{font-family:'Space Grotesk',sans-serif;font-size:26px;font-weight:800;letter-spacing:3px;background:linear-gradient(135deg,#fff 30%,var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-align:center;margin-bottom:4px;}
-.login-tagline{text-align:center;font-size:13px;color:var(--text2);margin-bottom:28px;}
-.tab-row{display:flex;gap:0;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:var(--radius);padding:3px;margin-bottom:22px;}
-.tab-btn{flex:1;padding:9px;border:none;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.2s;color:var(--text2);background:none;}
-.tab-btn.on{background:linear-gradient(135deg,var(--purple),#6d28d9);color:white;box-shadow:0 4px 12px rgba(124,58,237,0.3);}
-.login-btn{width:100%;padding:14px;border:none;border-radius:var(--radius);background:linear-gradient(135deg,var(--purple),#6d28d9);color:white;font-size:15px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.3s;box-shadow:0 6px 20px rgba(124,58,237,0.35);margin-top:4px;position:relative;overflow:hidden;}
+.login-logo{font-family:'Space Grotesk',sans-serif;font-size:26px;font-weight:800;letter-spacing:3px;background:linear-gradient(135deg,var(--logo-grad-start,#fff) 30%,var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-align:center;margin-bottom:4px;}
+.login-tagline{text-align:center;font-size:13px;color:var(--tx-2);margin-bottom:28px;}
+.tab-row{display:flex;gap:0;background:var(--hover-surface);border:1px solid var(--bdr);border-radius:var(--radius);padding:3px;margin-bottom:22px;}
+.tab-btn{flex:1;padding:9px;border:none;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.2s;color:var(--tx-2);background:none;}
+.tab-btn.on{background:linear-gradient(135deg,var(--purple),#6d28d9);color:#fff;box-shadow:0 4px 12px rgba(124,58,237,0.3);}
+.login-btn{width:100%;padding:14px;border:none;border-radius:var(--radius);background:linear-gradient(135deg,var(--purple),#6d28d9);color:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.3s;box-shadow:0 6px 20px rgba(124,58,237,0.35);margin-top:4px;position:relative;overflow:hidden;}
 .login-btn:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(124,58,237,0.45);}
 .err-msg{color:#fca5a5;font-size:13px;text-align:center;padding:9px;background:rgba(239,68,68,0.1);border-radius:var(--radius);margin-top:10px;display:none;}
 .success-msg{color:#86efac;font-size:14px;text-align:center;padding:10px;background:rgba(134,239,172,0.1);border-radius:var(--radius);margin-top:10px;display:none;font-weight:600;}
 .input-wrap{position:relative;display:flex;align-items:center;}
 .input-wrap .form-input{width:100%;padding-right:44px;}
-.eye-btn{position:absolute;right:12px;background:none;border:none;cursor:pointer;color:var(--text2);font-size:18px;line-height:1;padding:0;display:flex;align-items:center;transition:color 0.2s;}
+.eye-btn{position:absolute;right:12px;background:none;border:none;cursor:pointer;color:var(--tx-2);font-size:18px;line-height:1;padding:0;display:flex;align-items:center;transition:color 0.2s;}
 .eye-btn:hover{color:#a78bfa;}
 .login-btn .btn-loader{display:none;width:18px;height:18px;border:2.5px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.7s linear infinite;margin:0 auto;}
 .login-btn.loading .btn-text{display:none;}
 .login-btn.loading .btn-loader{display:block;}
 .login-btn.loading{pointer-events:none;opacity:0.85;}
 @keyframes spin{to{transform:rotate(360deg);}}
-body.light .login-card{background:rgba(255,255,255,0.93)!important;}
-body.light .tab-row{background:rgba(0,0,0,0.04)!important;border-color:rgba(0,0,0,0.1)!important;}
-body.light .tab-btn{color:rgba(26,26,46,0.6)!important;}
-body.light .eye-btn{color:rgba(26,26,46,0.4)!important;}
 </style>
 </head>
 <body>
@@ -51,7 +47,7 @@ body.light .eye-btn{color:rgba(26,26,46,0.4)!important;}
       <div class="form-group"><label class="form-label">Password</label>
         <div class="input-wrap">
           <input class="form-input" id="passInput" placeholder="Enter your password" type="password" autocomplete="current-password">
-          <button class="eye-btn" type="button" onclick="toggleEye('passInput','eyeStu')" id="eyeStu" title="Show/Hide Password">👁</button>
+          <button class="eye-btn" type="button" onclick="toggleEye('passInput','eyeStu')" id="eyeStu">👁</button>
         </div>
       </div>
       <button class="login-btn" onclick="stuLogin()" id="loginBtn"><span class="btn-text">🚀 Login</span><div class="btn-loader"></div></button>
@@ -65,7 +61,7 @@ body.light .eye-btn{color:rgba(26,26,46,0.4)!important;}
       <div class="form-group"><label class="form-label">Admin Password</label>
         <div class="input-wrap">
           <input class="form-input" id="admPass" placeholder="Enter admin password" type="password" autocomplete="current-password">
-          <button class="eye-btn" type="button" onclick="toggleEye('admPass','eyeAdm')" id="eyeAdm" title="Show/Hide Password">👁</button>
+          <button class="eye-btn" type="button" onclick="toggleEye('admPass','eyeAdm')" id="eyeAdm">👁</button>
         </div>
       </div>
       <button class="login-btn" onclick="admLogin()" id="admBtn"><span class="btn-text">🔐 Admin Login</span><div class="btn-loader"></div></button>
@@ -76,37 +72,38 @@ body.light .eye-btn{color:rgba(26,26,46,0.4)!important;}
 </div>
 <script src="aptiora.js"></script>
 <script>
-// Clear stale admin session
-sessionStorage.removeItem('adminLoggedIn');
-// Redirect student if already logged in
-// Session-based: no auto-redirect on login page
+// Login page — do NOT clear session here (index.html handles that)
+// If already has a valid session, go straight to dashboard
+if(localStorage.getItem('username') && sessionStorage.getItem('aptSession')==='1'){
+  location.replace('dashboard.html');
+}
+
 function setTab(t){
   document.getElementById('stuTab').classList.toggle('on',t==='student');
   document.getElementById('admTab').classList.toggle('on',t==='admin');
   document.getElementById('stuForm').style.display=t==='student'?'block':'none';
   document.getElementById('admForm').style.display=t==='admin'?'block':'none';
 }
-function toggleEye(inputId, btnId){
-  let inp=document.getElementById(inputId);
-  let btn=document.getElementById(btnId);
+function toggleEye(inputId,btnId){
+  let inp=document.getElementById(inputId),btn=document.getElementById(btnId);
   if(inp.type==='password'){inp.type='text';btn.textContent='🙈';}
   else{inp.type='password';btn.textContent='👁';}
 }
 function stuLogin(){
   let r=document.getElementById('regInput').value.trim();
   let p=document.getElementById('passInput').value;
-  let users=getUsers();
-  let u=users[r];
+  let users=getUsers(), u=users[r];
   let btn=document.getElementById('loginBtn');
-  if(u&&(u.password===p||p==='1234'||(p===''&&u.password===undefined))){
+  if(u && (u.password===p || p==='1234')){
     document.getElementById('stuErr').style.display='none';
     btn.classList.add('loading');
+    // Set session IMMEDIATELY — before any timeout
+    _startSession(r);
+    awardBadge(r,'first_practice');
     setTimeout(()=>{
       document.getElementById('stuSuccess').style.display='block';
-      sessionStorage.setItem('username',r);
-      awardBadge(r,'first_practice');
-      setTimeout(()=>location.href='dashboard.html',900);
-    },900);
+      setTimeout(()=>location.replace('dashboard.html'), 700);
+    }, 400);
   } else {
     document.getElementById('stuErr').style.display='block';
     document.getElementById('stuSuccess').style.display='none';
@@ -120,14 +117,14 @@ function admLogin(){
   let u=document.getElementById('admUser').value.trim();
   let p=document.getElementById('admPass').value;
   let btn=document.getElementById('admBtn');
-  if(u===creds.user&&p===creds.pass){
+  if(u===creds.user && p===creds.pass){
     document.getElementById('admErr').style.display='none';
     btn.classList.add('loading');
+    sessionStorage.setItem('adminSession','1');
     setTimeout(()=>{
       document.getElementById('admSuccess').style.display='block';
-      sessionStorage.setItem('adminLoggedIn','yes');
-      setTimeout(()=>location.href='admin.html',900);
-    },900);
+      setTimeout(()=>location.replace('admin.html'), 700);
+    }, 400);
   } else {
     document.getElementById('admErr').style.display='block';
     sndWrong();
@@ -135,7 +132,7 @@ function admLogin(){
 }
 document.addEventListener('keydown',e=>{
   if(e.key==='Enter'){
-    if(document.getElementById('stuForm').style.display!=='none')stuLogin();
+    if(document.getElementById('stuForm').style.display!=='none') stuLogin();
     else admLogin();
   }
 });
