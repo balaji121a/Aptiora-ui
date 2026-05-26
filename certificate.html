@@ -5,124 +5,795 @@
 <title>Certificate — APTIORA</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Space+Grotesk:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="aptiora.css">
+
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&display=swap');
-.cert-card{width:820px;max-width:95vw;background:white;color:#222;border-radius:18px;box-shadow:0 24px 80px rgba(0,0,0,0.6);overflow:hidden;position:relative;animation:scaleIn 0.7s ease;}
-.cert-card.r1{border:8px solid #d4af37;}.cert-card.r2{border:8px solid #94a3b8;}.cert-card.r3{border:8px solid #cd7f32;}.cert-card.rp{border:8px solid #6366f1;}
-.cert-hd{padding:26px 38px 18px;text-align:center;}
-.cert-card.r1 .cert-hd{background:linear-gradient(135deg,#f6d365,#fda085,#f6d365);}
-.cert-card.r2 .cert-hd{background:linear-gradient(135deg,#bdc3c7,#95a5a6,#bdc3c7);}
-.cert-card.r3 .cert-hd{background:linear-gradient(135deg,#cd7f32,#e8a838,#cd7f32);}
-.cert-card.rp .cert-hd{background:linear-gradient(135deg,#6366f1,#8b5cf6,#6366f1);}
-.cert-hd h2{font-family:'Playfair Display',serif;font-size:34px;font-weight:900;letter-spacing:5px;color:white;text-shadow:0 2px 8px rgba(0,0,0,0.3);}
-.medal{font-size:68px;display:block;text-align:center;margin:-14px auto 6px;filter:drop-shadow(0 4px 12px rgba(0,0,0,0.3));animation:float 3s ease-in-out infinite;}
-@keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);}}
-.cert-body{padding:10px 46px 24px;text-align:center;}
-.cert-name{font-family:'Playfair Display',serif;font-size:40px;font-weight:700;color:#1a1a1a;letter-spacing:2px;margin:12px 0;display:inline-block;border-bottom:3px solid;padding-bottom:5px;}
-.cert-card.r1 .cert-name{border-color:#d4af37;}.cert-card.r2 .cert-name{border-color:#94a3b8;}.cert-card.r3 .cert-name{border-color:#cd7f32;}.cert-card.rp .cert-name{border-color:#6366f1;}
-.rank-badge-c{display:inline-block;padding:6px 20px;border-radius:30px;font-size:15px;font-weight:700;margin:8px 0;color:white;}
-.cert-card.r1 .rank-badge-c{background:linear-gradient(135deg,#d4af37,#f6e27a);}.cert-card.r2 .rank-badge-c{background:linear-gradient(135deg,#94a3b8,#cbd5e1);}.cert-card.r3 .rank-badge-c{background:linear-gradient(135deg,#cd7f32,#e8a838);}.cert-card.rp .rank-badge-c{background:linear-gradient(135deg,#6366f1,#8b5cf6);}
-.cert-msg{font-size:14px;color:#555;font-style:italic;margin:6px 0 12px;}
-.cert-meta-row{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin:12px 0;}
-.meta-p{background:#f8fafc;border:1px solid #e2e8f0;border-radius:20px;padding:5px 14px;font-size:12px;font-weight:500;color:#374151;}
-.cert-foot{display:flex;justify-content:space-around;padding:0 46px 20px;margin-top:6px;}
-.sig-block{text-align:center;}
-.sig-line{border-top:1.5px solid #999;width:140px;margin:0 auto 5px;}
-.sig-lbl{font-size:11px;color:#888;}
-.cert-card::before{content:"";position:absolute;top:10px;left:10px;right:10px;bottom:10px;border:1.5px dashed rgba(0,0,0,0.07);border-radius:12px;pointer-events:none;}
-.corner-star{position:absolute;font-size:22px;color:rgba(0,0,0,0.07);}
-.corner-star.tl{top:18px;left:18px;}.corner-star.tr{top:18px;right:18px;}.corner-star.bl{bottom:18px;left:18px;}.corner-star.br{bottom:18px;right:18px;}
-.not-elig{text-align:center;color:var(--tx);padding:60px 28px;animation:scaleIn 0.5s ease;}
-@media(max-width:860px){.cert-card{border-width:5px;}.cert-hd h2{font-size:24px;}.cert-name{font-size:30px;}.cert-body{padding:10px 20px 20px;}.cert-foot{padding:0 20px 16px;}}
-body.light .not-elig{color:var(--tx);}
+/* ─── BASE RESET ─── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%;
+  background: #04000e;
+  overflow-x: hidden;
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+/* ─── 3D CANVAS ─── */
+#threeCanvas {
+  position: fixed; top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 0; display: block;
+}
+
+/* ─── GLOW PULSE ─── */
+.glow-ring {
+  position: fixed; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 700px; height: 700px; border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(212,175,55,0.08) 0%, transparent 70%);
+  pointer-events: none; z-index: 1;
+  animation: pulseRing 5s ease-in-out infinite;
+}
+@keyframes pulseRing {
+  0%,100% { transform: translate(-50%,-50%) scale(1); opacity: 0.6; }
+  50%      { transform: translate(-50%,-50%) scale(1.3); opacity: 1; }
+}
+
+/* ─── LAYOUT ─── */
+.page-wrap {
+  position: relative; z-index: 10;
+  min-height: 100vh;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 40px 20px 60px;
+}
+
+/* ─── TOP LOGO BAR ─── */
+.top-bar {
+  position: fixed; top: 0; left: 0; right: 0;
+  z-index: 50;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 32px;
+  background: rgba(4,0,14,0.7);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(212,175,55,0.15);
+}
+.top-logo {
+  font-family: 'Cinzel', serif;
+  font-size: 20px; font-weight: 900;
+  letter-spacing: 4px;
+  background: linear-gradient(135deg, #d4af37, #fff8dc, #d4af37);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.top-nav a {
+  color: rgba(255,255,255,0.5); text-decoration: none;
+  font-size: 13px; letter-spacing: 1px;
+  transition: color 0.3s;
+}
+.top-nav a:hover { color: #d4af37; }
+
+/* ─── SECTION TITLE ─── */
+.section-intro {
+  text-align: center;
+  margin-bottom: 40px;
+  margin-top: 30px;
+  animation: fadeUp 0.8s ease both;
+}
+.section-intro .eyebrow {
+  font-size: 11px; letter-spacing: 5px; text-transform: uppercase;
+  color: rgba(212,175,55,0.6); margin-bottom: 10px;
+}
+.section-intro h1 {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(28px, 5vw, 48px);
+  font-weight: 900; letter-spacing: 3px;
+  background: linear-gradient(135deg, #d4af37 0%, #fff8dc 50%, #d4af37 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 30px rgba(212,175,55,0.4));
+}
+
+/* ══════════════════════════════════════════
+   THE CERTIFICATE CARD
+══════════════════════════════════════════ */
+.cert-outer {
+  position: relative;
+  animation: scaleIn 0.9s cubic-bezier(0.34,1.56,0.64,1) 0.2s both;
+}
+
+/* Outer glow halo */
+.cert-outer::before {
+  content: '';
+  position: absolute; inset: -3px;
+  border-radius: 22px;
+  background: linear-gradient(135deg, #d4af37, #6366f1, #d4af37, #f59e0b);
+  background-size: 300% 300%;
+  animation: borderFlow 4s linear infinite;
+  z-index: -1;
+  filter: blur(2px);
+}
+
+@keyframes borderFlow {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* rank-specific outer glow colours */
+.cert-outer.r1::before { background: linear-gradient(135deg,#d4af37,#ffd700,#fff8dc,#d4af37); }
+.cert-outer.r2::before { background: linear-gradient(135deg,#94a3b8,#cbd5e1,#e2e8f0,#94a3b8); }
+.cert-outer.r3::before { background: linear-gradient(135deg,#cd7f32,#e8a838,#fbbf24,#cd7f32); }
+.cert-outer.rp::before { background: linear-gradient(135deg,#6366f1,#8b5cf6,#a78bfa,#6366f1); }
+
+/* The card itself */
+.cert-card {
+  width: min(860px, 96vw);
+  background: linear-gradient(160deg, #0d0722 0%, #06001a 40%, #0a0417 100%);
+  border-radius: 20px;
+  overflow: hidden;
+  position: relative;
+  color: #fff;
+}
+
+/* Noise texture overlay */
+.cert-card::after {
+  content: '';
+  position: absolute; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  opacity: 0.4; pointer-events: none; z-index: 1;
+  border-radius: 20px;
+}
+
+/* ─── HEADER BAND ─── */
+.cert-hd {
+  position: relative; overflow: hidden;
+  padding: 36px 48px 28px;
+  text-align: center;
+}
+
+/* rank-specific header bg */
+.cert-card.r1 .cert-hd { background: linear-gradient(135deg, #3d2a00, #7a5500, #b8860b, #7a5500, #3d2a00); }
+.cert-card.r2 .cert-hd { background: linear-gradient(135deg, #1e2a35, #374151, #6b7280, #374151, #1e2a35); }
+.cert-card.r3 .cert-hd { background: linear-gradient(135deg, #3a1a00, #7c3000, #cd7f32, #7c3000, #3a1a00); }
+.cert-card.rp .cert-hd { background: linear-gradient(135deg, #1e0a4a, #3730a3, #6366f1, #3730a3, #1e0a4a); }
+
+/* shimmer sweep on header */
+.cert-hd::before {
+  content: '';
+  position: absolute; top: 0; left: -100%; width: 60%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent);
+  animation: shimmer 3s ease-in-out infinite;
+}
+@keyframes shimmer { 0% { left: -60%; } 100% { left: 160%; } }
+
+.cert-org {
+  font-family: 'Cinzel', serif;
+  font-size: 11px; letter-spacing: 8px;
+  color: rgba(255,255,255,0.55);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.cert-hd-title {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(22px, 5vw, 38px);
+  font-weight: 900; letter-spacing: 6px;
+  color: #fff;
+  text-shadow: 0 0 40px rgba(255,255,255,0.4), 0 2px 6px rgba(0,0,0,0.5);
+}
+
+/* Decorative horizontal rule */
+.hd-rule {
+  display: flex; align-items: center; gap: 12px;
+  justify-content: center; margin-top: 14px;
+}
+.hd-rule-line { flex: 1; max-width: 100px; height: 1px; }
+.cert-card.r1 .hd-rule-line { background: linear-gradient(90deg, transparent, #d4af37, transparent); }
+.cert-card.r2 .hd-rule-line { background: linear-gradient(90deg, transparent, #94a3b8, transparent); }
+.cert-card.r3 .hd-rule-line { background: linear-gradient(90deg, transparent, #cd7f32, transparent); }
+.cert-card.rp .hd-rule-line { background: linear-gradient(90deg, transparent, #8b5cf6, transparent); }
+.hd-rule-diamond { font-size: 10px; opacity: 0.7; }
+
+/* ─── MEDAL ─── */
+.medal-wrap {
+  position: relative; z-index: 2;
+  text-align: center;
+  margin: -4px 0 0;
+  padding: 20px 0 0;
+}
+.medal {
+  font-size: 80px; display: block;
+  filter: drop-shadow(0 6px 24px rgba(0,0,0,0.5));
+  animation: medalFloat 3s ease-in-out infinite;
+}
+@keyframes medalFloat {
+  0%,100% { transform: translateY(0) rotate(-2deg); }
+  50%      { transform: translateY(-14px) rotate(2deg); }
+}
+
+/* ─── BODY ─── */
+.cert-body {
+  position: relative; z-index: 2;
+  padding: 14px 52px 28px;
+  text-align: center;
+}
+
+.cert-intro {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 17px; color: rgba(255,255,255,0.5);
+  margin-bottom: 12px; letter-spacing: 1px;
+}
+
+.cert-name {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(28px, 6vw, 46px);
+  font-weight: 700; letter-spacing: 3px;
+  display: inline-block;
+  margin: 8px 0 14px;
+  position: relative;
+}
+.cert-card.r1 .cert-name { color: #ffd700; text-shadow: 0 0 30px rgba(212,175,55,0.5); }
+.cert-card.r2 .cert-name { color: #e2e8f0; text-shadow: 0 0 30px rgba(148,163,184,0.4); }
+.cert-card.r3 .cert-name { color: #e8a838; text-shadow: 0 0 30px rgba(205,127,50,0.5); }
+.cert-card.rp .cert-name { color: #c4b5fd; text-shadow: 0 0 30px rgba(139,92,246,0.5); }
+
+/* underline decoration */
+.cert-name::after {
+  content: '';
+  position: absolute; bottom: -6px; left: 0; right: 0; height: 2px;
+  border-radius: 2px;
+}
+.cert-card.r1 .cert-name::after { background: linear-gradient(90deg, transparent, #d4af37, transparent); }
+.cert-card.r2 .cert-name::after { background: linear-gradient(90deg, transparent, #94a3b8, transparent); }
+.cert-card.r3 .cert-name::after { background: linear-gradient(90deg, transparent, #cd7f32, transparent); }
+.cert-card.rp .cert-name::after { background: linear-gradient(90deg, transparent, #8b5cf6, transparent); }
+
+/* Rank badge */
+.rank-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 8px 28px; border-radius: 50px;
+  font-family: 'Cinzel', serif;
+  font-size: 13px; font-weight: 700; letter-spacing: 2px;
+  color: #fff;
+  margin: 16px 0 10px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+  position: relative; overflow: hidden;
+}
+.rank-badge::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: rgba(255,255,255,0.08);
+}
+.cert-card.r1 .rank-badge { background: linear-gradient(135deg, #7a5500, #d4af37, #7a5500); border: 1px solid rgba(212,175,55,0.4); }
+.cert-card.r2 .rank-badge { background: linear-gradient(135deg, #374151, #94a3b8, #374151); border: 1px solid rgba(148,163,184,0.3); }
+.cert-card.r3 .rank-badge { background: linear-gradient(135deg, #7c3000, #cd7f32, #7c3000); border: 1px solid rgba(205,127,50,0.4); }
+.cert-card.rp .rank-badge { background: linear-gradient(135deg, #3730a3, #6366f1, #3730a3); border: 1px solid rgba(99,102,241,0.4); }
+
+.cert-msg {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 16px; font-style: italic;
+  color: rgba(255,255,255,0.6); margin: 8px 0 20px;
+}
+
+/* Meta pills */
+.meta-row {
+  display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;
+  margin: 14px 0;
+}
+.meta-pill {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 30px; padding: 7px 18px;
+  font-size: 12px; color: rgba(255,255,255,0.7);
+  font-weight: 600; letter-spacing: 0.5px;
+  backdrop-filter: blur(8px);
+}
+
+/* ─── DIVIDER ─── */
+.cert-divider {
+  display: flex; align-items: center; gap: 16px;
+  margin: 20px 52px;
+  opacity: 0.25;
+}
+.cert-divider-line { flex: 1; height: 1px; background: rgba(255,255,255,0.4); }
+.cert-divider-icon { font-size: 14px; }
+
+/* ─── FOOTER ─── */
+.cert-foot {
+  position: relative; z-index: 2;
+  display: flex; justify-content: space-around; align-items: flex-end;
+  padding: 10px 52px 32px;
+}
+.sig-block { text-align: center; }
+.sig-squiggle {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic; font-size: 26px;
+  color: rgba(255,255,255,0.5);
+  margin-bottom: 6px; letter-spacing: -1px;
+}
+.sig-line {
+  width: 130px; height: 1px;
+  background: rgba(255,255,255,0.25);
+  margin: 0 auto 6px;
+}
+.sig-lbl {
+  font-size: 10px; letter-spacing: 2px;
+  text-transform: uppercase; color: rgba(255,255,255,0.35);
+}
+
+/* ─── CORNER ORNAMENTS ─── */
+.corner-ornament {
+  position: absolute; font-size: 28px;
+  opacity: 0.12; pointer-events: none; z-index: 2;
+  font-family: 'Cinzel', serif;
+}
+.co-tl { top: 12px; left: 16px; }
+.co-tr { top: 12px; right: 16px; transform: scaleX(-1); }
+.co-bl { bottom: 12px; left: 16px; transform: scaleY(-1); }
+.co-br { bottom: 12px; right: 16px; transform: scale(-1,-1); }
+
+/* Inner border ring */
+.cert-card .inner-ring {
+  position: absolute; inset: 12px;
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 12px; pointer-events: none; z-index: 1;
+}
+
+/* ─── NOT ELIGIBLE ─── */
+.not-elig {
+  text-align: center; color: rgba(255,255,255,0.8);
+  padding: 60px 28px; animation: scaleIn 0.6s ease;
+}
+.not-elig .elig-icon { font-size: 72px; margin-bottom: 20px; display: block; }
+.not-elig h2 {
+  font-family: 'Cinzel', serif; font-size: 28px; letter-spacing: 3px;
+  color: #f97316; margin-bottom: 12px;
+}
+
+/* ─── ACTION BUTTONS ─── */
+.actions {
+  display: flex; gap: 12px; flex-wrap: wrap;
+  justify-content: center; margin-top: 28px;
+  animation: fadeUp 0.8s ease 0.6s both;
+}
+
+.btn-cert {
+  padding: 14px 32px; border-radius: 14px;
+  font-family: 'Cinzel', serif; font-size: 13px;
+  font-weight: 700; letter-spacing: 2px;
+  border: none; cursor: pointer;
+  transition: all 0.3s; position: relative; overflow: hidden;
+}
+.btn-cert::after {
+  content: ''; position: absolute; inset: 0;
+  background: rgba(255,255,255,0.08);
+  opacity: 0; transition: opacity 0.3s;
+}
+.btn-cert:hover::after { opacity: 1; }
+.btn-cert:hover { transform: translateY(-3px); box-shadow: 0 12px 36px rgba(0,0,0,0.4); }
+
+.btn-gold {
+  background: linear-gradient(135deg, #7a5500, #d4af37, #7a5500);
+  color: #fff; box-shadow: 0 6px 24px rgba(212,175,55,0.3);
+}
+.btn-glass {
+  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15);
+  color: rgba(255,255,255,0.8); backdrop-filter: blur(10px);
+}
+.btn-purple {
+  background: linear-gradient(135deg, #3730a3, #6366f1);
+  color: #fff; box-shadow: 0 6px 24px rgba(99,102,241,0.3);
+}
+
+/* ─── KEYFRAMES ─── */
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.85); }
+  to   { opacity: 1; transform: scale(1); }
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 640px) {
+  .cert-body { padding: 14px 24px 20px; }
+  .cert-foot { padding: 10px 24px 24px; }
+  .cert-divider { margin: 16px 24px; }
+  .cert-hd { padding: 28px 24px 22px; }
+}
 </style>
 </head>
 <body>
-<div class="orb orb1"></div><div class="orb orb2"></div>
-<canvas class="bg-canvas" id="bgCanvas"></canvas>
-<div id="sb"></div>
-<div class="app-main" id="appMain">
-  <div class="app-topbar">
-    <div class="topbar-left"><button class="collapse-btn" id="collapseBtn">☰</button><div class="page-title">🎓 Certificate</div></div>
-    <div class="topbar-right"><button class="tb-btn" id="themeBtn">🌙</button></div>
-  </div>
-  <div class="app-page" style="display:flex;flex-direction:column;align-items:center;">
-    <div id="certSection" style="width:100%;display:flex;flex-direction:column;align-items:center;">
-      <div id="certificate" class="cert-card">
-        <span class="corner-star tl">✦</span><span class="corner-star tr">✦</span><span class="corner-star bl">✦</span><span class="corner-star br">✦</span>
-        <div class="cert-hd"><h2>CERTIFICATE</h2></div>
-        <div class="medal" id="medal"></div>
-        <div class="cert-body">
-          <p style="font-size:15px;color:#555;">This is to proudly certify that</p>
-          <div class="cert-name" id="certName"></div>
-          <div class="rank-badge-c" id="rankBadge"></div>
-          <p class="cert-msg" id="certMsg"></p>
-          <div class="cert-meta-row">
-            <div class="meta-p">📊 Score: <strong id="certScore"></strong></div>
-            <div class="meta-p">📅 <span id="certDate"></span></div>
-            <div class="meta-p">🏫 APTIORA</div>
-          </div>
-        </div>
-        <div class="cert-foot">
-          <div class="sig-block"><div class="sig-line"></div><div class="sig-lbl">Examiner Signature</div></div>
-          <div class="sig-block"><div class="sig-line"></div><div class="sig-lbl">Director, APTIORA</div></div>
-        </div>
-      </div>
-      <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:20px;">
-        <button class="btn btn-primary" id="dlBtn" onclick="downloadPDF()">⬇ Download PDF</button>
-        <button class="btn btn-success" onclick="shareCert()">📱 Share</button>
-        <button class="btn btn-secondary" onclick="nav('leaderboard.html')">🏆 Leaderboard</button>
-      </div>
-    </div>
-    <div id="notElig" class="not-elig" style="display:none;">
-      <div style="font-size:60px;margin-bottom:16px;">⚠️</div>
-      <div style="font-family:'Space Grotesk',sans-serif;font-size:24px;font-weight:700;margin-bottom:10px;">Not Eligible</div>
-      <p style="opacity:0.7;margin-bottom:6px;">You need at least <strong>15 questions</strong> attempted.</p>
-      <p>Your attempts: <strong id="attCnt"></strong> / 20</p>
-      <button class="btn btn-secondary" onclick="nav('leaderboard.html')" style="margin-top:20px;">⬅ Leaderboard</button>
-    </div>
+
+<!-- 3D Background -->
+<canvas id="threeCanvas"></canvas>
+<div class="glow-ring"></div>
+
+<!-- Top Bar -->
+<div class="top-bar">
+  <div class="top-logo">📘 APTIORA</div>
+  <div class="top-nav">
+    <a href="leaderboard.html">← Leaderboard</a>
   </div>
 </div>
+
+<div class="page-wrap" style="padding-top: 90px;">
+
+  <!-- Section Intro -->
+  <div class="section-intro">
+    <div class="eyebrow">✦ &nbsp; Achievement Unlocked &nbsp; ✦</div>
+    <h1>Your Certificate</h1>
+  </div>
+
+  <!-- CERTIFICATE SECTION -->
+  <div id="certSection" style="width:100%;display:flex;flex-direction:column;align-items:center;">
+
+    <div class="cert-outer" id="certOuter">
+      <div class="cert-card" id="certificate">
+        <div class="inner-ring"></div>
+        <span class="corner-ornament co-tl">❧</span>
+        <span class="corner-ornament co-tr">❧</span>
+        <span class="corner-ornament co-bl">❧</span>
+        <span class="corner-ornament co-br">❧</span>
+
+        <!-- Header -->
+        <div class="cert-hd">
+          <div class="cert-org">Aptiora · Aptitude Online Examination Portal</div>
+          <div class="cert-hd-title">CERTIFICATE OF ACHIEVEMENT</div>
+          <div class="hd-rule">
+            <div class="hd-rule-line"></div>
+            <span class="hd-rule-diamond">◆</span>
+            <div class="hd-rule-line"></div>
+          </div>
+        </div>
+
+        <!-- Medal -->
+        <div class="medal-wrap">
+          <span class="medal" id="medal">🎓</span>
+        </div>
+
+        <!-- Body -->
+        <div class="cert-body">
+          <p class="cert-intro">This is to proudly certify that</p>
+          <div class="cert-name" id="certName">—</div>
+          <div class="rank-badge" id="rankBadge">🎓 Participation</div>
+          <p class="cert-msg" id="certMsg">has successfully completed the Assessment</p>
+          <div class="meta-row">
+            <div class="meta-pill">📊 Score: <strong id="certScore">—</strong></div>
+            <div class="meta-pill">📅 <span id="certDate">—</span></div>
+            <div class="meta-pill">🏫 APTIORA</div>
+          </div>
+        </div>
+
+        <!-- Divider -->
+        <div class="cert-divider">
+          <div class="cert-divider-line"></div>
+          <span class="cert-divider-icon">✦</span>
+          <div class="cert-divider-line"></div>
+        </div>
+
+        <!-- Footer / Signatures -->
+        <div class="cert-foot">
+          <div class="sig-block">
+            <div class="sig-squiggle">𝒜𝓊𝓉𝒽𝑜𝓇𝒾𝓃𝑔</div>
+            <div class="sig-line"></div>
+            <div class="sig-lbl">Examiner Signature</div>
+          </div>
+          <div class="sig-block">
+            <div class="sig-squiggle">𝒟𝒾𝓇𝑒𝒸𝓉𝑜𝓇</div>
+            <div class="sig-line"></div>
+            <div class="sig-lbl">Director, APTIORA</div>
+          </div>
+        </div>
+
+      </div><!-- /.cert-card -->
+    </div><!-- /.cert-outer -->
+
+    <!-- Action Buttons -->
+    <div class="actions">
+      <button class="btn-cert btn-gold" id="dlBtn" onclick="downloadPDF()">⬇ Download PDF</button>
+      <button class="btn-cert btn-glass" onclick="shareCert()">📱 Share</button>
+      <button class="btn-cert btn-purple" onclick="location.href='leaderboard.html'">🏆 Leaderboard</button>
+    </div>
+
+  </div><!-- /#certSection -->
+
+  <!-- NOT ELIGIBLE -->
+  <div id="notElig" class="not-elig" style="display:none;">
+    <span class="elig-icon">⚠️</span>
+    <h2>Not Eligible</h2>
+    <p style="color:rgba(255,255,255,0.5);margin-bottom:6px;">You need at least <strong style="color:#fff;">15 questions</strong> attempted.</p>
+    <p style="color:rgba(255,255,255,0.5);">Your attempts: <strong style="color:#fff;" id="attCnt">—</strong> / 20</p>
+    <div class="actions">
+      <button class="btn-cert btn-glass" onclick="location.href='leaderboard.html'">← Leaderboard</button>
+    </div>
+  </div>
+
+</div><!-- /.page-wrap -->
+
+<!-- ══════════════════════ THREE.JS SCENE ══════════════════════ -->
+<script>
+(function(){
+  const canvas = document.getElementById('threeCanvas');
+  const renderer = new THREE.WebGLRenderer({canvas, antialias:true, alpha:false});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setClearColor(0x04000e, 1);
+
+  const scene = new THREE.Scene();
+  scene.fog = new THREE.FogExp2(0x04000e, 0.006);
+
+  const camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 2000);
+  camera.position.set(0, 0, 80);
+
+  // Lights — gold theme for certificate page
+  scene.add(new THREE.AmbientLight(0xd4af37, 0.3));
+  const dir = new THREE.DirectionalLight(0xffffff, 0.6);
+  dir.position.set(1,1,1); scene.add(dir);
+
+  const goldLight  = new THREE.PointLight(0xd4af37, 3.0, 150);
+  goldLight.position.set(0, 0, 30); scene.add(goldLight);
+
+  const purpleLight= new THREE.PointLight(0x6366f1, 1.5, 120);
+  purpleLight.position.set(30,-20,10); scene.add(purpleLight);
+
+  const blueLight  = new THREE.PointLight(0x3b82f6, 1.0, 100);
+  blueLight.position.set(-30,20,0); scene.add(blueLight);
+
+  // Floating shapes
+  const shapes = [];
+  const geoTypes = [
+    new THREE.IcosahedronGeometry(5,0),
+    new THREE.OctahedronGeometry(4,0),
+    new THREE.TetrahedronGeometry(4,0),
+    new THREE.IcosahedronGeometry(3,0),
+    new THREE.OctahedronGeometry(6,0),
+    new THREE.TetrahedronGeometry(5,0),
+  ];
+  const colors = [0xd4af37,0xf59e0b,0x6366f1,0xffd700,0x8b5cf6,0xf97316,0xfbbf24,0xc4b5fd];
+
+  for(let i=0;i<22;i++){
+    const geo = geoTypes[i % geoTypes.length];
+    const mat = new THREE.MeshStandardMaterial({
+      color: colors[i % colors.length],
+      wireframe: i%3 !== 0,
+      metalness: 0.8, roughness: 0.2,
+      transparent: true, opacity: 0.35 + Math.random()*0.45
+    });
+    const mesh = new THREE.Mesh(geo, mat);
+    mesh.position.set(
+      (Math.random()-0.5)*220,
+      (Math.random()-0.5)*120,
+      (Math.random()-0.5)*100 - 20
+    );
+    mesh.rotation.set(Math.random()*Math.PI*2, Math.random()*Math.PI*2, 0);
+    const s = 0.4 + Math.random()*0.9;
+    mesh.scale.set(s,s,s);
+    mesh.userData = {
+      rx: (Math.random()-0.5)*0.008,
+      ry: (Math.random()-0.5)*0.012,
+      rz: (Math.random()-0.5)*0.006,
+      floatSpeed: 0.3+Math.random()*0.7,
+      floatAmp:   1.5+Math.random()*2.5,
+      floatOffset:Math.random()*Math.PI*2
+    };
+    scene.add(mesh); shapes.push(mesh);
+  }
+
+  // Particle field
+  const pCount = 3000;
+  const pos = new Float32Array(pCount*3);
+  const col = new Float32Array(pCount*3);
+  const pColors = [
+    new THREE.Color(0xd4af37),
+    new THREE.Color(0xf59e0b),
+    new THREE.Color(0xc4b5fd),
+    new THREE.Color(0xffffff),
+    new THREE.Color(0x6366f1),
+    new THREE.Color(0xffd700),
+  ];
+  for(let i=0;i<pCount;i++){
+    pos[i*3]   = (Math.random()-0.5)*450;
+    pos[i*3+1] = (Math.random()-0.5)*280;
+    pos[i*3+2] = (Math.random()-0.5)*220-40;
+    const c = pColors[Math.floor(Math.random()*pColors.length)];
+    col[i*3]=c.r; col[i*3+1]=c.g; col[i*3+2]=c.b;
+  }
+  const pGeo = new THREE.BufferGeometry();
+  pGeo.setAttribute('position', new THREE.BufferAttribute(pos,3));
+  pGeo.setAttribute('color',    new THREE.BufferAttribute(col,3));
+  const pMat = new THREE.PointsMaterial({size:0.5,vertexColors:true,transparent:true,opacity:0.7,sizeAttenuation:true});
+  const particles = new THREE.Points(pGeo, pMat);
+  scene.add(particles);
+
+  // Grid floor
+  const grid = new THREE.GridHelper(320,42,0xd4af37,0x3d2a00);
+  grid.position.y = -50;
+  grid.material.transparent=true; grid.material.opacity=0.18;
+  scene.add(grid);
+
+  // Torus rings (gold theme)
+  const ring1 = new THREE.Mesh(
+    new THREE.TorusGeometry(26,0.4,8,90),
+    new THREE.MeshStandardMaterial({color:0xd4af37,metalness:0.95,roughness:0.05,transparent:true,opacity:0.5})
+  );
+  ring1.rotation.x = Math.PI/2.5; ring1.position.z=-10; scene.add(ring1);
+
+  const ring2 = new THREE.Mesh(
+    new THREE.TorusGeometry(40,0.35,8,90),
+    new THREE.MeshStandardMaterial({color:0x6366f1,metalness:0.95,roughness:0.05,transparent:true,opacity:0.3})
+  );
+  ring2.rotation.x=Math.PI/2.2; ring2.rotation.y=0.4; ring2.position.z=-18; scene.add(ring2);
+
+  const ring3 = new THREE.Mesh(
+    new THREE.TorusGeometry(55,0.2,8,90),
+    new THREE.MeshStandardMaterial({color:0xf59e0b,metalness:0.95,roughness:0.05,transparent:true,opacity:0.2})
+  );
+  ring3.rotation.x=Math.PI/2.8; ring3.rotation.z=0.5; ring3.position.z=-26; scene.add(ring3);
+
+  // Mouse parallax
+  let mx=0, my=0;
+  document.addEventListener('mousemove',e=>{
+    mx = (e.clientX/window.innerWidth-0.5)*2;
+    my = (e.clientY/window.innerHeight-0.5)*2;
+  });
+
+  window.addEventListener('resize',()=>{
+    camera.aspect = window.innerWidth/window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  });
+
+  let t=0;
+  function animate(){
+    requestAnimationFrame(animate);
+    t += 0.006;
+
+    camera.position.x += (mx*8 - camera.position.x)*0.04;
+    camera.position.y += (-my*5 - camera.position.y)*0.04;
+    camera.lookAt(0,0,0);
+
+    shapes.forEach(m=>{
+      m.rotation.x += m.userData.rx;
+      m.rotation.y += m.userData.ry;
+      m.rotation.z += m.userData.rz;
+      m.position.y += Math.sin(t*m.userData.floatSpeed + m.userData.floatOffset)*0.016*m.userData.floatAmp;
+    });
+
+    ring1.rotation.z += 0.005;
+    ring2.rotation.z -= 0.003;
+    ring3.rotation.z += 0.002;
+
+    particles.rotation.y += 0.0003;
+    particles.rotation.x += 0.0002;
+
+    grid.position.y = -50 + Math.sin(t*0.4)*1.2;
+
+    goldLight.intensity   = 2.2 + Math.sin(t*1.2)*1.0;
+    goldLight.position.x  = Math.sin(t*0.5)*24;
+    goldLight.position.y  = Math.cos(t*0.4)*16;
+    purpleLight.position.x= Math.cos(t*0.45)*26;
+    purpleLight.position.y= Math.sin(t*0.55)*14;
+
+    renderer.render(scene, camera);
+  }
+  animate();
+})();
+</script>
+
+<!-- ══════════════════════ APP LOGIC ══════════════════════ -->
 <script src="aptiora.js"></script>
 <script>
-let user=getCurrentUser();if(!user)throw'';
-let {reg,name}=user;
-document.getElementById('sb').innerHTML=buildSidebar('',name,reg);
-initSidebar();
-let rank=parseInt(localStorage.getItem('rank'))||0,score=parseInt(localStorage.getItem('cert_score'))||0,attempted=parseInt(localStorage.getItem('cert_attempted'))||0;
-let s=getSettings();
-if(attempted<15){document.getElementById('certSection').style.display='none';document.getElementById('notElig').style.display='block';document.getElementById('attCnt').innerText=attempted;}
-else{
-  document.getElementById('certName').innerText=name;
-  document.getElementById('certScore').innerText=score+' / 20';
-  document.getElementById('certDate').innerText=new Date().toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'});
-  let card=document.getElementById('certificate'),medal=document.getElementById('medal'),badge=document.getElementById('rankBadge'),msg=document.getElementById('certMsg');
-  if(rank===1){card.classList.add('r1');medal.innerText='🥇';badge.innerText='🏆 1st Place — Gold';msg.innerText='has achieved the Highest Score in the Assessment';}
-  else if(rank===2){card.classList.add('r2');medal.innerText='🥈';badge.innerText='🥈 2nd Place — Silver';msg.innerText='has achieved an Outstanding Performance in the Assessment';}
-  else if(rank===3){card.classList.add('r3');medal.innerText='🥉';badge.innerText='🥉 3rd Place — Bronze';msg.innerText='has achieved an Excellent Performance in the Assessment';}
-  else{card.classList.add('rp');medal.innerText='🎓';badge.innerText='🎓 Participation Certificate';msg.innerText='has successfully completed the Assessment';}
-  if(!s.certDownload){let b=document.getElementById('dlBtn');b.disabled=true;b.innerText='⛔ Download Disabled';}
-  setTimeout(()=>{launchConfetti(120);if(rank<=3&&rank>0){setTimeout(()=>launchConfetti(60),600);}},500);
+// Graceful init — if aptiora.js helpers missing, fall back to demo mode
+try {
+  let user = typeof getCurrentUser === 'function' ? getCurrentUser() : null;
+  let name, reg;
+
+  if (user) {
+    name = user.name; reg = user.reg;
+    if (typeof buildSidebar === 'function') {
+      document.getElementById('sb') && (document.getElementById('sb').innerHTML = buildSidebar('', name, reg));
+    }
+    if (typeof initSidebar === 'function') initSidebar();
+  } else {
+    // demo / standalone preview
+    name = 'Demo Student';
+  }
+
+  let rank      = parseInt(localStorage.getItem('rank'))         || 0;
+  let score     = parseInt(localStorage.getItem('cert_score'))   || 0;
+  let attempted = parseInt(localStorage.getItem('cert_attempted'))|| 0;
+  let s         = typeof getSettings === 'function' ? getSettings() : { certDownload: true };
+
+  if (attempted > 0 && attempted < 15) {
+    document.getElementById('certSection').style.display = 'none';
+    document.getElementById('notElig').style.display = 'block';
+    document.getElementById('attCnt').innerText = attempted;
+  } else {
+    // Populate
+    document.getElementById('certName').innerText  = name;
+    document.getElementById('certScore').innerText = score + ' / 20';
+    document.getElementById('certDate').innerText  =
+      new Date().toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'});
+
+    const card  = document.getElementById('certificate');
+    const outer = document.getElementById('certOuter');
+    const medal = document.getElementById('medal');
+    const badge = document.getElementById('rankBadge');
+    const msg   = document.getElementById('certMsg');
+
+    if (rank === 1) {
+      card.classList.add('r1'); outer.classList.add('r1');
+      medal.innerText = '🥇'; badge.innerText = '🏆 1st Place — Gold';
+      msg.innerText   = 'has achieved the Highest Score in the Assessment';
+    } else if (rank === 2) {
+      card.classList.add('r2'); outer.classList.add('r2');
+      medal.innerText = '🥈'; badge.innerText = '🥈 2nd Place — Silver';
+      msg.innerText   = 'has achieved an Outstanding Performance in the Assessment';
+    } else if (rank === 3) {
+      card.classList.add('r3'); outer.classList.add('r3');
+      medal.innerText = '🥉'; badge.innerText = '🥉 3rd Place — Bronze';
+      msg.innerText   = 'has achieved an Excellent Performance in the Assessment';
+    } else {
+      card.classList.add('rp'); outer.classList.add('rp');
+      medal.innerText = '🎓'; badge.innerText = '🎓 Participation Certificate';
+      msg.innerText   = 'has successfully completed the Assessment';
+    }
+
+    if (!s.certDownload) {
+      const b = document.getElementById('dlBtn');
+      b.disabled = true; b.innerText = '⛔ Download Disabled';
+      b.style.opacity = '0.5'; b.style.cursor = 'not-allowed';
+    }
+
+    // Confetti after entry animation
+    setTimeout(()=>{
+      if (typeof launchConfetti === 'function') {
+        launchConfetti(120);
+        if (rank <= 3 && rank > 0) setTimeout(()=>launchConfetti(60),600);
+      }
+    }, 900);
+  }
+} catch(e) {
+  console.warn('APTIORA init:', e);
 }
-async function downloadPDF(){
-  if(!getSettings().certDownload){alert('⛔ Download disabled by admin.');return;}
-  launchConfetti(80);
-  const {jsPDF}=window.jspdf;
-  let el=document.getElementById('certificate');
-  document.querySelector('.app-page').querySelectorAll('.btn').forEach(b=>b.style.display='none');
-  let cv=await html2canvas(el,{scale:2,useCORS:true,backgroundColor:'#ffffff'});
-  document.querySelector('.app-page').querySelectorAll('.btn').forEach(b=>b.style.display='');
-  let img=cv.toDataURL('image/png');
-  let pdf=new jsPDF('landscape','px',[cv.width/2,cv.height/2]);
-  pdf.addImage(img,'PNG',0,0,cv.width/2,cv.height/2);
+
+// ── DOWNLOAD PDF ──
+async function downloadPDF() {
+  const s = typeof getSettings === 'function' ? getSettings() : {certDownload:true};
+  if (!s.certDownload) { alert('⛔ Download disabled by admin.'); return; }
+  if (typeof launchConfetti === 'function') launchConfetti(80);
+  const {jsPDF} = window.jspdf;
+  const el = document.getElementById('certificate');
+  document.querySelectorAll('.actions .btn-cert').forEach(b=>b.style.visibility='hidden');
+  const cv = await html2canvas(el, {scale:2.5, useCORS:true, backgroundColor:'#04000e'});
+  document.querySelectorAll('.actions .btn-cert').forEach(b=>b.style.visibility='');
+  const img = cv.toDataURL('image/png');
+  const name = document.getElementById('certName').innerText || 'Student';
+  const pdf = new jsPDF('landscape','px',[cv.width/2.5, cv.height/2.5]);
+  pdf.addImage(img,'PNG',0,0,cv.width/2.5,cv.height/2.5);
   pdf.save('Certificate_'+name+'_APTIORA.pdf');
 }
-function shareCert(){
-  let txt=`I scored ${score}/20 in APTIORA Aptitude Assessment! 🎓 #APTIORA #Placement`;
-  if(navigator.share){navigator.share({title:'APTIORA Certificate',text:txt}).catch(()=>{});}
-  else{navigator.clipboard.writeText(txt).then(()=>alert('✅ Copied! Paste in WhatsApp or LinkedIn.')).catch(()=>alert(txt));}
+
+// ── SHARE ──
+function shareCert() {
+  const score = document.getElementById('certScore')?.innerText || '';
+  const name  = document.getElementById('certName')?.innerText  || 'Student';
+  const txt   = `I scored ${score} in the APTIORA Aptitude Assessment! 🎓 #APTIORA #Placement`;
+  if (navigator.share) {
+    navigator.share({title:'APTIORA Certificate', text:txt}).catch(()=>{});
+  } else {
+    navigator.clipboard?.writeText(txt)
+      .then(()=>alert('✅ Copied! Paste in WhatsApp or LinkedIn.'))
+      .catch(()=>alert(txt));
+  }
 }
 </script>
+
 </body>
 </html>
