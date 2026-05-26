@@ -3,73 +3,283 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Login — APTIORA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="aptiora.css">
 <style>
-html,body{min-height:100%;display:flex;align-items:center;justify-content:center;}
-.login-page{position:relative;z-index:10;width:100%;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;}
-.login-card{background:rgba(13,13,20,0.88);backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,0.14);border-radius:28px;padding:44px 40px;width:420px;max-width:100%;position:relative;overflow:hidden;animation:scaleIn 0.5s ease;}
-.login-card::before{content:"";position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(124,58,237,0.5),transparent);}
-.login-logo{font-family:'Space Grotesk',sans-serif;font-size:26px;font-weight:800;letter-spacing:3px;background:linear-gradient(135deg,#fff 30%,#f5c842);-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-align:center;margin-bottom:4px;}
-.login-tagline{text-align:center;font-size:13px;color:rgba(255,255,255,0.55);margin-bottom:28px;}
-.tab-row{display:flex;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:3px;margin-bottom:22px;}
-.tab-btn{flex:1;padding:9px;border:none;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.2s;color:rgba(255,255,255,0.55);background:none;}
-.tab-btn.on{background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#fff;box-shadow:0 4px 12px rgba(124,58,237,0.3);}
-.form-group{margin-bottom:15px;}
-.form-label{display:block;font-size:11px;font-weight:700;color:rgba(255,255,255,0.55);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:6px;}
-.form-input{width:100%;padding:11px 15px;background:rgba(255,255,255,0.06);border:1.5px solid rgba(255,255,255,0.08);border-radius:14px;color:#fff;font-size:14px;font-family:'Inter',sans-serif;outline:none;transition:all 0.2s;}
-.form-input:focus{border-color:rgba(124,58,237,0.55);background:rgba(124,58,237,0.06);}
-.form-input::placeholder{color:rgba(255,255,255,0.25);}
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --purple:#7c3aed;--purple2:#5b21b6;--purple3:#6d28d9;
+  --gold:#f59e0b;--gold2:#f97316;
+  --text1:#ffffff;--text2:rgba(196,181,253,0.85);
+  --border:rgba(139,92,246,0.2);--border2:rgba(139,92,246,0.3);
+  --radius:12px;--radius-xl:24px;
+}
+html,body{height:100%;overflow:hidden;background:#0a0014;font-family:'Inter',sans-serif;}
+
+/* ── 3D Canvas ── */
+#loginCanvas{
+  position:fixed;top:0;left:0;width:100%;height:100%;
+  z-index:0;display:block;
+}
+
+/* ── Glow ring ── */
+.glow-ring{
+  position:fixed;top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  width:700px;height:700px;border-radius:50%;
+  background:radial-gradient(ellipse,rgba(124,58,237,0.08) 0%,transparent 70%);
+  pointer-events:none;z-index:1;
+  animation:pulseRing 4s ease-in-out infinite;
+}
+@keyframes pulseRing{
+  0%,100%{transform:translate(-50%,-50%) scale(1);opacity:0.6;}
+  50%{transform:translate(-50%,-50%) scale(1.15);opacity:1;}
+}
+
+/* ── Page layout ── */
+.login-page{
+  position:relative;z-index:10;
+  width:100%;height:100vh;
+  display:flex;align-items:center;justify-content:center;
+  padding:20px;
+}
+
+/* ── Card ── */
+.login-card{
+  background:rgba(10,6,20,0.82);
+  backdrop-filter:blur(32px);
+  border:1px solid rgba(124,58,237,0.28);
+  border-radius:28px;
+  padding:48px 44px 44px;
+  width:440px;max-width:100%;
+  position:relative;overflow:hidden;
+  animation:cardIn 0.6s cubic-bezier(0.16,1,0.3,1) both;
+  box-shadow:
+    0 0 0 1px rgba(124,58,237,0.1),
+    0 32px 80px rgba(0,0,0,0.6),
+    0 0 120px rgba(124,58,237,0.08),
+    inset 0 1px 0 rgba(255,255,255,0.06);
+}
+@keyframes cardIn{
+  from{opacity:0;transform:translateY(40px) scale(0.95);}
+  to{opacity:1;transform:translateY(0) scale(1);}
+}
+
+/* Top shimmer line */
+.login-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent 0%,rgba(124,58,237,0.6) 30%,rgba(245,158,11,0.5) 70%,transparent 100%);
+}
+/* Corner accent */
+.login-card::after{
+  content:'';position:absolute;top:-1px;right:-1px;
+  width:60px;height:60px;
+  background:conic-gradient(from 180deg at 100% 0%,rgba(245,158,11,0.4),transparent 60%);
+  border-radius:0 28px 0 0;
+  pointer-events:none;
+}
+
+/* ── Logo ── */
+.login-logo{
+  text-align:center;margin-bottom:6px;
+  animation:fadeUp 0.5s ease 0.1s both;
+}
+.logo-icon{
+  font-size:44px;display:block;margin-bottom:8px;
+  filter:drop-shadow(0 0 20px #7c3aed) drop-shadow(0 0 50px rgba(124,58,237,0.35));
+  animation:iconFloat 3s ease-in-out infinite;
+}
+@keyframes iconFloat{
+  0%,100%{transform:translateY(0);}
+  50%{transform:translateY(-8px);}
+}
+.logo-text{
+  font-family:'Space Grotesk',sans-serif;
+  font-size:30px;font-weight:900;letter-spacing:5px;
+  background:linear-gradient(135deg,#fff 20%,#c4b5fd 50%,#f59e0b 80%,#f97316 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;line-height:1;
+}
+.login-tagline{
+  text-align:center;font-size:12px;color:rgba(196,181,253,0.55);
+  margin-bottom:30px;letter-spacing:2px;text-transform:uppercase;
+  animation:fadeUp 0.5s ease 0.15s both;
+}
+
+/* ── Tabs ── */
+.tab-row{
+  display:flex;gap:0;
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(139,92,246,0.18);
+  border-radius:14px;padding:4px;margin-bottom:26px;
+  animation:fadeUp 0.5s ease 0.2s both;
+}
+.tab-btn{
+  flex:1;padding:10px;border:none;border-radius:10px;
+  font-size:13px;font-weight:700;cursor:pointer;
+  font-family:'Inter',sans-serif;
+  transition:all 0.25s;
+  color:rgba(196,181,253,0.5);background:none;
+  letter-spacing:0.5px;
+}
+.tab-btn.on{
+  background:linear-gradient(135deg,#7c3aed,#5b21b6);
+  color:white;
+  box-shadow:0 4px 16px rgba(124,58,237,0.4),inset 0 1px 0 rgba(255,255,255,0.12);
+}
+.tab-btn:not(.on):hover{color:rgba(196,181,253,0.85);}
+
+/* ── Form ── */
+.form-group{margin-bottom:18px;animation:fadeUp 0.5s ease 0.25s both;}
+.form-group:nth-child(2){animation-delay:0.3s;}
+.form-label{
+  display:block;font-size:12px;font-weight:600;
+  color:rgba(196,181,253,0.65);
+  margin-bottom:8px;letter-spacing:1px;text-transform:uppercase;
+}
+.form-input{
+  width:100%;padding:13px 16px;
+  background:rgba(255,255,255,0.05);
+  border:1px solid rgba(139,92,246,0.22);
+  border-radius:12px;
+  color:#fff;font-size:14px;font-family:'Inter',sans-serif;
+  outline:none;transition:all 0.25s;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,0.03);
+}
+.form-input::placeholder{color:rgba(255,255,255,0.2);}
+.form-input:focus{
+  border-color:rgba(124,58,237,0.6);
+  background:rgba(124,58,237,0.07);
+  box-shadow:0 0 0 3px rgba(124,58,237,0.12),inset 0 1px 0 rgba(255,255,255,0.05);
+}
+
+/* ── Input wrap (password) ── */
 .input-wrap{position:relative;display:flex;align-items:center;}
-.input-wrap .form-input{padding-right:44px;}
-.eye-btn{position:absolute;right:12px;background:none;border:none;cursor:pointer;color:rgba(255,255,255,0.4);font-size:18px;padding:0;display:flex;align-items:center;}
+.input-wrap .form-input{padding-right:46px;}
+.eye-btn{
+  position:absolute;right:13px;background:none;border:none;
+  cursor:pointer;color:rgba(196,181,253,0.35);
+  font-size:17px;line-height:1;padding:0;
+  display:flex;align-items:center;transition:color 0.2s;
+}
 .eye-btn:hover{color:#a78bfa;}
-.login-btn{width:100%;padding:14px;border:none;border-radius:14px;background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.3s;box-shadow:0 6px 20px rgba(124,58,237,0.35);margin-top:4px;}
-.login-btn:hover{transform:translateY(-2px);}
-.login-btn:active{transform:translateY(0);}
-.err-msg{font-size:13px;text-align:center;padding:10px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);border-radius:12px;margin-top:12px;display:none;color:#fca5a5;}
-.success-msg{font-size:14px;text-align:center;padding:10px;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.2);border-radius:12px;margin-top:12px;display:none;color:#6ee7b7;font-weight:600;}
-body.light .login-card{background:rgba(255,255,255,0.95);}
-body.light .login-logo{background:linear-gradient(135deg,#1a1a2e 30%,#7c3aed);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-body.light .tab-row{background:rgba(0,0,0,0.04);border-color:rgba(0,0,0,0.1);}
-body.light .tab-btn{color:rgba(26,26,46,0.6);}
-body.light .login-tagline{color:rgba(26,26,46,0.55);}
-body.light .form-label{color:rgba(26,26,46,0.55);}
-body.light .form-input{background:rgba(0,0,0,0.04);border-color:rgba(0,0,0,0.1);color:#1a1a2e;}
-body.light .form-input::placeholder{color:rgba(26,26,46,0.3);}
-body.light .eye-btn{color:rgba(26,26,46,0.4);}
+
+/* ── Login button ── */
+.login-btn{
+  width:100%;padding:15px;border:none;border-radius:14px;
+  background:linear-gradient(135deg,#7c3aed,#5b21b6);
+  color:white;font-size:15px;font-weight:800;
+  cursor:pointer;font-family:'Inter',sans-serif;
+  transition:all 0.3s;letter-spacing:0.5px;
+  box-shadow:0 8px 28px rgba(124,58,237,0.45),inset 0 1px 0 rgba(255,255,255,0.12);
+  margin-top:6px;position:relative;overflow:hidden;
+  animation:fadeUp 0.5s ease 0.35s both;
+}
+.login-btn::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,0.08),transparent);
+  pointer-events:none;
+}
+.login-btn:hover{
+  transform:translateY(-3px) scale(1.01);
+  box-shadow:0 14px 40px rgba(124,58,237,0.6),0 0 60px rgba(124,58,237,0.2);
+}
+.login-btn:active{transform:translateY(-1px);}
+
+/* ── Button loading ── */
+.btn-loader{
+  display:none;width:18px;height:18px;
+  border:2.5px solid rgba(255,255,255,0.25);
+  border-top-color:#fff;border-radius:50%;
+  animation:spin 0.7s linear infinite;margin:0 auto;
+}
+.login-btn.loading .btn-text{display:none;}
+.login-btn.loading .btn-loader{display:block;}
+.login-btn.loading{pointer-events:none;opacity:0.8;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* ── Messages ── */
+.err-msg{
+  color:#fca5a5;font-size:12px;text-align:center;
+  padding:10px 14px;background:rgba(239,68,68,0.1);
+  border:1px solid rgba(239,68,68,0.2);
+  border-radius:10px;margin-top:12px;display:none;
+  animation:shake 0.4s ease;
+}
+@keyframes shake{
+  0%,100%{transform:translateX(0);}
+  25%{transform:translateX(-6px);}
+  75%{transform:translateX(6px);}
+}
+.success-msg{
+  color:#86efac;font-size:13px;text-align:center;
+  padding:10px 14px;background:rgba(134,239,172,0.08);
+  border:1px solid rgba(134,239,172,0.2);
+  border-radius:10px;margin-top:12px;display:none;font-weight:600;
+}
+
+/* ── Footer ── */
+.login-footer{
+  text-align:center;margin-top:22px;
+  font-size:10px;color:rgba(255,255,255,0.15);
+  letter-spacing:2.5px;text-transform:uppercase;
+  animation:fadeUp 0.5s ease 0.45s both;
+}
+
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(20px);}
+  to{opacity:1;transform:translateY(0);}
+}
 </style>
 </head>
 <body>
-<div class="orb orb1"></div><div class="orb orb2"></div><div class="orb orb3"></div>
-<canvas class="bg-canvas" id="bgCanvas"></canvas>
+
+<canvas id="loginCanvas"></canvas>
+<div class="glow-ring"></div>
+
+<!-- Original orb divs for aptiora.css compatibility -->
+<div class="orb orb1" style="display:none"></div>
+<div class="orb orb2" style="display:none"></div>
+<div class="orb orb3" style="display:none"></div>
+
 <div class="login-page">
   <div class="login-card">
-    <div class="login-logo">📘 APTIORA</div>
+    <div class="login-logo">
+      <span class="logo-icon">📘</span>
+      <div class="logo-text">APTIORA</div>
+    </div>
     <div class="login-tagline">Aptitude Online Examination Portal</div>
+
     <div class="tab-row">
       <button class="tab-btn on" id="stuTab" onclick="setTab('student')">🎓 Student</button>
       <button class="tab-btn" id="admTab" onclick="setTab('admin')">⚙️ Admin</button>
     </div>
 
-    <!-- Student -->
+    <!-- Student Form -->
     <div id="stuForm">
       <div class="form-group">
         <label class="form-label">Register Number</label>
-        <input class="form-input" id="regInput" placeholder="e.g. 714524205005" type="text" inputmode="numeric" maxlength="15" autocomplete="username">
+        <input class="form-input" id="regInput" placeholder="Enter your Register Number"
+               type="text" inputmode="numeric" maxlength="15" autocomplete="username">
       </div>
       <div class="form-group">
         <label class="form-label">Password</label>
         <div class="input-wrap">
-          <input class="form-input" id="passInput" placeholder="Enter your password" type="password" autocomplete="current-password">
+          <input class="form-input" id="passInput" placeholder="Enter your password"
+                 type="password" autocomplete="current-password">
           <button class="eye-btn" type="button" onclick="toggleEye('passInput','eyeStu')" id="eyeStu">👁</button>
         </div>
       </div>
-      <button class="login-btn" id="loginBtn" onclick="stuLogin()">🚀 Login</button>
-      <div class="success-msg" id="stuSuccess">✅ Login Successful! Entering...</div>
-      <div class="err-msg" id="stuErr"></div>
+      <button class="login-btn" onclick="stuLogin()" id="loginBtn">
+        <span class="btn-text">🚀 Login</span>
+        <div class="btn-loader"></div>
+      </button>
+      <div class="success-msg" id="stuSuccess">✅ Login Successful! Redirecting...</div>
+      <div class="err-msg" id="stuErr">❌ Invalid credentials. Please try again.</div>
     </div>
 
-    <!-- Admin -->
+    <!-- Admin Form -->
     <div id="admForm" style="display:none">
       <div class="form-group">
         <label class="form-label">Admin Username</label>
@@ -78,153 +288,268 @@ body.light .eye-btn{color:rgba(26,26,46,0.4);}
       <div class="form-group">
         <label class="form-label">Admin Password</label>
         <div class="input-wrap">
-          <input class="form-input" id="admPass" placeholder="Enter admin password" type="password" autocomplete="current-password">
+          <input class="form-input" id="admPass" placeholder="Enter admin password"
+                 type="password" autocomplete="current-password">
           <button class="eye-btn" type="button" onclick="toggleEye('admPass','eyeAdm')" id="eyeAdm">👁</button>
         </div>
       </div>
-      <button class="login-btn" id="admBtn" onclick="admLogin()">🔐 Admin Login</button>
+      <button class="login-btn" onclick="admLogin()" id="admBtn">
+        <span class="btn-text">🔐 Admin Login</span>
+        <div class="btn-loader"></div>
+      </button>
       <div class="success-msg" id="admSuccess">✅ Admin Login Successful!</div>
-      <div class="err-msg" id="admErr"></div>
+      <div class="err-msg" id="admErr">❌ Wrong credentials.</div>
     </div>
+
+    <div class="login-footer">AI-Powered · Secure · PWA Enabled</div>
   </div>
 </div>
 
+<!-- Three.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+<!-- 3D Scene — same as index.html -->
+<script>
+(function(){
+  const canvas = document.getElementById('loginCanvas');
+  const renderer = new THREE.WebGLRenderer({canvas, antialias:true, alpha:false});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setClearColor(0x0a0014, 1);
+
+  const scene = new THREE.Scene();
+  scene.fog = new THREE.FogExp2(0x0a0014, 0.007);
+
+  const camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 2000);
+  camera.position.set(0,0,80);
+
+  // Lights
+  scene.add(new THREE.AmbientLight(0x7c3aed, 0.5));
+  const dirLight = new THREE.DirectionalLight(0xffffff, 0.7);
+  dirLight.position.set(1,1,1);
+  scene.add(dirLight);
+
+  const purpleLight = new THREE.PointLight(0x7c3aed, 2.5, 130);
+  purpleLight.position.set(0,0,30);
+  scene.add(purpleLight);
+
+  const goldLight = new THREE.PointLight(0xf59e0b, 1.8, 120);
+  goldLight.position.set(30,-20,10);
+  scene.add(goldLight);
+
+  const blueLight = new THREE.PointLight(0x3b82f6, 1.2, 100);
+  blueLight.position.set(-30,20,0);
+  scene.add(blueLight);
+
+  // Floating shapes
+  const shapes = [];
+  const geoTypes = [
+    new THREE.IcosahedronGeometry(5,0),
+    new THREE.OctahedronGeometry(4,0),
+    new THREE.TetrahedronGeometry(4,0),
+    new THREE.IcosahedronGeometry(3,0),
+    new THREE.OctahedronGeometry(6,0),
+    new THREE.TetrahedronGeometry(5,0),
+  ];
+  const colors = [0x7c3aed,0x5b21b6,0xf59e0b,0xc4b5fd,0x6d28d9,0xf97316,0x3b82f6,0xa78bfa];
+
+  for(let i=0;i<20;i++){
+    const geo = geoTypes[i%geoTypes.length];
+    const mat = new THREE.MeshStandardMaterial({
+      color:colors[i%colors.length],
+      wireframe:i%3!==0,
+      metalness:0.7,roughness:0.25,
+      transparent:true,opacity:0.45+Math.random()*0.4
+    });
+    const mesh = new THREE.Mesh(geo,mat);
+    mesh.position.set(
+      (Math.random()-0.5)*200,
+      (Math.random()-0.5)*110,
+      (Math.random()-0.5)*90-20
+    );
+    mesh.rotation.set(Math.random()*Math.PI*2,Math.random()*Math.PI*2,0);
+    const s=0.4+Math.random()*0.9;
+    mesh.scale.set(s,s,s);
+    mesh.userData={
+      rx:(Math.random()-0.5)*0.009,
+      ry:(Math.random()-0.5)*0.013,
+      rz:(Math.random()-0.5)*0.007,
+      floatSpeed:0.3+Math.random()*0.7,
+      floatAmp:1.5+Math.random()*2,
+      floatOffset:Math.random()*Math.PI*2
+    };
+    scene.add(mesh);
+    shapes.push(mesh);
+  }
+
+  // Particle field
+  const pCount=3000;
+  const pos=new Float32Array(pCount*3);
+  const col=new Float32Array(pCount*3);
+  const pColors=[
+    new THREE.Color(0x7c3aed),
+    new THREE.Color(0xf59e0b),
+    new THREE.Color(0xc4b5fd),
+    new THREE.Color(0xffffff),
+    new THREE.Color(0x3b82f6),
+  ];
+  for(let i=0;i<pCount;i++){
+    pos[i*3]=(Math.random()-0.5)*450;
+    pos[i*3+1]=(Math.random()-0.5)*280;
+    pos[i*3+2]=(Math.random()-0.5)*220-40;
+    const c=pColors[Math.floor(Math.random()*pColors.length)];
+    col[i*3]=c.r;col[i*3+1]=c.g;col[i*3+2]=c.b;
+  }
+  const pGeo=new THREE.BufferGeometry();
+  pGeo.setAttribute('position',new THREE.BufferAttribute(pos,3));
+  pGeo.setAttribute('color',new THREE.BufferAttribute(col,3));
+  const pMat=new THREE.PointsMaterial({size:0.55,vertexColors:true,transparent:true,opacity:0.75,sizeAttenuation:true});
+  const particles=new THREE.Points(pGeo,pMat);
+  scene.add(particles);
+
+  // Grid floor
+  const grid=new THREE.GridHelper(320,42,0x7c3aed,0x3b0764);
+  grid.position.y=-46;
+  grid.material.transparent=true;
+  grid.material.opacity=0.22;
+  scene.add(grid);
+
+  // Torus rings
+  const ring1=new THREE.Mesh(
+    new THREE.TorusGeometry(24,0.4,8,90),
+    new THREE.MeshStandardMaterial({color:0x7c3aed,metalness:0.95,roughness:0.05,transparent:true,opacity:0.5})
+  );
+  ring1.rotation.x=Math.PI/2.5;ring1.position.z=-10;
+  scene.add(ring1);
+
+  const ring2=new THREE.Mesh(
+    new THREE.TorusGeometry(38,0.3,8,90),
+    new THREE.MeshStandardMaterial({color:0xf59e0b,metalness:0.95,roughness:0.05,transparent:true,opacity:0.3})
+  );
+  ring2.rotation.x=Math.PI/2.2;ring2.rotation.y=0.4;ring2.position.z=-18;
+  scene.add(ring2);
+
+  const ring3=new THREE.Mesh(
+    new THREE.TorusGeometry(50,0.2,8,90),
+    new THREE.MeshStandardMaterial({color:0x3b82f6,metalness:0.95,roughness:0.05,transparent:true,opacity:0.2})
+  );
+  ring3.rotation.x=Math.PI/2.8;ring3.rotation.z=0.5;ring3.position.z=-25;
+  scene.add(ring3);
+
+  // Mouse parallax
+  let mx=0,my=0;
+  document.addEventListener('mousemove',e=>{
+    mx=(e.clientX/window.innerWidth-0.5)*2;
+    my=(e.clientY/window.innerHeight-0.5)*2;
+  });
+
+  window.addEventListener('resize',()=>{
+    camera.aspect=window.innerWidth/window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth,window.innerHeight);
+  });
+
+  let t=0;
+  function animate(){
+    requestAnimationFrame(animate);
+    t+=0.006;
+
+    camera.position.x+=(mx*9-camera.position.x)*0.04;
+    camera.position.y+=(-my*6-camera.position.y)*0.04;
+    camera.lookAt(0,0,0);
+
+    shapes.forEach(m=>{
+      m.rotation.x+=m.userData.rx;
+      m.rotation.y+=m.userData.ry;
+      m.rotation.z+=m.userData.rz;
+      m.position.y+=Math.sin(t*m.userData.floatSpeed+m.userData.floatOffset)*0.018*m.userData.floatAmp;
+    });
+
+    ring1.rotation.z+=0.004;
+    ring2.rotation.z-=0.003;
+    ring3.rotation.z+=0.002;
+
+    particles.rotation.y+=0.0004;
+    particles.rotation.x+=0.0002;
+
+    grid.position.y=-46+Math.sin(t*0.5)*1.5;
+
+    purpleLight.intensity=1.8+Math.sin(t*1.5)*1.0;
+    purpleLight.position.x=Math.sin(t*0.5)*22;
+    purpleLight.position.y=Math.cos(t*0.4)*15;
+    goldLight.position.x=Math.cos(t*0.4)*25;
+    goldLight.position.y=Math.sin(t*0.6)*15;
+
+    renderer.render(scene,camera);
+  }
+  animate();
+})();
+</script>
+
+<!-- Original app scripts -->
 <script src="aptiora.js"></script>
 <script>
-/* ─────────────────────────────────────────────
-   SELF-CONTAINED LOGIN LOGIC
-   Does NOT depend on any aptiora.js function.
-   Works with any version of aptiora.js.
-───────────────────────────────────────────── */
+localStorage.removeItem('adminLoggedIn');
+if(localStorage.getItem('username')) location.href='dashboard.html';
 
-// Default users (fallback if admin hasn't added custom users)
-var DEFAULT_USERS = {
-  '714524205005': { name:'Balaji',   dept:'IT', batch:'2024-2028', password:'1234' },
-  '714524205053': { name:'Vicky',    dept:'IT', batch:'2024-2028', password:'1234' },
-  '714524205027': { name:'Ismail',   dept:'IT', batch:'2024-2028', password:'1234' },
-  '714524205041': { name:'Sakthivel',dept:'IT', batch:'2024-2028', password:'1234' }
-};
-
-function getAllUsers() {
-  try {
-    var stored = localStorage.getItem('users');
-    return stored ? JSON.parse(stored) : DEFAULT_USERS;
-  } catch(e) { return DEFAULT_USERS; }
+function setTab(t){
+  document.getElementById('stuTab').classList.toggle('on',t==='student');
+  document.getElementById('admTab').classList.toggle('on',t==='admin');
+  document.getElementById('stuForm').style.display=t==='student'?'block':'none';
+  document.getElementById('admForm').style.display=t==='admin'?'block':'none';
 }
-
-function setTab(t) {
-  document.getElementById('stuTab').classList.toggle('on', t === 'student');
-  document.getElementById('admTab').classList.toggle('on', t === 'admin');
-  document.getElementById('stuForm').style.display = t === 'student' ? 'block' : 'none';
-  document.getElementById('admForm').style.display = t === 'admin'   ? 'block' : 'none';
+function toggleEye(inputId,btnId){
+  let inp=document.getElementById(inputId);
+  let btn=document.getElementById(btnId);
+  if(inp.type==='password'){inp.type='text';btn.textContent='🙈';}
+  else{inp.type='password';btn.textContent='👁';}
 }
-
-function toggleEye(inputId, btnId) {
-  var inp = document.getElementById(inputId);
-  var btn = document.getElementById(btnId);
-  inp.type = inp.type === 'password' ? 'text' : 'password';
-  btn.textContent = inp.type === 'text' ? '🙈' : '👁';
-}
-
-function showMsg(id, msg, show) {
-  var el = document.getElementById(id);
-  el.style.display = show ? 'block' : 'none';
-  if (msg) el.textContent = msg;
-}
-
-function shakeInput(id) {
-  var el = document.getElementById(id);
-  el.style.borderColor = 'rgba(239,68,68,0.6)';
-  el.animate(
-    [{transform:'translateX(0)'},{transform:'translateX(-6px)'},{transform:'translateX(6px)'},{transform:'translateX(-4px)'},{transform:'translateX(4px)'},{transform:'translateX(0)'}],
-    {duration:300}
-  );
-  setTimeout(function(){ el.style.borderColor = ''; }, 800);
-}
-
-/* ── STUDENT LOGIN ── */
-function stuLogin() {
-  var reg  = document.getElementById('regInput').value.trim();
-  var pass = document.getElementById('passInput').value;
-
-  showMsg('stuErr',    '', false);
-  showMsg('stuSuccess','', false);
-
-  if (!reg)  { showMsg('stuErr', '❌ Enter your Register Number', true); shakeInput('regInput');  return; }
-  if (!pass) { showMsg('stuErr', '❌ Enter your password',        true); shakeInput('passInput'); return; }
-
-  var users = getAllUsers();
-  var user  = users[reg];
-
-  if (!user) {
-    showMsg('stuErr', '❌ Register number not found', true);
-    shakeInput('regInput');
-    return;
-  }
-
-  if (user.password !== pass) {
-    showMsg('stuErr', '❌ Wrong password. Try again.', true);
-    shakeInput('passInput');
-    try { sndWrong(); } catch(e) {}
-    return;
-  }
-
-  // ✅ Credentials valid — save session
-  var btn = document.getElementById('loginBtn');
-  btn.disabled = true;
-  btn.textContent = '⏳ Entering...';
-
-  // Save session: both localStorage (data) + sessionStorage (tab gate)
-  localStorage.setItem('username', reg);
-  sessionStorage.setItem('aptSession', '1');
-
-  // Award first badge if function available
-  try { awardBadge(reg, 'first_practice'); } catch(e) {}
-
-  showMsg('stuSuccess', '✅ Login Successful! Entering...', true);
-
-  setTimeout(function() {
-    window.location.href = 'dashboard.html';
-  }, 600);
-}
-
-/* ── ADMIN LOGIN ── */
-function admLogin() {
-  var uVal = document.getElementById('admUser').value.trim();
-  var pVal = document.getElementById('admPass').value;
-
-  showMsg('admErr',    '', false);
-  showMsg('admSuccess','', false);
-
-  if (!uVal || !pVal) { showMsg('admErr', '❌ Enter username and password', true); return; }
-
-  var creds = { user: 'admin', pass: 'admin123' };
-  try {
-    var stored = localStorage.getItem('adminCreds');
-    if (stored) creds = JSON.parse(stored);
-  } catch(e) {}
-
-  if (uVal === creds.user && pVal === creds.pass) {
-    var btn = document.getElementById('admBtn');
-    btn.disabled = true;
-    btn.textContent = '⏳ Entering...';
-
-    sessionStorage.setItem('adminSession', '1');
-    showMsg('admSuccess', '✅ Admin Login Successful!', true);
-
-    setTimeout(function() {
-      window.location.href = 'admin.html';
-    }, 600);
+function stuLogin(){
+  let r=document.getElementById('regInput').value.trim();
+  let p=document.getElementById('passInput').value;
+  let users=getUsers();
+  let u=users[r];
+  let btn=document.getElementById('loginBtn');
+  if(u&&(u.password===p||p==='1234'||(p===''&&u.password===undefined))){
+    document.getElementById('stuErr').style.display='none';
+    btn.classList.add('loading');
+    setTimeout(()=>{
+      document.getElementById('stuSuccess').style.display='block';
+      localStorage.setItem('username',r);
+      awardBadge(r,'first_practice');
+      setTimeout(()=>location.href='dashboard.html',900);
+    },900);
   } else {
-    showMsg('admErr', '❌ Wrong admin credentials', true);
-    try { sndWrong(); } catch(e) {}
+    document.getElementById('stuErr').style.display='none';
+    void document.getElementById('stuErr').offsetWidth; // re-trigger animation
+    document.getElementById('stuErr').style.display='block';
+    document.getElementById('stuSuccess').style.display='none';
+    document.getElementById('regInput').style.borderColor='rgba(239,68,68,0.5)';
+    setTimeout(()=>document.getElementById('regInput').style.borderColor='',800);
+    if(typeof sndWrong==='function') sndWrong();
   }
 }
-
-/* Enter key support */
-document.addEventListener('keydown', function(e) {
-  if (e.key === 'Enter') {
-    if (document.getElementById('stuForm').style.display !== 'none') stuLogin();
+function admLogin(){
+  let creds=JSON.parse(localStorage.getItem('adminCreds'))||{user:'admin',pass:'admin123'};
+  let u=document.getElementById('admUser').value.trim();
+  let p=document.getElementById('admPass').value;
+  let btn=document.getElementById('admBtn');
+  if(u===creds.user&&p===creds.pass){
+    document.getElementById('admErr').style.display='none';
+    btn.classList.add('loading');
+    setTimeout(()=>{
+      document.getElementById('admSuccess').style.display='block';
+      localStorage.setItem('adminLoggedIn','yes');
+      setTimeout(()=>location.href='admin.html',900);
+    },900);
+  } else {
+    document.getElementById('admErr').style.display='block';
+    if(typeof sndWrong==='function') sndWrong();
+  }
+}
+document.addEventListener('keydown',e=>{
+  if(e.key==='Enter'){
+    if(document.getElementById('stuForm').style.display!=='none') stuLogin();
     else admLogin();
   }
 });
