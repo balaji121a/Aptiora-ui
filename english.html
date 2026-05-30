@@ -113,5 +113,126 @@ async function gradeEssay(prompt){
   catch(e){fb.innerHTML='<span style="color:#fca5a5">Connection error. Try again.</span>';}
 }
 </script>
+
+<!-- ══ THREE.JS 3D BACKGROUND ══ -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function(){
+  // Remove old 2D canvas if present
+  var old=document.getElementById('bgCanvas');
+  if(old)old.style.display='none';
+
+  var c=document.createElement('canvas');
+  c.id='threeCanvas3D';
+  c.style.cssText='position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;';
+  document.body.insertBefore(c,document.body.firstChild);
+
+  var renderer=new THREE.WebGLRenderer({canvas:c,antialias:true,alpha:false});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+  renderer.setSize(window.innerWidth,window.innerHeight);
+  renderer.setClearColor(0x04000e,1);
+
+  var scene=new THREE.Scene();
+  scene.fog=new THREE.FogExp2(0x04000e,0.007);
+
+  var camera=new THREE.PerspectiveCamera(60,window.innerWidth/window.innerHeight,0.1,2000);
+  camera.position.set(0,0,80);
+
+  scene.add(new THREE.AmbientLight(0x7c3aed,0.4));
+  var dl=new THREE.DirectionalLight(0xffffff,0.6);
+  dl.position.set(1,1,1);scene.add(dl);
+
+  var pl1=new THREE.PointLight(0x7c3aed,2.5,140);
+  pl1.position.set(0,0,30);scene.add(pl1);
+  var pl2=new THREE.PointLight(0xd4af37,1.8,120);
+  pl2.position.set(30,-20,10);scene.add(pl2);
+  var pl3=new THREE.PointLight(0x3b82f6,1.2,100);
+  pl3.position.set(-30,20,0);scene.add(pl3);
+
+  var geos=[
+    new THREE.IcosahedronGeometry(5,0),
+    new THREE.OctahedronGeometry(4,0),
+    new THREE.TetrahedronGeometry(4,0),
+    new THREE.IcosahedronGeometry(3,0),
+    new THREE.OctahedronGeometry(6,0),
+    new THREE.TetrahedronGeometry(5,0)
+  ];
+  var cols=[0x7c3aed,0x5b21b6,0xd4af37,0xc4b5fd,0x6d28d9,0xf97316,0x3b82f6,0xa78bfa];
+  var shapes=[];
+  for(var i=0;i<20;i++){
+    var mat=new THREE.MeshStandardMaterial({
+      color:cols[i%cols.length],wireframe:i%3!==0,
+      metalness:0.75,roughness:0.2,transparent:true,opacity:0.4+Math.random()*0.4
+    });
+    var m=new THREE.Mesh(geos[i%geos.length],mat);
+    m.position.set((Math.random()-0.5)*200,(Math.random()-0.5)*110,(Math.random()-0.5)*90-20);
+    var s=0.4+Math.random()*0.9;m.scale.set(s,s,s);
+    m.userData={rx:(Math.random()-0.5)*0.009,ry:(Math.random()-0.5)*0.013,rz:(Math.random()-0.5)*0.007,
+      fs:0.3+Math.random()*0.7,fa:1.5+Math.random()*2,fo:Math.random()*Math.PI*2};
+    scene.add(m);shapes.push(m);
+  }
+
+  var pN=3000,pp=new Float32Array(pN*3),pc=new Float32Array(pN*3);
+  var pC=[new THREE.Color(0x7c3aed),new THREE.Color(0xd4af37),new THREE.Color(0xc4b5fd),
+          new THREE.Color(0xffffff),new THREE.Color(0x3b82f6)];
+  for(var i=0;i<pN;i++){
+    pp[i*3]=(Math.random()-0.5)*450;pp[i*3+1]=(Math.random()-0.5)*280;pp[i*3+2]=(Math.random()-0.5)*220-40;
+    var cl=pC[Math.floor(Math.random()*pC.length)];
+    pc[i*3]=cl.r;pc[i*3+1]=cl.g;pc[i*3+2]=cl.b;
+  }
+  var pg=new THREE.BufferGeometry();
+  pg.setAttribute('position',new THREE.BufferAttribute(pp,3));
+  pg.setAttribute('color',new THREE.BufferAttribute(pc,3));
+  var pts=new THREE.Points(pg,new THREE.PointsMaterial({size:0.55,vertexColors:true,transparent:true,opacity:0.72,sizeAttenuation:true}));
+  scene.add(pts);
+
+  var grid=new THREE.GridHelper(320,42,0x7c3aed,0x3b0764);
+  grid.position.y=-46;grid.material.transparent=true;grid.material.opacity=0.2;
+  scene.add(grid);
+
+  var r1=new THREE.Mesh(new THREE.TorusGeometry(24,0.4,8,90),
+    new THREE.MeshStandardMaterial({color:0x7c3aed,metalness:0.95,roughness:0.05,transparent:true,opacity:0.5}));
+  r1.rotation.x=Math.PI/2.5;r1.position.z=-10;scene.add(r1);
+
+  var r2=new THREE.Mesh(new THREE.TorusGeometry(38,0.3,8,90),
+    new THREE.MeshStandardMaterial({color:0xd4af37,metalness:0.95,roughness:0.05,transparent:true,opacity:0.3}));
+  r2.rotation.x=Math.PI/2.2;r2.rotation.y=0.4;r2.position.z=-18;scene.add(r2);
+
+  var r3=new THREE.Mesh(new THREE.TorusGeometry(50,0.2,8,90),
+    new THREE.MeshStandardMaterial({color:0x3b82f6,metalness:0.95,roughness:0.05,transparent:true,opacity:0.2}));
+  r3.rotation.x=Math.PI/2.8;r3.rotation.z=0.5;r3.position.z=-25;scene.add(r3);
+
+  var mx=0,my=0;
+  document.addEventListener('mousemove',function(e){
+    mx=(e.clientX/window.innerWidth-0.5)*2;my=(e.clientY/window.innerHeight-0.5)*2;
+  });
+  window.addEventListener('resize',function(){
+    camera.aspect=window.innerWidth/window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth,window.innerHeight);
+  });
+
+  var t=0;
+  function animate(){
+    requestAnimationFrame(animate);t+=0.006;
+    camera.position.x+=(mx*9-camera.position.x)*0.04;
+    camera.position.y+=(-my*6-camera.position.y)*0.04;
+    camera.lookAt(0,0,0);
+    shapes.forEach(function(m){
+      m.rotation.x+=m.userData.rx;m.rotation.y+=m.userData.ry;m.rotation.z+=m.userData.rz;
+      m.position.y+=Math.sin(t*m.userData.fs+m.userData.fo)*0.018*m.userData.fa;
+    });
+    r1.rotation.z+=0.004;r2.rotation.z-=0.003;r3.rotation.z+=0.002;
+    pts.rotation.y+=0.0004;pts.rotation.x+=0.0002;
+    grid.position.y=-46+Math.sin(t*0.5)*1.5;
+    pl1.intensity=1.8+Math.sin(t*1.5)*1.0;
+    pl1.position.x=Math.sin(t*0.5)*22;pl1.position.y=Math.cos(t*0.4)*15;
+    pl2.position.x=Math.cos(t*0.4)*25;pl2.position.y=Math.sin(t*0.6)*15;
+    renderer.render(scene,camera);
+  }
+  animate();
+})();
+</script>
+
 </body>
 </html>
